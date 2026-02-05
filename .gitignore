@@ -1,0 +1,10 @@
+# Lab/test files (not needed in production)
+color-lab.html
+logo-lab.html
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo

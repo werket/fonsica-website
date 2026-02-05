@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Fonsica — iGaming & Lottery Consultant</title>
+    <meta name="description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, and market entry.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --white: #fafafa;
+            --gray: #6b6b6b;
+            --gray-light: #e5e5e5;
+            --accent: #14b8a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+        }
+
+        .mono {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem clamp(1.5rem, 5vw, 4rem);
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--white);
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--white);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--white);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: var(--black);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+        }
+
+        .hero-label {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--gray);
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 12vw, 10rem);
+            line-height: 0.9;
+            margin-bottom: 3rem;
+            max-width: 12ch;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+        }
+
+        .hero-intro {
+            max-width: 45ch;
+            color: var(--gray);
+            font-size: 1.125rem;
+            line-height: 1.7;
+        }
+
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--white);
+            transition: gap 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            gap: 1.5rem;
+        }
+
+        .hero-cta span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .arrow {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-cta:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            right: clamp(1.5rem, 5vw, 4rem);
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+        }
+
+        .scroll-indicator span {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: var(--gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: var(--white);
+            animation: scrollDown 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollDown {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(400%); }
+        }
+
+        /* Section base */
+        section {
+            padding: clamp(4rem, 10vw, 8rem) 0;
+        }
+
+        .section-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            align-items: end;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            font-size: 1.125rem;
+            line-height: 1.7;
+            max-width: 50ch;
+        }
+
+        /* About Section */
+        #about {
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: clamp(2rem, 8vw, 6rem);
+        }
+
+        .about-image {
+            aspect-ratio: 4/5;
+            background: var(--gray-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            border: 1px dashed var(--gray);
+        }
+
+        .image-placeholder .mono {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .image-placeholder p {
+            color: var(--gray);
+            font-size: 0.875rem;
+            max-width: 30ch;
+        }
+
+        .about-content {
+            padding-top: 2rem;
+        }
+
+        .about-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            font-family: 'Instrument Serif', Georgia, serif;
+        }
+
+        .about-text em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .expertise-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .expertise-item {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--black);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .expertise-item:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* Services Section */
+        #services {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        #services .section-header p {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .services-list {
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .service-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 4rem;
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            align-items: start;
+            transition: background 0.3s ease;
+            cursor: default;
+        }
+
+        .service-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .service-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--accent);
+        }
+
+        .service-content h3 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .service-content p {
+            color: rgba(255,255,255,0.5);
+            max-width: 50ch;
+            line-height: 1.7;
+        }
+
+        .service-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: right;
+        }
+
+        .service-tags span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Speaking Section */
+        #speaking {
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .speaking-grid {
+            display: grid;
+            gap: 1px;
+            background: var(--gray-light);
+        }
+
+        .speaking-item {
+            display: grid;
+            grid-template-columns: 200px 1fr auto;
+            gap: 3rem;
+            padding: 2rem;
+            background: var(--white);
+            transition: background 0.3s ease;
+        }
+
+        .speaking-item:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .speaking-item:hover .speaking-meta,
+        .speaking-item:hover .speaking-link {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .speaking-item:hover .speaking-link:hover {
+            color: var(--accent);
+        }
+
+        .speaking-meta {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .speaking-meta strong {
+            display: block;
+            color: var(--black);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .speaking-item:hover .speaking-meta strong {
+            color: var(--white);
+        }
+
+        .speaking-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .speaking-content p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .speaking-item:hover .speaking-content p {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .speaking-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            align-self: center;
+            transition: color 0.3s ease;
+        }
+
+        .speaking-link:hover {
+            color: var(--accent);
+        }
+
+        /* Contact Section */
+        #contact {
+            background: var(--black);
+            color: var(--white);
+            padding: clamp(6rem, 15vw, 12rem) 0;
+        }
+
+        .contact-headline {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            line-height: 1.1;
+            margin-bottom: 4rem;
+            max-width: 20ch;
+        }
+
+        .contact-headline em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .contact-card {
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .contact-card .mono {
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 1rem;
+        }
+
+        .contact-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-card p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-inner p {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.4);
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+        }
+
+        /* Mobile menu button */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .mobile-menu span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--white);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .mobile-menu span:first-child {
+            transform: translateY(-4px);
+        }
+
+        .mobile-menu span:last-child {
+            transform: translateY(4px);
+        }
+
+        .mobile-menu.active span:first-child {
+            transform: translateY(1px) rotate(45deg);
+        }
+
+        .mobile-menu.active span:last-child {
+            transform: translateY(-1px) rotate(-45deg);
+        }
+
+        /* Mobile menu overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--black);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-overlay nav {
+            position: static;
+            mix-blend-mode: normal;
+        }
+
+        .mobile-overlay-links {
+            list-style: none;
+            text-align: center;
+        }
+
+        .mobile-overlay-links li {
+            margin: 1.5rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-overlay.active .mobile-overlay-links li {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-overlay.active .mobile-overlay-links li:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-overlay.active .mobile-overlay-links li:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-overlay.active .mobile-overlay-links li:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-overlay.active .mobile-overlay-links li:nth-child(4) { transition-delay: 0.25s; }
+
+        .mobile-overlay-links a {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .mobile-overlay-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-overlay-footer {
+            position: absolute;
+            bottom: 3rem;
+            text-align: center;
+        }
+
+        .mobile-overlay-footer a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray);
+            margin: 0 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .mobile-overlay-footer a:hover {
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .section-header {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-item {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .service-tags {
+                flex-direction: row;
+                text-align: left;
+            }
+
+            .speaking-item {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: clamp(2.5rem, 15vw, 5rem);
+            }
+
+            .scroll-indicator {
+                display: none;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="logo">Fonsica</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#speaking">Speaking</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="mobile-menu" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Overlay Menu -->
+    <div class="mobile-overlay" id="mobile-overlay">
+        <ul class="mobile-overlay-links">
+            <li><a href="#about" class="mobile-nav-link">About</a></li>
+            <li><a href="#services" class="mobile-nav-link">Services</a></li>
+            <li><a href="#speaking" class="mobile-nav-link">Speaking</a></li>
+            <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
+        </ul>
+        <div class="mobile-overlay-footer">
+            <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank">LinkedIn</a>
+            <a href="mailto:adam@fonsica.se">Email</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="scroll-indicator">
+            <span class="mono">
+                Scroll
+                <div class="scroll-line"></div>
+            </span>
+        </div>
+
+        <div class="hero-content">
+            <span class="mono hero-label">iGaming & Lottery Consultant</span>
+            <h1>Bridging <em>gaming</em> and gambling</h1>
+        </div>
+
+        <div class="hero-bottom">
+            <p class="hero-intro">
+                15+ years helping lottery operators and iGaming companies
+                innovate, expand, and connect with the next generation of players.
+            </p>
+            <a href="#contact" class="hero-cta">
+                <span>Start a conversation</span>
+                <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image reveal">
+                    <img src="images/BA3823E9-2356-4C6E-A471-8863015F6E4F (1).jpeg" alt="Adam Fonsica" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="about-content reveal">
+                    <p class="about-text">
+                        I work at the intersection of <em>traditional gaming</em> and modern gambling—understanding both worlds allows me to help operators create products that resonate with today's players while respecting the heritage of lottery gaming.
+                    </p>
+                    <p class="about-text">
+                        From the Nordic region's most successful lottery brands to emerging markets in the UAE and North America, I've shaped products and strategies that drive <em>real results</em>.
+                    </p>
+                    <div class="expertise-list">
+                        <span class="expertise-item">iLottery</span>
+                        <span class="expertise-item">Product Strategy</span>
+                        <span class="expertise-item">Game Design</span>
+                        <span class="expertise-item">Digital Transformation</span>
+                        <span class="expertise-item">Market Entry</span>
+                        <span class="expertise-item">Player Experience</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>What I do</h2>
+                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming.</p>
+            </div>
+
+            <div class="services-list">
+                <div class="service-item reveal">
+                    <span class="service-number">01</span>
+                    <div class="service-content">
+                        <h3>Product Strategy & Development</h3>
+                        <p>From concept to launch—building products players love and that drive sustainable revenue. Product roadmaps, game design consultation, player experience optimization, and competitive positioning.</p>
+                    </div>
+                    <div class="service-tags">
+                        <span>Roadmaps</span>
+                        <span>Game Design</span>
+                        <span>UX Strategy</span>
+                    </div>
+                </div>
+
+                <div class="service-item reveal">
+                    <span class="service-number">02</span>
+                    <div class="service-content">
+                        <h3>Market Entry & Licensing</h3>
+                        <p>Navigate new markets with confidence. I provide guidance on regulatory landscapes, market opportunity assessment, go-to-market strategy, and partnership identification.</p>
+                    </div>
+                    <div class="service-tags">
+                        <span>Regulation</span>
+                        <span>Go-to-market</span>
+                        <span>Partnerships</span>
+                    </div>
+                </div>
+
+                <div class="service-item reveal">
+                    <span class="service-number">03</span>
+                    <div class="service-content">
+                        <h3>Advisory & Board Roles</h3>
+                        <p>Strategic guidance for companies at any stage—from startups seeking direction to established operators pursuing growth. Available for advisory, board participation, and interim executive roles.</p>
+                    </div>
+                    <div class="service-tags">
+                        <span>Advisory</span>
+                        <span>Board</span>
+                        <span>Due Diligence</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Speaking Section -->
+    <section id="speaking">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Speaking & Media</h2>
+                <p>Sharing perspectives on the future of lotteries, Gen Z engagement, and digital transformation at industry events.</p>
+            </div>
+
+            <div class="speaking-hero reveal" style="margin-bottom: 3rem; overflow: hidden;">
+                <img src="images/IMG_5139.jpeg" alt="Adam Fonsica speaking at conference" style="width: 100%; height: auto; display: block;">
+            </div>
+
+            <div class="speaking-grid">
+                <a href="https://sigma.world/news/can-modernizing-luck-bring-the-worlds-oldest-gamble-online/" target="_blank" class="speaking-item reveal">
+                    <div class="speaking-meta">
+                        <strong>Dec 2025</strong>
+                        Colombo, Sri Lanka
+                    </div>
+                    <div class="speaking-content">
+                        <h3>Modernising Digital Lottery for Gen Z</h3>
+                        <p>Keynote at SiGMA South Asia on moving the world's oldest gamble into a digital-first era</p>
+                    </div>
+                    <span class="speaking-link">
+                        Read article
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://www.gamingnewscanada.ca/p/random-state-bets-on-ontario-with" target="_blank" class="speaking-item reveal">
+                    <div class="speaking-meta">
+                        <strong>Jul 2025</strong>
+                        Podcast
+                    </div>
+                    <div class="speaking-content">
+                        <h3>Gaming News Canada Show</h3>
+                        <p>From poker to running an online lottery and bingo business—the full journey</p>
+                    </div>
+                    <span class="speaking-link">
+                        Listen now
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://sigma.world/news/uae-ilottery-launch-random-state-coo-adam-fonsica-shares-vision/" target="_blank" class="speaking-item reveal">
+                    <div class="speaking-meta">
+                        <strong>Jun 2025</strong>
+                        SiGMA News
+                    </div>
+                    <div class="speaking-content">
+                        <h3>UAE iLottery Launch — Exclusive Interview</h3>
+                        <p>Gamifying the future of lottery in one of the world's most dynamic emerging markets</p>
+                    </div>
+                    <span class="speaking-link">
+                        Read article
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <div class="speaking-item reveal">
+                    <div class="speaking-meta">
+                        <strong>2025</strong>
+                        Lisbon, Portugal
+                    </div>
+                    <div class="speaking-content">
+                        <h3>SBC Summit First Pitch Competition</h3>
+                        <p>Judge—evaluating startups innovating in sports betting and iGaming</p>
+                    </div>
+                    <span class="speaking-link" style="visibility: hidden;">—</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="contact-headline reveal">Let's build something <em>remarkable</em> together</h2>
+
+            <div class="contact-grid">
+                <a href="mailto:adam@fonsica.se" class="contact-card reveal">
+                    <span class="mono">Email</span>
+                    <h3>adam@fonsica.se</h3>
+                    <p>For inquiries and proposals</p>
+                </a>
+
+                <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank" class="contact-card reveal">
+                    <span class="mono">LinkedIn</span>
+                    <h3>Connect with me</h3>
+                    <p>Let's expand our networks</p>
+                </a>
+
+                <a href="#" class="contact-card reveal">
+                    <span class="mono">Schedule</span>
+                    <h3>Book a call</h3>
+                    <p>30-minute intro conversation</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <p>&copy; 2025 Adam Fonsica. Gothenburg, Sweden.</p>
+                <div class="footer-links">
+                    <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank">LinkedIn</a>
+                    <a href="mailto:adam@fonsica.se">Email</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Reveal animations on scroll
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        reveals.forEach(el => observer.observe(el));
+
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        function toggleMobileMenu() {
+            mobileMenuBtn.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileOverlay.classList.contains('active') ? 'hidden' : '';
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                toggleMobileMenu();
+                setTimeout(() => {
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 300);
+            });
+        });
+
+        // Smooth scroll for desktop
+        document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
