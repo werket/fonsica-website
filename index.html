@@ -66,7 +66,18 @@
             top: 0;
             width: 100%;
             z-index: 1000;
-            mix-blend-mode: difference;
+            background: transparent;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            border-bottom: 1px solid transparent;
+        }
+
+        nav.scrolled {
+            background: var(--black);
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        nav.scrolled .nav-inner {
+            padding: 1rem clamp(1.5rem, 5vw, 4rem);
         }
 
         .nav-inner {
@@ -74,6 +85,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 2rem clamp(1.5rem, 5vw, 4rem);
+            transition: padding 0.3s ease;
         }
 
         .logo {
@@ -1011,6 +1023,18 @@
     </footer>
 
     <script>
+        // Navigation scroll effect
+        const nav = document.querySelector('nav');
+        function checkNavScroll() {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+        window.addEventListener('scroll', checkNavScroll);
+        checkNavScroll();
+
         // Reveal animations on scroll
         const reveals = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
