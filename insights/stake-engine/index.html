@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stake Engine Intelligence &mdash; Adam Fonsica</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #161618;
+    --bg-card: #1e1e20;
+    --bg-hover: #2a2a2c;
+    --text-primary: #fafafa;
+    --text-secondary: #8a8a8a;
+    --text-tertiary: #6b6b6b;
+    --accent: #14b8a6;
+    --accent-green: #34d399;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #a78bfa;
+    --accent-teal: #14b8a6;
+    --accent-pink: #f472b6;
+    --border: rgba(255,255,255,0.06);
+    --glass: rgba(10,10,10,0.80);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .serif { font-family: 'Instrument Serif', Georgia, serif; }
+  .mono { font-family: 'Space Mono', monospace; }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(0,0,0,0.72);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+  .nav-brand span { color: var(--text-tertiary); font-weight: 400; font-size: 12px; }
+  .nav-brand a { color: inherit; text-decoration: none; }
+  .nav-brand a:hover { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: visible;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(20,184,166,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .hero h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(52px, 9vw, 88px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat-number {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .stat-blue .hero-stat-number { color: var(--accent); }
+  .stat-green .hero-stat-number { color: var(--accent-green); }
+  .stat-orange .hero-stat-number { color: var(--accent-orange); }
+  .stat-purple .hero-stat-number { color: var(--accent-purple); }
+  .hero-stat-number { font-family: 'Space Mono', monospace; font-weight: 700; }
+
+  /* ===== SECTIONS ===== */
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 24px;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(34px, 5vw, 52px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  /* ===== INSIGHT CARDS (infographics) ===== */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    margin-bottom: 80px;
+  }
+  .insight-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    overflow: visible;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .insight-card.visible { opacity: 1; transform: translateY(0); }
+  .insight-card:hover { border-color: rgba(255,255,255,0.15); }
+  .insight-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .insight-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .insight-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .insight-big-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .insight-card .glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    top: -60px;
+    right: -60px;
+    pointer-events: none;
+    clip-path: inset(-20px -20px -20px -20px round 16px);
+  }
+
+  /* ===== GAME GRID ===== */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .game-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  .game-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+  .game-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 8px 40px rgba(20,184,166,0.12);
+  }
+  .game-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    background: var(--bg-card);
+  }
+  .game-info {
+    padding: 14px;
+  }
+  .game-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .game-provider {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .game-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .game-players {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-green);
+  }
+  .game-players .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); }
+  .game-bets {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .game-rank {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .game-card-inner { position: relative; }
+  .challenge-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--accent-orange);
+    color: #000;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* ===== PROVIDER TABLE ===== */
+  .provider-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .provider-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .provider-table th.right { text-align: right; }
+  .provider-table td {
+    padding: 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .provider-table td.right { text-align: right; }
+  .provider-table tr {
+    transition: background 0.2s;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .provider-table tr.visible { opacity: 1; transform: translateX(0); }
+  .provider-table tbody tr:hover { background: var(--bg-elevated); }
+  .provider-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .provider-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  .provider-rank.gold { background: linear-gradient(135deg, #b8860b, #ffd700); color: #000; }
+  .provider-rank.silver { background: linear-gradient(135deg, #71706e, #c0c0c0); color: #000; }
+  .provider-rank.bronze { background: linear-gradient(135deg, #8b4513, #cd7f32); color: #000; }
+  .bar-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .bar-value { font-weight: 600; font-size: 14px; min-width: 44px; text-align: right; }
+  .bar-track {
+    width: 120px;
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 0;
+  }
+  .bar-fill.blue { background: var(--accent); }
+  .bar-fill.green { background: var(--accent-green); }
+  .bar-fill.orange { background: var(--accent-orange); }
+
+  /* ===== MARKET SPLIT ===== */
+  .split-visual {
+    display: flex;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--bg-elevated);
+  }
+  .split-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .split-bar.com { background: var(--accent); width: 0; }
+  .split-bar.us { background: var(--accent-purple); width: 0; }
+  .split-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .split-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .split-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* ===== DISTRIBUTION CHART ===== */
+  .dist-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    height: 240px;
+    padding: 0 20px;
+    margin-bottom: 12px;
+  }
+  .dist-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .dist-bar {
+    width: 100%;
+    border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+    transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 0;
+    position: relative;
+    min-width: 40px;
+  }
+  .dist-bar-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+  .dist-bar-value {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ===== TAKEAWAYS ===== */
+  .takeaway-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .takeaway {
+    display: flex;
+    gap: 20px;
+    padding: 28px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .takeaway.visible { opacity: 1; transform: translateY(0); }
+  .takeaway-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 48px;
+    opacity: 0.5;
+  }
+  .takeaway h4 { font-family: 'Instrument Serif', Georgia, serif; font-size: 20px; font-weight: 400; margin-bottom: 8px; }
+  .takeaway p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 60px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  footer p { font-size: 12px; color: var(--text-tertiary); }
+  .footer-logo { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ===== DIVIDER ===== */
+  .section-divider {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero-stats { gap: 24px; }
+    .hero-stat-number { font-size: 40px; }
+    .insights-grid { grid-template-columns: 1fr; }
+    .games-grid { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { display: none; }
+    .bar-track { width: 60px; }
+    .provider-table { font-size: 12px; }
+    section { padding: 60px 16px; }
+  }
+
+  /* ===== FILTER PILLS ===== */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .filter-pill {
+    padding: 7px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .filter-pill:hover { border-color: var(--text-tertiary); color: var(--text-primary); }
+  .filter-pill.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* ===== SCROLL COUNTER ANIMATION ===== */
+  .count-up { transition: all 0.3s; }
+
+  /* ===== CATEGORY PERFORMANCE ===== */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+  .cat-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 24px;
+    position: relative;
+    overflow: visible;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: default;
+  }
+  .cat-card.visible { opacity: 1; transform: translateY(0); }
+  .cat-card:hover { border-color: rgba(255,255,255,0.12); }
+  .cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .cat-name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .cat-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .cat-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .cat-stat-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .cat-stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .cat-bar-row {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-bar-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    width: 70px;
+    text-align: right;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .cat-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cat-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 0;
+  }
+  .cat-top-game {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+  .cat-top-game strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* Category efficiency ranking */
+  .cat-rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cat-rank-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cat-rank-row.visible { opacity: 1; transform: translateX(0); }
+  .cat-rank-pos {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 40px;
+    text-align: center;
+    opacity: 0.6;
+  }
+  .cat-rank-info { flex: 1; }
+  .cat-rank-name {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .cat-rank-detail {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+  .cat-rank-metric {
+    text-align: right;
+  }
+  .cat-rank-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .cat-rank-unit {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .cat-rank-bar {
+    width: 140px;
+  }
+  .cat-rank-bar-track {
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .cat-rank-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 0;
+  }
+
+  .cat-section-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 60px;
+  }
+  @media (max-width: 768px) {
+    .cat-section-split { grid-template-columns: 1fr; }
+    .cat-rank-bar { width: 80px; }
+  }
+
+  /* ===== INFO TOOLTIPS ===== */
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--text-tertiary);
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: help;
+    position: relative;
+    vertical-align: middle;
+    margin-left: 6px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .info-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(20,184,166,0.08);
+  }
+  .info-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e22;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    width: 300px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    text-transform: none;
+    letter-spacing: 0;
+    text-align: left;
+  }
+  .info-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e1e22;
+  }
+  .info-btn:hover .info-tooltip {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .info-tooltip strong { color: var(--text-primary); font-weight: 600; }
+  .info-tooltip a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .info-tooltip a:hover { text-decoration: underline; }
+
+  /* Category example links */
+  .cat-examples {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cat-example-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(20,184,166,0.08);
+    border: 1px solid rgba(20,184,166,0.15);
+    transition: all 0.2s;
+  }
+  .cat-example-link:hover {
+    background: rgba(20,184,166,0.15);
+    border-color: var(--accent);
+  }
+  .cat-example-link .arrow { font-size: 9px; opacity: 0.7; }
+
+  .game-cat-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand"><a href="https://fonsica.se" target="_blank">Adam Fonsica</a> <span>&middot; Game Intelligence</span></div>
+    <div class="nav-links">
+      <a href="#insights">Insights</a>
+      <a href="#categories">Categories</a>
+      <a href="#games">Top Games</a>
+      <a href="#providers">Providers</a>
+      <a href="#market">Markets</a>
+      <a href="#takeaways">Takeaways</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><div class="dot"></div> Live data &middot; February 14, 2026</div>
+  <h1>Stake Engine <span class="info-btn" style="font-size:16px; vertical-align:super;">i<div class="info-tooltip"><strong>Stake Engine</strong> is Stake.com's RGS platform for indie game studios. This data does NOT include Stake Originals (Crash, Dice, etc.) or major providers (Pragmatic Play, Evolution, etc.) — only indie games built on the Stake Engine SDK.</div></span><br><em>Game Intelligence</em></h1>
+  <p>Real-time performance analytics across 626 games and 180 providers. Data-driven insights into what drives player engagement in iGaming.</p>
+  <div class="hero-stats">
+    <div class="hero-stat stat-blue">
+      <div class="hero-stat-number" data-count="626">0</div>
+      <div class="hero-stat-label">Games Tracked</div>
+    </div>
+    <div class="hero-stat stat-green">
+      <div class="hero-stat-number" data-count="5210">0</div>
+      <div class="hero-stat-label">Live Players</div>
+    </div>
+    <div class="hero-stat stat-orange">
+      <div class="hero-stat-number" data-count="180">0</div>
+      <div class="hero-stat-label">Providers</div>
+    </div>
+    <div class="hero-stat stat-purple">
+      <div class="hero-stat-number" data-count="2581">0</div>
+      <div class="hero-stat-label">Million Bets</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- KEY INSIGHTS -->
+<section id="insights">
+  <div class="section-label">Key Findings</div>
+  <div class="section-title">The numbers tell the <em style="font-style:italic; color: var(--accent);">story.</em></div>
+  <div class="section-subtitle">Six data-driven insights from analyzing every game on Stake Engine's platform.</div>
+
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent-red);"></div>
+      <div class="insight-icon" style="background: rgba(255,69,58,0.15); color: var(--accent-red);">&#x1F4A5;</div>
+      <div class="insight-big-number" style="color: var(--accent-red);">47%</div>
+      <h3>of games have zero players <span class="info-btn">i<div class="info-tooltip">Measured at a single point in time (08:25 UTC). Some games may have players at other times of day, but the pattern is consistent: a small number of games capture most of the audience.</div></span></h3>
+      <p>292 out of 626 games had no active players at time of measurement. The market follows an extreme power law &mdash; only 4% of titles capture meaningful audiences.</p>
+    </div>
+
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent-green);"></div>
+      <div class="insight-icon" style="background: rgba(48,209,88,0.15); color: var(--accent-green);">&#x1F3AF;</div>
+      <div class="insight-big-number" style="color: var(--accent-green);">+123%</div>
+      <h3>Gamification boost <span class="info-btn">i<div class="info-tooltip"><strong>Challenges</strong> are Stake's built-in gamification layer — missions like "Win 5x in Dragonspire" or "Bet $100 on any game". Completing challenges earns rewards. This data shows games with active challenges get 2.2x more players.</div></span></h3>
+      <p>Games with active challenges attract 2.2x more players on average (30.2 vs 13.5). Challenges are the single strongest predictor of engagement on the platform.</p>
+    </div>
+
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent);"></div>
+      <div class="insight-icon" style="background: rgba(10,132,255,0.15); color: var(--accent);">&#x1F3B0;</div>
+      <div class="insight-big-number" style="color: var(--accent);">90%</div>
+      <h3>of Keno games find players <span class="info-btn">i<div class="info-tooltip"><strong>Success rate</strong> = % of games with at least 1 active player. Keno (90%) and Plinko (78%) far outperform the average (53%). These are lottery-style instant games — very close to eInstant mechanics.</div></span></h3>
+      <p>Keno has a 90% success rate &mdash; the highest of any category. Plinko follows at 78%. Instant-play, number-picking mechanics are the safest bet for engagement.</p>
+    </div>
+
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent-purple);"></div>
+      <div class="insight-icon" style="background: rgba(191,90,242,0.15); color: var(--accent-purple);">&#x1F30E;</div>
+      <div class="insight-big-number" style="color: var(--accent-purple);">52%</div>
+      <h3>of players are on .us</h3>
+      <p>The US social casino market (stake.us) slightly outpaces the international crypto market (.com). Different markets prefer different game themes.</p>
+    </div>
+
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent-orange);"></div>
+      <div class="insight-icon" style="background: rgba(255,159,10,0.15); color: var(--accent-orange);">&#x1F451;</div>
+      <div class="insight-big-number" style="color: var(--accent-orange);">5</div>
+      <h3>providers control 69% of players</h3>
+      <p>Paperclip Gaming, Titan, Uppercut, Massive Studios, and Twist Gaming dominate. The top provider alone (Paperclip) holds 23% of all players.</p>
+    </div>
+
+    <div class="insight-card">
+      <div class="glow" style="background: var(--accent-teal);"></div>
+      <div class="insight-icon" style="background: rgba(100,210,255,0.15); color: var(--accent-teal);">&#x26A1;</div>
+      <div class="insight-big-number" style="color: var(--accent-teal);">108M</div>
+      <h3>bets on the #1 game</h3>
+      <p>Dragonspire (Paperclip Gaming) leads with 108.6M total bets. Action/fantasy themes with fast gameplay loops generate the highest repeat play.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CATEGORY PERFORMANCE -->
+<section id="categories">
+  <div class="section-label">Game Categories</div>
+  <div class="section-title">What players actually <em style="font-style:italic; color: var(--accent);">want.</em></div>
+  <div class="section-subtitle">All 626 games classified into 14 categories. Efficiency (players/game) reveals which mechanics truly resonate.</div>
+
+  <div class="cat-grid" id="catGrid"></div>
+
+  <div class="cat-section-split">
+    <div>
+      <div class="section-label" style="margin-bottom:16px;">Efficiency Ranking</div>
+      <div style="font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:6px;">Players per game <span class="info-btn" style="font-family:'Inter',sans-serif;font-size:11px;">i<div class="info-tooltip">Categories with fewer than 3 games are excluded from rankings to avoid misleading results from tiny sample sizes. <strong>Higher players/game</strong> means each game in that category attracts more players on average.</div></span></div>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:24px;">Which game types attract the most players per title? Higher = better product-market fit.</p>
+      <div class="cat-rank-list" id="catEfficiency"></div>
+    </div>
+    <div>
+      <div class="section-label" style="margin-bottom:16px;">Success Rate</div>
+      <div style="font-family:'Instrument Serif',serif; font-size:28px; margin-bottom:6px;">% of games with players <span class="info-btn" style="font-family:'Inter',sans-serif;font-size:11px;">i<div class="info-tooltip"><strong>Success rate</strong> answers: "If I build a game in this category, what are my odds of having any players at all?" Keno at 90% means 9 out of 10 keno games attract players. Wheel at 10% means only 1 in 10.</div></span></div>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:24px;">What percentage of games in each category have at least one active player? Higher = safer bet.</p>
+      <div class="cat-rank-list" id="catSuccess"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TOP GAMES -->
+<section id="games">
+  <div class="section-label">Top Performers</div>
+  <div class="section-title">The games people <em style="font-style:italic; color: var(--accent);">play.</em></div>
+  <div class="section-subtitle">Top 24 games ranked by live player count. Click any game to try the demo on Stake.</div>
+
+  <div class="filter-bar">
+    <button class="filter-pill active" data-filter="all">All Games</button>
+    <button class="filter-pill" data-filter="paperclip-gaming">Paperclip Gaming</button>
+    <button class="filter-pill" data-filter="titan-gaming">Titan Gaming</button>
+    <button class="filter-pill" data-filter="uppercut-gaming">Uppercut Gaming</button>
+    <button class="filter-pill" data-filter="twist-gaming">Twist Gaming</button>
+    <button class="filter-pill" data-filter="massive-studios">Massive Studios</button>
+  </div>
+
+  <div class="games-grid" id="gamesGrid"></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROVIDERS -->
+<section id="providers">
+  <div class="section-label">Provider Rankings</div>
+  <div class="section-title">Who's <em style="font-style:italic; color: var(--accent);">winning.</em></div>
+  <div class="section-subtitle">Top 15 game providers ranked by total live players, with efficiency metrics.</div>
+
+  <table class="provider-table">
+    <thead>
+      <tr class="visible">
+        <th style="width:50px">#</th>
+        <th>Provider</th>
+        <th class="right">Players</th>
+        <th class="right">Games</th>
+        <th class="right">Players / Game <span class="info-btn" style="width:14px;height:14px;font-size:9px;">i<div class="info-tooltip"><strong>Efficiency metric</strong> — total live players divided by number of games. Shows how well each game in a provider's portfolio performs on average. Higher is better.</div></span></th>
+        <th class="right">Challenges <span class="info-btn" style="width:14px;height:14px;font-size:9px;">i<div class="info-tooltip"><strong>Active challenges</strong> — gamification missions running on this provider's games. Challenges boost player counts by ~123% on average.</div></span></th>
+      </tr>
+    </thead>
+    <tbody id="providerBody"></tbody>
+  </table>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- MARKET SPLIT -->
+<section id="market">
+  <div class="section-label">Market Analysis</div>
+  <div class="section-title">.com vs .us <span class="info-btn" style="font-family:'Inter',sans-serif;font-size:11px;">i<div class="info-tooltip"><strong>stake.com</strong> is the international crypto-casino platform. <strong>stake.us</strong> is the US social casino (sweepstakes model). Same games, different player bases and regulations. Both markets are nearly equal in size.</div></span></div>
+  <div class="section-subtitle">Player distribution across Stake's international crypto platform and US social casino.</div>
+
+  <div class="split-visual" id="splitVisual">
+    <div class="split-bar com" id="splitCom">48.3%</div>
+    <div class="split-bar us" id="splitUs">51.7%</div>
+  </div>
+  <div class="split-labels">
+    <div class="split-label"><div class="split-dot" style="background: var(--accent);"></div> stake.com &middot; 2,321 players &middot; International/Crypto</div>
+    <div class="split-label"><div class="split-dot" style="background: var(--accent-purple);"></div> stake.us &middot; 2,482 players &middot; US Social Casino</div>
+  </div>
+
+  <div class="section-title" style="font-size: 28px; margin-top: 40px; margin-bottom: 32px;">Player Distribution <span class="info-btn" style="font-family:'Inter',sans-serif;font-size:11px;">i<div class="info-tooltip">Shows how many games fall into each player count bracket. The extreme skew toward 0 players (292 games) illustrates the <strong>power law</strong> in iGaming — most games fail, a few games dominate.</div></span></div>
+  <div class="dist-chart" id="distChart"></div>
+  <div style="display:flex; gap:12px; padding: 0 20px;">
+    <div class="dist-bar-wrap"><div class="dist-bar-label">100+</div></div>
+    <div class="dist-bar-wrap"><div class="dist-bar-label">50-99</div></div>
+    <div class="dist-bar-wrap"><div class="dist-bar-label">20-49</div></div>
+    <div class="dist-bar-wrap"><div class="dist-bar-label">10-19</div></div>
+    <div class="dist-bar-wrap"><div class="dist-bar-label">1-9</div></div>
+    <div class="dist-bar-wrap"><div class="dist-bar-label">0</div></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TAKEAWAYS -->
+<section id="takeaways">
+  <div class="section-label">Strategic Implications</div>
+  <div class="section-title">What this means for<br><em style="font-style:italic; color: var(--accent);">game makers.</em></div>
+  <div class="section-subtitle">Actionable insights for B2B game providers and content studios.</div>
+
+  <div class="takeaway-list">
+    <div class="takeaway">
+      <div class="takeaway-num">01</div>
+      <div>
+        <h4>Gamification is not optional</h4>
+        <p>Challenges and missions boost player engagement by 123%. Any game framework should include gamification layers as a core feature, not an afterthought. Consider tournaments, daily missions, and achievement systems.</p>
+      </div>
+    </div>
+    <div class="takeaway">
+      <div class="takeaway-num">02</div>
+      <div>
+        <h4>Quality crushes quantity</h4>
+        <p>47% of games have zero players. Degen Lab proves that 2 exceptional games outperform portfolios of 30+. Invest in gameplay loops and retention mechanics over catalog breadth.</p>
+      </div>
+    </div>
+    <div class="takeaway">
+      <div class="takeaway-num">03</div>
+      <div>
+        <h4>Mines and Rush outperform Slots 3&ndash;4x</h4>
+        <p>Mines (24.7 pl/game) and Rush (17.7) dramatically outperform Slots (6.5). Meanwhile, Keno has a 90% success rate vs Slots at 56%. The data strongly favors fast-paced, instant-result mechanics over traditional reel-spinning.</p>
+      </div>
+    </div>
+    <div class="takeaway">
+      <div class="takeaway-num">04</div>
+      <div>
+        <h4>Localize for your market</h4>
+        <p>US players prefer "big win" multiplier games and familiar themes (farming, mining). International players lean toward stylized and action-oriented experiences. One size does not fit all.</p>
+      </div>
+    </div>
+    <div class="takeaway">
+      <div class="takeaway-num">05</div>
+      <div>
+        <h4>Arcade / Action is the #1 non-slot category</h4>
+        <p>99 action games attract 1,538 players at 15.5 per game &mdash; 2.4x the efficiency of slots. Players want interactive, skill-feeling experiences. Dojo Duel, Forged in Plasma, and Bank Basher prove that action-oriented design wins engagement.</p>
+      </div>
+    </div>
+    <div class="takeaway">
+      <div class="takeaway-num">06</div>
+      <div>
+        <h4>The long tail is a graveyard</h4>
+        <p>84% of games have fewer than 10 active players. The cost of launching a failed game is real. Validate concepts early, use data-driven design, and be prepared to kill underperformers quickly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><a href="https://fonsica.se" target="_blank" style="color: inherit; text-decoration: none;">Adam Fonsica</a> <span style="color: var(--text-tertiary); font-weight: 400;">&mdash; iGaming &amp; Lottery Consultant</span></div>
+  <p style="margin-top: 4px;">Data sourced from stakeplayercount.com &middot; Snapshot: February 14, 2026 08:25 UTC<br>
+  626 games &middot; 180 providers &middot; Updated daily</p>
+  <p style="margin-top: 16px;"><a href="https://fonsica.se" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500;">fonsica.se</a> &nbsp;&middot;&nbsp; <a href="mailto:adam@fonsica.se" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500;">adam@fonsica.se</a></p>
+</footer>
+
+<script>
+// ===== DATA =====
+const games = [
+  {n:"Dojo Duel",s:"titan-gaming-dojo-duel",t:"https://mediumrare.imgix.net/93ae3076a5c16680713b32566cd83ddfae4d60a5029ec719d75cd2b68a69fecd",p:"Titan Gaming",ps:"titan-gaming",tp:303,com:98,us:205,bets:36564661,ch:0},
+  {n:"Phoenix 1000",s:"uppercut-phoenix-1000",t:"https://mediumrare.imgix.net/255c76eb492d877a0ece1364b14105bd92cf5ce922675893fa7a47462b620c7f",p:"Uppercut Gaming",ps:"uppercut-gaming",tp:279,com:135,us:144,bets:11085899,ch:0},
+  {n:"Dragonspire",s:"paperclip-dragonspire",t:"https://mediumrare.imgix.net/a746f89526bc0e9e64526d37793f234dfecef3c07f8df27ec09994ca0f08a8f5",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:249,com:76,us:173,bets:108605755,ch:12},
+  {n:"Golden Geese",s:"massive-golden-geese",t:"https://mediumrare.imgix.net/6f4b33fb4e60888d3a0edb8abc61516f00bc6f6087759fd765fa0d26b765b0e7",p:"Massive Studios",ps:"massive-studios",tp:212,com:148,us:64,bets:1480174,ch:0},
+  {n:"Forged in Plasma",s:"paperclip-forged-in-plasma",t:"https://mediumrare.imgix.net/e30123d83818424689775e4a21bdec67962c39ffb5a7e2d5ef6c296f55ab6c07",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:184,com:86,us:98,bets:5126156,ch:8},
+  {n:"Toon Pilot",s:"paperclip-toon-pilot",t:"https://mediumrare.imgix.net/5d32796ed172535b4aeca1c664698de9938ff0b6c809a56a88a03e20261a32df",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:175,com:113,us:62,bets:2591609,ch:0},
+  {n:"Wicked Brew",s:"twist-gaming-wicked-brew",t:"https://mediumrare.imgix.net/7d110b219a81dac834aa396265af6655de0e1dfb48de7d7cebb0776524f2df67",p:"Twist Gaming",ps:"twist-gaming",tp:141,com:62,us:79,bets:38811980,ch:0},
+  {n:"Candy Party",s:"paperclip-candy-party",t:"https://mediumrare.imgix.net/fa9fc35c9b08c5642fdc0bd4374b568a8fda3b01fd80d427b5d81a3b901b7638",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:129,com:122,us:7,bets:10567439,ch:0},
+  {n:"Duel of Olympus",s:"titan-gaming-duel-of-olympus",t:"https://mediumrare.imgix.net/b0b934d46f44b19b179d0334f11993cc44281e6db886b269f619bacc01d222a7",p:"Titan Gaming",ps:"titan-gaming",tp:126,com:68,us:58,bets:5065783,ch:6},
+  {n:"Candy Rush",s:"paperclip-candy-rush",t:"https://mediumrare.imgix.net/8c8553eb2d7014c2bcf43fc3378a90c56cc3162cf5f3c7f2cb7257065dc75162",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:119,com:49,us:70,bets:70369578,ch:12},
+  {n:"Bank Basher",s:"twist-gaming-bank-basher",t:"https://mediumrare.imgix.net/18d087f0b3258481f70b05c1fd2f38df84139009f124b7d3ffffa5e1013e3e28",p:"Twist Gaming",ps:"twist-gaming",tp:110,com:43,us:67,bets:100284292,ch:8},
+  {n:"Pirate Rush",s:"titan-gaming-pirate-rush",t:"https://mediumrare.imgix.net/ef5806a9ebac4f8b2c5e958a21c972bd78dd1886bd5d34dc1ea6c23e227a33ec",p:"Titan Gaming",ps:"titan-gaming",tp:102,com:68,us:34,bets:1429205,ch:0},
+  {n:"Crossfire",s:"uppercut-crossfire",t:"https://mediumrare.imgix.net/67380fe7a9621e43516a301b18b8ad719b3b3a3597dd9a24e45bf1f1b097e321",p:"Uppercut Gaming",ps:"uppercut-gaming",tp:93,com:67,us:26,bets:1294667,ch:12},
+  {n:"Minedrop",s:"paperclip-minedrop",t:"https://mediumrare.imgix.net/88e1bf62daafe0a8ebd36c2d0c69a6c3e962daaa07879c0cbc56e4a68413c68e",p:"Paperclip Gaming",ps:"paperclip-gaming",tp:92,com:55,us:37,bets:13535722,ch:0},
+  {n:"Angry Balls",s:"coreffectinteractive-angry-balls",t:"https://mediumrare.imgix.net/8bf810c166da5f5456e547c6740ac6b56994213c6ad2c96241506e3afa011dac",p:"Coreffect Interactive",ps:"coreffect-interactive",tp:90,com:27,us:63,bets:11321458,ch:0},
+  {n:"Million X",s:"titan-gaming-million-x",t:"https://mediumrare.imgix.net/09ff237d38f44b8d7b73eee0e35075abf883af90075336b3dc128f6a5a423b97",p:"Titan Gaming",ps:"titan-gaming",tp:78,com:11,us:67,bets:58427961,ch:0},
+  {n:"Drop The Boss",s:"mirrorimage-drop-the-boss-trump",t:"https://mediumrare.imgix.net/99467dbcd881dd613dca7a88f28bc9e15dd80c2190a345739e4888c5d2076e33",p:"Mirror Image Gaming",ps:"mirror-image-gaming",tp:78,com:47,us:31,bets:42206324,ch:0},
+  {n:"Mines Rush",s:"uppercut-mines-rush",t:"https://mediumrare.imgix.net/e5def330813a6708281cd1d05eaf0b34224948c743ab1d7707726a590b848cd1",p:"Uppercut Gaming",ps:"uppercut-gaming",tp:77,com:14,us:63,bets:8527376,ch:0},
+  {n:"Pho Fortune",s:"madlab-pho-fortune",t:"https://mediumrare.imgix.net/38e5dd04df5481b5f283bb072ec7c1a8949d25fe12ce05ae1fed9c6b8a437470",p:"Madlab Gaming",ps:"madlab-gaming",tp:75,com:43,us:32,bets:539255,ch:0},
+  {n:"Stupid Cupid",s:"sidequest-stupid-cupid",t:"https://mediumrare.imgix.net/4b044826eed9fbb776885414c9bc95c498950cc18412ff35474e7f5cbab665c1",p:"Sidequest Studios",ps:"sidequest-studios",tp:72,com:49,us:23,bets:535905,ch:0},
+  {n:"Keno Xtreme",s:"degenlab-keno-xtreme",t:"https://mediumrare.imgix.net/8bd1dcc64ba0209b8b806b4b5f6c79470d5a2b9788005c9daf604835368f945f",p:"Degen Lab",ps:"degen-lab",tp:66,com:38,us:28,bets:19771398,ch:1},
+  {n:"Wild Don Donkey",s:"massive-wild-don-donkey",t:"https://mediumrare.imgix.net/872ad3bbc9e38ed0edcf791213d462ad9f1fac13fdef2a0b418464c15384921d",p:"Massive Studios",ps:"massive-studios",tp:64,com:32,us:32,bets:6434419,ch:1},
+  {n:"Bazooka Knight",s:"colorfulplay-bazooka-knight",t:"https://mediumrare.imgix.net/4170f4afa333f530b05a75f962d023072eae4b1319e5ec5987bf830c8bbeee33",p:"Colorful Play",ps:"colorful-play",tp:63,com:42,us:21,bets:476957,ch:3},
+  {n:"Love",s:"rainfallgaming-love",t:"https://mediumrare.imgix.net/c273c9f23dc9296091cf418c0949280176a2ca078655af888cd9e96f24af0145",p:"Rainfall Gaming",ps:"rainfall-gaming",tp:53,com:29,us:24,bets:529940,ch:0},
+];
+
+const providers = [
+  {n:"Paperclip Gaming",players:1201,games:31,ppg:38.7,ch:136},
+  {n:"Titan Gaming",players:895,games:41,ppg:21.8,ch:4},
+  {n:"Uppercut Gaming",players:598,games:16,ppg:37.4,ch:66},
+  {n:"Massive Studios",players:557,games:31,ppg:18.0,ch:213},
+  {n:"Twist Gaming",players:383,games:30,ppg:12.8,ch:66},
+  {n:"Sidequest Studios",players:123,games:6,ppg:20.5,ch:36},
+  {n:"Degen Lab",players:111,games:2,ppg:55.5,ch:4},
+  {n:"Coreffect Interactive",players:98,games:4,ppg:24.5,ch:0},
+  {n:"Madlab Gaming",players:96,games:14,ppg:6.9,ch:0},
+  {n:"Colorful Play",players:95,games:13,ppg:7.3,ch:8},
+  {n:"Mirror Image Gaming",players:79,games:4,ppg:19.8,ch:0},
+  {n:"18 Gaming",players:63,games:38,ppg:1.7,ch:0},
+  {n:"Black Coffee Studios",players:63,games:2,ppg:31.5,ch:20},
+  {n:"Sunflower Gaming",players:64,games:5,ppg:12.8,ch:0},
+  {n:"Creative City",players:58,games:3,ppg:19.3,ch:14},
+];
+
+// ===== CATEGORY DATA =====
+const categoryData = [
+  {name:"Slots", games:342, players:2217, ppg:6.5, success:56.4, bets:1430274509, top:"Dragonspire", color:"var(--accent-purple)",
+   desc:"Traditional reel-spinning games with paylines, wilds, scatters, and bonus rounds. The largest category by far — but also the most competitive with below-average efficiency.",
+   examples:[{n:"Dragonspire",s:"paperclip-dragonspire"},{n:"Wicked Brew",s:"twist-gaming-wicked-brew"},{n:"Golden Geese",s:"massive-golden-geese"},{n:"Drac's Stacks",s:"massive-dracs-stacks"}]},
+  {name:"Arcade / Action", games:99, players:1538, ppg:15.5, success:52.5, bets:452653866, top:"Dojo Duel", color:"var(--accent-orange)",
+   desc:"Interactive games where players feel in control — fighting, shooting, dodging, throwing. High engagement because the skill-feeling mechanic creates adrenaline even when outcomes are RNG-based.",
+   examples:[{n:"Dojo Duel",s:"titan-gaming-dojo-duel"},{n:"Forged in Plasma",s:"paperclip-forged-in-plasma"},{n:"Toon Pilot",s:"paperclip-toon-pilot"},{n:"Bank Basher",s:"twist-gaming-bank-basher"},{n:"Angry Balls",s:"coreffectinteractive-angry-balls"},{n:"Drop The Boss",s:"mirrorimage-drop-the-boss-trump"}]},
+  {name:"Crash / Multiplier", games:40, players:477, ppg:11.9, success:50.0, bets:265766526, top:"Phoenix 1000", color:"var(--accent-red)",
+   desc:"A growing multiplier that could crash at any time. Players cash out when they dare. Variants include '1000x' chase games and limbo-style mechanics. High-risk, high-reward dopamine loops.",
+   examples:[{n:"Phoenix 1000",s:"uppercut-phoenix-1000"},{n:"Million X",s:"titan-gaming-million-x"},{n:"Wizard 1000",s:"titan-gaming-wizard-1000"},{n:"Aztec 1000",s:"titan-gaming-aztec-1000"}]},
+  {name:"Animal / Creature", games:41, players:333, ppg:8.1, success:61.0, bets:168346799, top:"Wild Don Donkey", color:"var(--accent-green)",
+   desc:"Games themed around animals, creatures, or farming. Often slot-style mechanics but with strong visual identities around ducks, dragons, fish, etc. Surprisingly high success rate at 61%.",
+   examples:[{n:"Wild Don Donkey",s:"massive-wild-don-donkey"},{n:"Farmageddon",s:"twist-gaming-farmageddon"},{n:"Chicken Run",s:"massive-chicken-run"},{n:"Quack the Dragon",s:"massive-quack-the-dragon"}]},
+  {name:"Rush", games:13, players:230, ppg:17.7, success:46.2, bets:78707693, top:"Candy Rush", color:"var(--accent-pink)",
+   desc:"Fast-paced games with rapid-fire rounds and quick resolution. The 'Rush' mechanic means short sessions with immediate results — players can burn through many rounds in minutes. Similar to eInstant pacing.",
+   examples:[{n:"Candy Rush",s:"paperclip-candy-rush"},{n:"Pirate Rush",s:"titan-gaming-pirate-rush"},{n:"Mines Rush",s:"uppercut-mines-rush"},{n:"Nitro Rush",s:"twist-gaming-nitro-rush"},{n:"Pixel Rush",s:"twist-gaming-pixel-rush"}]},
+  {name:"Mines", games:7, players:173, ppg:24.7, success:57.1, bets:25424807, top:"Minedrop", color:"var(--accent-teal)",
+   desc:"Minesweeper-inspired grid games. Players reveal tiles one by one — each safe tile increases the multiplier, but hitting a mine loses everything. Tension builds with every pick. Highest efficiency category.",
+   examples:[{n:"Minedrop",s:"paperclip-minedrop"},{n:"Mines Rush",s:"uppercut-mines-rush"},{n:"Diamond Digger",s:"twist-gaming-diamond-digger"},{n:"Pickaxe Drop",s:"massive-pickaxe-drop"}]},
+  {name:"Keno", games:10, players:102, ppg:10.2, success:90.0, bets:31589630, top:"Keno Xtreme", color:"#60a5fa",
+   desc:"Number-picking lottery-style games. Pick numbers, watch the draw. Simple mechanic but extremely reliable — 90% of all keno games have active players. Closest mechanic to eInstants on the platform.",
+   examples:[{n:"Keno Xtreme",s:"degenlab-keno-xtreme"},{n:"Bonus Keno",s:"twist-gaming-bonus-keno"},{n:"Keno 10000",s:"uppercut-keno-10000"},{n:"Extreme Keno",s:"madlab-extreme-keno"}]},
+  {name:"Plinko", games:9, players:66, ppg:7.3, success:77.8, bets:57189945, top:"Plinko Xtreme", color:"#c084fc",
+   desc:"Drop a ball from the top of a pegged board and watch it bounce into multiplier buckets at the bottom. Pure physics-based randomness with satisfying visual feedback. 78% success rate.",
+   examples:[{n:"Plinko Xtreme",s:"degenlab-plinko-xtreme"},{n:"Plinko Infinity",s:"uppercut-plinko-infinity"},{n:"Plinko Multiball",s:"uppercut-plinko-multiball-10000x"},{n:"Crazy Plinko",s:"madlab-crazy-plinko"}]},
+  {name:"Sports", games:16, players:32, ppg:2.0, success:50.0, bets:47530818, top:"Reel Racing", color:"#fbbf24",
+   desc:"Sports-themed games including racing, football/soccer, and pool. Moderate engagement — sports themes don't translate as well to casino mechanics as action or fantasy themes.",
+   examples:[{n:"Reel Racing",s:"massive-reel-racing"},{n:"NFL Touchdown",s:"massive-nfl-touchdown"},{n:"Derby Race",s:"massive-derby-race"}]},
+  {name:"Scratch / Reveal", games:11, players:28, ppg:2.5, success:36.4, bets:12594970, top:"Scratch Mania", color:"#fb923c",
+   desc:"Pick-a-box, scratch card, and case opening mechanics. Instant reveals with simple gameplay. Low engagement on this platform despite being popular in lottery markets.",
+   examples:[{n:"Scratch Mania",s:"massive-scratch-mania"},{n:"Pick a Briefcase",s:"massive-pick-a-briefcase"},{n:"CASE OPENING",s:"massive-case-opening"}]},
+  {name:"Card / Poker", games:16, players:8, ppg:0.5, success:25.0, bets:2407416, top:"Double Poker", color:"#f87171",
+   desc:"Card-based games including poker variants, card matching, and trick games. Very low engagement — likely because Stake has dedicated poker and table game sections.",
+   examples:[{n:"Double Poker",s:"18-gaming-double-poker"},{n:"Pokerfall Extreme",s:"18-gaming-pokerfall-extreme"},{n:"Seven Card Legends",s:"18-gaming-seven-card-legends"}]},
+  {name:"Wheel / Spinner", games:10, players:3, ppg:0.3, success:10.0, bets:4024983, top:"Spin Reaper", color:"#94a3b8",
+   desc:"Spin a wheel to win prizes. A classic mechanic but severely underperforming here — only 10% success rate. Players seem to prefer more interactive formats.",
+   examples:[{n:"Wheel Extreme",s:"twist-gaming-wheel-extreme"},{n:"Duck Wheels",s:"big-ducking-wings-duck-wheels"}]},
+  {name:"Climb / Ladder", games:6, players:3, ppg:0.5, success:16.7, bets:224664, top:"Space Jump", color:"#a78bfa",
+   desc:"Progressive climbing mechanics where each level increases risk and reward. Cash out at any floor or risk going higher. Conceptually similar to Crash but with a spatial metaphor.",
+   examples:[{n:"Space Jump",s:"18-gaming-space-jump"},{n:"Ladder Climb",s:"18-gaming-ladder-climb"},{n:"Neko Climber",s:"schnulu-games-neko-climber"}]},
+  {name:"Pachinko", games:4, players:0, ppg:0.0, success:0.0, bets:3653335, top:"—", color:"#64748b",
+   desc:"Japanese pachinko-style ball-drop into pockets. Zero active players despite 3.6M historical bets. The mechanic seems to have lost appeal, or these specific implementations underperform.",
+   examples:[{n:"Crystal Cart Pachinko",s:"18-gaming-crystal-cart-pachinko"},{n:"Tiki Pachinko",s:"18-gaming-tiki-pachinko"},{n:"Neon Pachinko",s:"18-gaming-neon-pachinko"}]},
+];
+
+// Game-to-category lookup
+const gameCategoryMap = {
+  "Dojo Duel":"Arcade / Action","Phoenix 1000":"Crash / Multiplier","Dragonspire":"Slots",
+  "Golden Geese":"Slots","Forged in Plasma":"Arcade / Action","Toon Pilot":"Arcade / Action",
+  "Wicked Brew":"Slots","Candy Party":"Slots","Duel of Olympus":"Arcade / Action",
+  "Candy Rush":"Rush","Bank Basher":"Arcade / Action","Pirate Rush":"Rush",
+  "Crossfire":"Arcade / Action","Minedrop":"Mines","Angry Balls":"Arcade / Action",
+  "Million X":"Crash / Multiplier","Drop The Boss":"Arcade / Action","Mines Rush":"Mines",
+  "Pho Fortune":"Slots","Stupid Cupid":"Slots","Keno Xtreme":"Keno",
+  "Wild Don Donkey":"Animal / Creature","Bazooka Knight":"Arcade / Action","Love":"Slots",
+};
+
+const maxPlayers = providers[0].players;
+
+// ===== RENDER GAMES =====
+function renderGames(filter = 'all') {
+  const grid = document.getElementById('gamesGrid');
+  const filtered = filter === 'all' ? games : games.filter(g => g.ps === filter);
+  grid.innerHTML = filtered.map((g, i) => {
+    const cat = gameCategoryMap[g.n] || 'Slots';
+    return `
+    <a class="game-card" href="https://stake.com/casino/games/${g.s}" target="_blank" rel="noopener" style="transition-delay: ${i * 40}ms">
+      <div class="game-card-inner">
+        <div class="game-rank">#${games.indexOf(g) + 1}</div>
+        ${g.ch > 0 ? `<div class="challenge-badge">${g.ch} challenges</div>` : ''}
+        <img class="game-thumb" src="${g.t}?w=400&h=400&fit=crop&auto=format" alt="${g.n}" loading="lazy">
+        <div class="game-cat-badge">${cat}</div>
+      </div>
+      <div class="game-info">
+        <div class="game-name">${g.n}</div>
+        <div class="game-provider">${g.p}</div>
+        <div class="game-stats-row">
+          <div class="game-players"><div class="dot"></div> ${g.tp}</div>
+          <div class="game-bets">${formatBets(g.bets)} bets</div>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+  // Re-observe new cards
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.game-card').forEach(el => observer.observe(el));
+  });
+}
+
+function formatBets(n) {
+  if (!n) return '0';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return n.toString();
+}
+
+// ===== RENDER PROVIDERS =====
+function renderProviders() {
+  const body = document.getElementById('providerBody');
+  body.innerHTML = providers.map((p, i) => {
+    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const pctPlayers = (p.players / maxPlayers * 100).toFixed(0);
+    const pctPpg = (p.ppg / 55.5 * 100).toFixed(0);
+    const pctCh = providers[0].ch > 0 ? (p.ch / 213 * 100).toFixed(0) : 0;
+    return `
+    <tr style="transition-delay: ${i * 60}ms">
+      <td><div class="provider-rank ${rankClass}">${i + 1}</div></td>
+      <td><div class="provider-name">${p.n}</div></td>
+      <td class="right">
+        <div class="bar-cell">
+          <div class="bar-value">${p.players.toLocaleString()}</div>
+          <div class="bar-track"><div class="bar-fill blue" data-width="${pctPlayers}"></div></div>
+        </div>
+      </td>
+      <td class="right" style="color: var(--text-secondary)">${p.games}</td>
+      <td class="right">
+        <div class="bar-cell">
+          <div class="bar-value">${p.ppg}</div>
+          <div class="bar-track"><div class="bar-fill green" data-width="${pctPpg}"></div></div>
+        </div>
+      </td>
+      <td class="right">
+        <div class="bar-cell">
+          <div class="bar-value" style="color: ${p.ch > 0 ? 'var(--accent-orange)' : 'var(--text-tertiary)'}">${p.ch}</div>
+          <div class="bar-track"><div class="bar-fill orange" data-width="${pctCh}"></div></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER DISTRIBUTION CHART =====
+function renderDistChart() {
+  const chart = document.getElementById('distChart');
+  const data = [
+    {label:'100+', count:12, color:'var(--accent)'},
+    {label:'50-99', count:13, color:'var(--accent-teal)'},
+    {label:'20-49', count:28, color:'var(--accent-green)'},
+    {label:'10-19', count:45, color:'var(--accent-orange)'},
+    {label:'1-9', count:236, color:'var(--accent-pink)'},
+    {label:'0', count:292, color:'var(--accent-red)'},
+  ];
+  const max = 292;
+  chart.innerHTML = data.map(d => `
+    <div class="dist-bar-wrap">
+      <div class="dist-bar" data-height="${(d.count / max * 100).toFixed(0)}" style="background: ${d.color};">
+        <div class="dist-bar-value" style="color: ${d.color}">${d.count}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER CATEGORIES =====
+function renderCategories() {
+  const grid = document.getElementById('catGrid');
+  const maxPpg = Math.max(...categoryData.map(c => c.ppg));
+  const maxCatPlayers = Math.max(...categoryData.map(c => c.players));
+
+  grid.innerHTML = categoryData.map((c, i) => {
+    const ppgPct = (c.ppg / maxPpg * 100).toFixed(0);
+    const playersPct = (c.players / maxCatPlayers * 100).toFixed(0);
+    const badgeColor = c.ppg >= 15 ? 'var(--accent-green)' : c.ppg >= 8 ? 'var(--accent)' : c.ppg >= 3 ? 'var(--accent-orange)' : 'var(--accent-red)';
+    const badgeBg = c.ppg >= 15 ? 'rgba(52,211,153,0.15)' : c.ppg >= 8 ? 'rgba(20,184,166,0.15)' : c.ppg >= 3 ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)';
+    const exLinks = (c.examples || []).map(e =>
+      `<a class="cat-example-link" href="https://stake.com/casino/games/${e.s}" target="_blank" rel="noopener">${e.n} <span class="arrow">&nearr;</span></a>`
+    ).join('');
+    return `
+    <div class="cat-card" style="transition-delay: ${i * 50}ms">
+      <div class="cat-header">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="cat-name">${c.name}</div>
+          <span class="info-btn">i<div class="info-tooltip">${c.desc}</div></span>
+        </div>
+        <div class="cat-badge" style="color:${badgeColor}; background:${badgeBg};">${c.ppg} pl/game</div>
+      </div>
+      <div class="cat-stats">
+        <div>
+          <div class="cat-stat-label">Games</div>
+          <div class="cat-stat-value" style="color:var(--text-secondary)">${c.games}</div>
+        </div>
+        <div>
+          <div class="cat-stat-label">Players</div>
+          <div class="cat-stat-value" style="color:${c.color}">${c.players.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Players</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" data-width="${playersPct}" style="background:${c.color}"></div></div>
+      </div>
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Efficiency
+          <span class="info-btn" style="width:14px;height:14px;font-size:9px;">i<div class="info-tooltip"><strong>Players per game</strong> — total players divided by number of games. Higher means each game attracts more players on average.</div></span>
+        </div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" data-width="${ppgPct}" style="background:var(--accent-green)"></div></div>
+      </div>
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Success
+          <span class="info-btn" style="width:14px;height:14px;font-size:9px;">i<div class="info-tooltip"><strong>Success rate</strong> — percentage of games in this category that have at least 1 active player right now. Higher = safer bet when building a game in this category.</div></span>
+        </div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" data-width="${c.success}" style="background:var(--accent-orange)"></div></div>
+      </div>
+      <div class="cat-examples">
+        ${exLinks}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCatRankings() {
+  // Efficiency ranking (min 3 games)
+  const effList = document.getElementById('catEfficiency');
+  const effData = categoryData.filter(c => c.games >= 3).sort((a, b) => b.ppg - a.ppg);
+  const maxEff = effData[0].ppg;
+  effList.innerHTML = effData.map((c, i) => `
+    <div class="cat-rank-row" style="transition-delay:${i * 60}ms">
+      <div class="cat-rank-pos">${i + 1}</div>
+      <div class="cat-rank-info">
+        <div class="cat-rank-name">${c.name}</div>
+        <div class="cat-rank-detail">${c.games} games &middot; ${c.players.toLocaleString()} players</div>
+      </div>
+      <div class="cat-rank-bar">
+        <div class="cat-rank-bar-track"><div class="cat-rank-bar-fill" data-width="${(c.ppg / maxEff * 100).toFixed(0)}" style="background:var(--accent-green)"></div></div>
+      </div>
+      <div class="cat-rank-metric">
+        <div class="cat-rank-value" style="color:var(--accent-green)">${c.ppg}</div>
+        <div class="cat-rank-unit">pl / game</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Success rate ranking (min 3 games)
+  const sucList = document.getElementById('catSuccess');
+  const sucData = categoryData.filter(c => c.games >= 3).sort((a, b) => b.success - a.success);
+  sucList.innerHTML = sucData.map((c, i) => {
+    const color = c.success >= 70 ? 'var(--accent-green)' : c.success >= 50 ? 'var(--accent-orange)' : 'var(--accent-red)';
+    return `
+    <div class="cat-rank-row" style="transition-delay:${i * 60}ms">
+      <div class="cat-rank-pos">${i + 1}</div>
+      <div class="cat-rank-info">
+        <div class="cat-rank-name">${c.name}</div>
+        <div class="cat-rank-detail">${c.games} games &middot; ${c.players.toLocaleString()} players</div>
+      </div>
+      <div class="cat-rank-bar">
+        <div class="cat-rank-bar-track"><div class="cat-rank-bar-fill" data-width="${c.success}" style="background:${color}"></div></div>
+      </div>
+      <div class="cat-rank-metric">
+        <div class="cat-rank-value" style="color:${color}">${c.success}%</div>
+        <div class="cat-rank-unit">success</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== FILTER PILLS =====
+document.querySelectorAll('.filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    renderGames(pill.dataset.filter);
+  });
+});
+
+// ===== SCROLL ANIMATIONS =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Animate bars
+      entry.target.querySelectorAll('.bar-fill, .cat-bar-fill, .cat-rank-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+      // Animate dist bars
+      entry.target.querySelectorAll('.dist-bar').forEach(bar => {
+        bar.style.height = bar.dataset.height + '%';
+      });
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+// ===== COUNT UP ANIMATION =====
+function countUp(el, target, duration = 1500) {
+  let start = 0;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(eased * target).toLocaleString();
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target.toLocaleString();
+  }
+  requestAnimationFrame(update);
+}
+
+const heroObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      document.querySelectorAll('[data-count]').forEach(el => {
+        countUp(el, parseInt(el.dataset.count));
+      });
+      heroObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+
+// ===== MARKET SPLIT ANIMATION =====
+const splitObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      document.getElementById('splitCom').style.width = '48.3%';
+      document.getElementById('splitUs').style.width = '51.7%';
+      splitObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+
+// ===== INIT =====
+renderGames();
+renderProviders();
+renderDistChart();
+renderCategories();
+renderCatRankings();
+
+// Observe all animatable elements
+document.querySelectorAll('.insight-card, .game-card, .takeaway, .cat-card, .cat-rank-row').forEach(el => observer.observe(el));
+document.querySelectorAll('.provider-table tr').forEach(el => observer.observe(el));
+document.querySelectorAll('.dist-bar-wrap').forEach(el => observer.observe(el));
+
+heroObserver.observe(document.querySelector('.hero-stats'));
+splitObserver.observe(document.getElementById('splitVisual'));
+</script>
+</body>
+</html>
