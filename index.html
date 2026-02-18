@@ -407,6 +407,121 @@
             letter-spacing: 0.05em;
         }
 
+        /* Insights Section */
+        #insights {
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .insight-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(2rem, 6vw, 4rem);
+            align-items: center;
+            padding: 3rem;
+            border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .insight-card:hover .insight-label,
+        .insight-card:hover .insight-description {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .insight-card:hover .insight-link {
+            color: var(--accent);
+        }
+
+        .insight-label {
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-card h3 {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .insight-description {
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 50ch;
+            margin-bottom: 1.5rem;
+        }
+
+        .insight-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--black);
+            transition: color 0.3s ease, gap 0.3s ease;
+        }
+
+        .insight-card:hover .insight-link {
+            color: var(--accent);
+        }
+
+        .insight-link:hover {
+            gap: 0.75rem;
+        }
+
+        .insight-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 16/10;
+            background: var(--black);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .insight-card:hover .insight-visual {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .insight-visual-inner {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .insight-stat {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        @media (max-width: 1024px) {
+            .insight-card {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-visual {
+                order: -1;
+            }
+        }
+
         /* Speaking Section */
         #speaking {
             border-top: 1px solid var(--gray-light);
@@ -901,6 +1016,36 @@
         </div>
     </section>
 
+    <!-- Insights Section -->
+    <section id="insights">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Insights</h2>
+                <p>Occasional deep dives into industry trends, platform data, and the mechanics shaping iGaming and lottery.</p>
+            </div>
+
+            <a href="/insights/stake-engine/" class="insight-card reveal">
+                <div>
+                    <span class="mono insight-label">Latest</span>
+                    <h3>Stake Engine Game Intelligence</h3>
+                    <p class="insight-description">Six data-driven insights from analyzing all 626 games on Stake Engine's indie RGS platform: category efficiency, top performers, and where the market gaps are.</p>
+                    <span class="insight-link">
+                        Read the analysis
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="insight-visual">
+                    <div class="insight-visual-inner">
+                        <div class="insight-stat">626</div>
+                        <div class="insight-stat-label">Games analyzed</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
     <!-- Speaking Section -->
     <section id="speaking">
         <div class="container">
@@ -965,17 +1110,22 @@
                     </span>
                 </a>
 
-                <div class="speaking-item reveal">
+                <a href="https://sbcevents.com/sbc-summit-2024/first-pitch/" target="_blank" class="speaking-item reveal">
                     <div class="speaking-meta">
-                        <strong>2025</strong>
+                        <strong>2024</strong>
                         Lisbon, Portugal
                     </div>
                     <div class="speaking-content">
-                        <h3>SBC Summit First Pitch Competition</h3>
-                        <p>Evaluating startups innovating in sports betting and iGaming</p>
+                        <h3>SBC Summit First Pitch, Finalist</h3>
+                        <p>Selected as a finalist in SBC's startup pitch competition at SBC Summit 2024</p>
                     </div>
-                    <span class="speaking-link" style="visibility: hidden;">—</span>
-                </div>
+                    <span class="speaking-link">
+                        Learn more
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
             </div>
         </div>
     </section>
