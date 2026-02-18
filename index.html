@@ -762,7 +762,7 @@
         }
 
         .mobile-overlay-links li {
-            margin: 1.5rem 0;
+            margin: 1.25rem 0;
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -863,6 +863,20 @@
                 flex-direction: column;
                 gap: 1.5rem;
                 text-align: center;
+            }
+        }
+
+        @media (max-height: 600px) and (max-width: 768px) {
+            .mobile-overlay-links li {
+                margin: 0.75rem 0;
+            }
+
+            .mobile-overlay-links a {
+                font-size: clamp(1.75rem, 6vw, 2.5rem);
+            }
+
+            .mobile-overlay-footer {
+                bottom: 1.5rem;
             }
         }
 
