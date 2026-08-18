@@ -53,6 +53,35 @@ Personal consulting website for Adam Fonsica, iGaming & Lottery consultant.
 | Electric Blue | `#3b82f6` | Tech-forward |
 | Violet | `#8b5cf6` | Creative, distinctive |
 
+## Insights & Pipelines
+
+Public analysis pages live in `insights/<topic>/index.html`. Each has a corresponding data pipeline in `_pipeline/<topic>/` that is gitignored (data stays local).
+
+### `_pipeline/` Convention
+
+```
+_pipeline/
+├── <topic>/
+│   ├── scrape.mjs          # Data fetcher
+│   ├── categorize.mjs      # Optional analysis step
+│   ├── deploy.mjs          # Build HTML + git push
+│   ├── *.plist              # macOS launchd schedules
+│   └── data/                # Scraped data (gitignored)
+└── logs/                    # Launchd log output (gitignored)
+```
+
+**Adding a new analysis:**
+1. Create `_pipeline/<topic>/` with scrape + deploy scripts
+2. Create `insights/<topic>/index.html` for the public page
+3. Add a launchd plist, symlink to `~/Library/LaunchAgents/`
+4. Data and logs are automatically gitignored via `_pipeline/*/data/` and `_pipeline/logs/`
+
+### Active Pipelines
+
+| Pipeline | Schedule | Public URL |
+|----------|----------|------------|
+| Stake Engine | Daily 08:00 (scrape) + 09:00 (deploy) | `/insights/stake-engine/` |
+
 ## Notes
 - Keep Random State separate from personal brand
 - Focus on personal consulting services

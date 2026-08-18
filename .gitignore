@@ -8,3 +8,10 @@ logo-lab.html
 # Editor
 *.swp
 *.swo
+
+# Pipeline data (scraped JSON/CSV, not deployed)
+_pipeline/*/data/
+_pipeline/logs/
+
+# Local design drafts (not deployed)
+design-proposals/
