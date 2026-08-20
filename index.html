@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adam Fonsica — iGaming & Lottery Consultant</title>
-    <meta name="description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, and market entry.">
+    <meta name="description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, market entry, and applied AI.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
@@ -407,6 +407,91 @@
             letter-spacing: 0.05em;
         }
 
+        /* Ventures Section */
+        #ventures {
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .ventures-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .venture-item {
+            display: block;
+            padding: 3rem;
+            border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .venture-item:hover {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .venture-label {
+            display: block;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .venture-item h3 {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .venture-item p {
+            color: var(--gray);
+            line-height: 1.7;
+            max-width: 50ch;
+            margin-bottom: 1.5rem;
+        }
+
+        .venture-item:hover .venture-label,
+        .venture-item:hover p {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .venture-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--black);
+            transition: color 0.3s ease, gap 0.3s ease;
+        }
+
+        .venture-item:hover .venture-link {
+            color: var(--accent);
+        }
+
+        .venture-link:hover {
+            gap: 0.75rem;
+        }
+
+        .ventures-footnote {
+            margin-top: 2rem;
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .ventures-footnote .mono {
+            color: var(--accent);
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .ventures-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Insights Section */
         #insights {
             border-top: 1px solid var(--gray-light);
@@ -778,6 +863,7 @@
         .mobile-overlay.active .mobile-overlay-links li:nth-child(3) { transition-delay: 0.2s; }
         .mobile-overlay.active .mobile-overlay-links li:nth-child(4) { transition-delay: 0.25s; }
         .mobile-overlay.active .mobile-overlay-links li:nth-child(5) { transition-delay: 0.3s; }
+        .mobile-overlay.active .mobile-overlay-links li:nth-child(6) { transition-delay: 0.35s; }
 
         .mobile-overlay-links a {
             font-family: 'Instrument Serif', Georgia, serif;
@@ -901,6 +987,7 @@
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
+                <li><a href="#ventures">Ventures</a></li>
                 <li><a href="#insights">Insights</a></li>
                 <li><a href="#speaking">Speaking</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -917,6 +1004,7 @@
         <ul class="mobile-overlay-links">
             <li><a href="#about" class="mobile-nav-link">About</a></li>
             <li><a href="#services" class="mobile-nav-link">Services</a></li>
+            <li><a href="#ventures" class="mobile-nav-link">Ventures</a></li>
             <li><a href="#insights" class="mobile-nav-link">Insights</a></li>
             <li><a href="#speaking" class="mobile-nav-link">Speaking</a></li>
             <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
@@ -976,6 +1064,7 @@
                         <span class="expertise-item">Digital Transformation</span>
                         <span class="expertise-item">Market Entry</span>
                         <span class="expertise-item">Player Experience</span>
+                        <span class="expertise-item">Applied AI</span>
                     </div>
                 </div>
             </div>
@@ -987,7 +1076,7 @@
         <div class="container">
             <div class="section-header reveal">
                 <h2>What I do</h2>
-                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming.</p>
+                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming — and to put AI to work while doing it.</p>
             </div>
 
             <div class="services-list">
@@ -1020,6 +1109,19 @@
                 <div class="service-item reveal">
                     <span class="service-number">03</span>
                     <div class="service-content">
+                        <h3>Applied AI & Automation</h3>
+                        <p>AI that ships, not slideware. I run my own companies on autonomous agents — support, content, analytics, bookkeeping — and bring that operating experience to gaming and lottery organizations. Opportunity audits, agent workflow design, and hands-on implementation sprints.</p>
+                    </div>
+                    <div class="service-tags">
+                        <span>AI Audits</span>
+                        <span>Agent Workflows</span>
+                        <span>Implementation</span>
+                    </div>
+                </div>
+
+                <div class="service-item reveal">
+                    <span class="service-number">04</span>
+                    <div class="service-content">
                         <h3>Advisory & Board Roles</h3>
                         <p>Strategic guidance for companies at any stage, from startups seeking direction to established operators pursuing growth. Available for advisory, board participation, and interim executive roles.</p>
                     </div>
@@ -1030,6 +1132,44 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Ventures Section -->
+    <section id="ventures">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Ventures</h2>
+                <p>The companies I build and run — where everything I recommend gets tested first.</p>
+            </div>
+
+            <div class="ventures-grid">
+                <a href="https://modready.gg" target="_blank" rel="noopener" class="venture-item reveal">
+                    <span class="mono venture-label">Co-founder & Operator</span>
+                    <h3>Modready</h3>
+                    <p>Gameserver hosting, run on AI. Autonomous agents handle customer support, content production, growth analytics, and the bookkeeping — a working answer to what a lean company looks like when agents do the operating.</p>
+                    <span class="venture-link">
+                        Visit modready.gg
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://apps.apple.com/se/app/id6793058263" target="_blank" rel="noopener" class="venture-item reveal">
+                    <span class="mono venture-label">Founder & Builder</span>
+                    <h3>Nōte de Parfum</h3>
+                    <p>AI-powered fragrance discovery for iOS. Designed, built, and shipped solo with AI coding agents — from first prototype to the App Store.</p>
+                    <span class="venture-link">
+                        On the App Store
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+            </div>
+
+            <p class="ventures-footnote reveal"><span class="mono">Also</span> — the automated data pipelines behind the Insights on this site run the same way.</p>
         </div>
     </section>
 
