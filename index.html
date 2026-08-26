@@ -412,46 +412,43 @@
             border-top: 1px solid var(--gray-light);
         }
 
-        .ventures-grid {
+        .ventures-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            gap: 1px;
+            background: var(--gray-light);
         }
 
-        .venture-item {
-            display: block;
-            padding: 3rem;
-            border: 1px solid var(--gray-light);
-            transition: all 0.3s ease;
+        .venture-row {
+            display: grid;
+            grid-template-columns: 160px 1fr auto;
+            gap: 3rem;
+            padding: 2rem;
+            background: var(--white);
+            align-items: center;
+            transition: background 0.3s ease;
         }
 
-        .venture-item:hover {
+        .venture-row:hover {
             background: var(--black);
             color: var(--white);
-            border-color: var(--black);
         }
 
-        .venture-label {
-            display: block;
+        .venture-role {
             color: var(--gray);
-            margin-bottom: 1rem;
         }
 
-        .venture-item h3 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            line-height: 1.2;
-            margin-bottom: 1rem;
+        .venture-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        .venture-item p {
+        .venture-info p {
             color: var(--gray);
-            line-height: 1.7;
-            max-width: 50ch;
-            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
         }
 
-        .venture-item:hover .venture-label,
-        .venture-item:hover p {
+        .venture-row:hover .venture-role,
+        .venture-row:hover .venture-info p {
             color: rgba(255,255,255,0.5);
         }
 
@@ -463,32 +460,18 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--black);
+            color: var(--gray);
             transition: color 0.3s ease, gap 0.3s ease;
         }
 
-        .venture-item:hover .venture-link {
+        .venture-row:hover .venture-link {
             color: var(--accent);
-        }
-
-        .venture-link:hover {
-            gap: 0.75rem;
-        }
-
-        .ventures-footnote {
-            margin-top: 2rem;
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        .ventures-footnote .mono {
-            color: var(--accent);
-            margin-right: 0.5rem;
         }
 
         @media (max-width: 1024px) {
-            .ventures-grid {
+            .venture-row {
                 grid-template-columns: 1fr;
+                gap: 0.75rem;
             }
         }
 
@@ -987,9 +970,9 @@
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
-                <li><a href="#ventures">Ventures</a></li>
                 <li><a href="#insights">Insights</a></li>
                 <li><a href="#speaking">Speaking</a></li>
+                <li><a href="#ventures">Ventures</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="mobile-menu" id="mobile-menu-btn">
@@ -1004,9 +987,9 @@
         <ul class="mobile-overlay-links">
             <li><a href="#about" class="mobile-nav-link">About</a></li>
             <li><a href="#services" class="mobile-nav-link">Services</a></li>
-            <li><a href="#ventures" class="mobile-nav-link">Ventures</a></li>
             <li><a href="#insights" class="mobile-nav-link">Insights</a></li>
             <li><a href="#speaking" class="mobile-nav-link">Speaking</a></li>
+            <li><a href="#ventures" class="mobile-nav-link">Ventures</a></li>
             <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
         </ul>
         <div class="mobile-overlay-footer">
@@ -1052,10 +1035,10 @@
                 </div>
                 <div class="about-content reveal">
                     <p class="about-text">
-                        I work at the intersection of <em>traditional gaming</em> and modern gambling. Understanding both worlds allows me to help operators create products that resonate with today's players while respecting the heritage of lottery gaming.
+                        My work sits between <em>traditional gaming</em> and modern gambling. Knowing both worlds helps operators build products that feel right to today's players and true to the heritage of lottery.
                     </p>
                     <p class="about-text">
-                        From the Nordic region's most successful lottery brands to emerging markets in the UAE and North America, I've shaped products and strategies that drive <em>real results</em>.
+                        I've shaped products and strategies for some of the Nordics' most successful lottery brands, and for <em>new markets</em> in the UAE and North America.
                     </p>
                     <div class="expertise-list">
                         <span class="expertise-item">iLottery</span>
@@ -1076,7 +1059,7 @@
         <div class="container">
             <div class="section-header reveal">
                 <h2>What I do</h2>
-                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming — and to put AI to work while doing it.</p>
+                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming.</p>
             </div>
 
             <div class="services-list">
@@ -1110,7 +1093,7 @@
                     <span class="service-number">03</span>
                     <div class="service-content">
                         <h3>Applied AI & Automation</h3>
-                        <p>AI that ships, not slideware. I run my own companies on autonomous agents — support, content, analytics, bookkeeping — and bring that operating experience to gaming and lottery organizations. Opportunity audits, agent workflow design, and hands-on implementation sprints.</p>
+                        <p>Practical AI, tested in my own companies before it reaches yours. At my ventures, agents run support, content, analytics, and bookkeeping. For gaming and lottery teams, that experience becomes audits, workflow design, and hands-on implementation.</p>
                     </div>
                     <div class="service-tags">
                         <span>AI Audits</span>
@@ -1135,57 +1118,19 @@
         </div>
     </section>
 
-    <!-- Ventures Section -->
-    <section id="ventures">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>Ventures</h2>
-                <p>The companies I build and run — where everything I recommend gets tested first.</p>
-            </div>
-
-            <div class="ventures-grid">
-                <a href="https://modready.gg" target="_blank" rel="noopener" class="venture-item reveal">
-                    <span class="mono venture-label">Co-founder & Operator</span>
-                    <h3>Modready</h3>
-                    <p>Gameserver hosting, run on AI. Autonomous agents handle customer support, content production, growth analytics, and the bookkeeping — a working answer to what a lean company looks like when agents do the operating.</p>
-                    <span class="venture-link">
-                        Visit modready.gg
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://apps.apple.com/se/app/id6793058263" target="_blank" rel="noopener" class="venture-item reveal">
-                    <span class="mono venture-label">Founder & Builder</span>
-                    <h3>Nōte de Parfum</h3>
-                    <p>AI-powered fragrance discovery for iOS. Designed, built, and shipped solo with AI coding agents — from first prototype to the App Store.</p>
-                    <span class="venture-link">
-                        On the App Store
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-            </div>
-
-            <p class="ventures-footnote reveal"><span class="mono">Also</span> — the automated data pipelines behind the Insights on this site run the same way.</p>
-        </div>
-    </section>
-
     <!-- Insights Section -->
     <section id="insights">
         <div class="container">
             <div class="section-header reveal">
                 <h2>Insights</h2>
-                <p>Occasional deep dives into industry trends, platform data, and the mechanics shaping iGaming and lottery.</p>
+                <p>Analysis of the trends, platforms, and mechanics shaping iGaming and lottery.</p>
             </div>
 
             <a href="/insights/stake-engine/" class="insight-card reveal">
                 <div>
                     <span class="mono insight-label">Latest</span>
                     <h3>Stake Engine Game Intelligence</h3>
-                    <p class="insight-description">Data-driven insights from tracking every game on Stake Engine's indie RGS platform — category efficiency, top performers, and where the market gaps are. Updated daily.</p>
+                    <p class="insight-description">Daily tracking of every game on Stake Engine's indie RGS platform: category efficiency, top performers, and where the gaps are.</p>
                     <span class="insight-link">
                         Read the analysis
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1208,7 +1153,7 @@
         <div class="container">
             <div class="section-header reveal">
                 <h2>Speaking & Media</h2>
-                <p>Sharing perspectives on the future of lotteries, Gen Z engagement, and digital transformation at industry events.</p>
+                <p>Talks and interviews on the future of lotteries, Gen Z engagement, and digital transformation.</p>
             </div>
 
             <div class="speaking-hero reveal" style="margin-bottom: 3rem; overflow: hidden;">
@@ -1287,12 +1232,94 @@
         </div>
     </section>
 
+    <!-- Ventures Section -->
+    <section id="ventures">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Ventures</h2>
+                <p>The companies I help build and run, from B2B gaming to consumer products.</p>
+            </div>
+
+            <div class="ventures-list">
+                <a href="https://randomstate.com" target="_blank" rel="noopener" class="venture-row reveal">
+                    <span class="mono venture-role">Co-founder</span>
+                    <div class="venture-info">
+                        <h3>Random State</h3>
+                        <p>B2B iGaming supplier behind iLottery and bingo launches in the UAE and North America.</p>
+                    </div>
+                    <span class="venture-link">
+                        randomstate.com
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://modready.gg" target="_blank" rel="noopener" class="venture-row reveal">
+                    <span class="mono venture-role">Co-founder</span>
+                    <div class="venture-info">
+                        <h3>Modready</h3>
+                        <p>Gameserver hosting for modded gaming communities.</p>
+                    </div>
+                    <span class="venture-link">
+                        modready.gg
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://apps.apple.com/se/app/id6793058263" target="_blank" rel="noopener" class="venture-row reveal">
+                    <span class="mono venture-role">Founder</span>
+                    <div class="venture-info">
+                        <h3>Nōte de Parfum</h3>
+                        <p>Fragrance discovery for iOS.</p>
+                    </div>
+                    <span class="venture-link">
+                        App Store
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://kustfangst.se" target="_blank" rel="noopener" class="venture-row reveal">
+                    <span class="mono venture-role">Founder</span>
+                    <div class="venture-info">
+                        <h3>Kustfångst</h3>
+                        <p>Reserve fish and shellfish straight from local boats along the Swedish coast.</p>
+                    </div>
+                    <span class="venture-link">
+                        kustfangst.se
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+
+                <a href="https://boosterfynd.se" target="_blank" rel="noopener" class="venture-row reveal">
+                    <span class="mono venture-role">Founder</span>
+                    <div class="venture-info">
+                        <h3>Boosterfynd</h3>
+                        <p>Price comparison for trading card boosters across Swedish retailers.</p>
+                    </div>
+                    <span class="venture-link">
+                        boosterfynd.se
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact">
         <div class="container">
             <h2 class="contact-headline reveal">Let's build something <em>remarkable</em> together</h2>
 
-            <p style="color: rgba(255,255,255,0.6); font-size: 1.125rem; margin-bottom: 3rem; max-width: 50ch;" class="reveal">Drop me a message and let's talk. Whether it's a quick question or a bigger project, I'm always happy to connect.</p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 1.125rem; margin-bottom: 3rem; max-width: 50ch;" class="reveal">A quick question or a bigger project, it starts with a message.</p>
 
             <div class="contact-grid">
                 <a href="mailto:adam@fonsica.se" class="contact-card reveal">
