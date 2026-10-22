@@ -1,1425 +1,990 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam Fonsica — iGaming & Lottery Consultant</title>
-    <meta name="description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, market entry, and applied AI.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --black: #0a0a0a;
-            --white: #fafafa;
-            --gray: #6b6b6b;
-            --gray-light: #e5e5e5;
-            --accent: #14b8a6;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--white);
-            color: var(--black);
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        /* Typography */
-        h1, h2, h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-weight: 400;
-        }
-
-        .mono {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        /* Layout */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 clamp(1.5rem, 5vw, 4rem);
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            background: transparent;
-            transition: background 0.3s ease, border-color 0.3s ease;
-            border-bottom: 1px solid transparent;
-        }
-
-        nav.scrolled {
-            background: var(--black);
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-
-        nav.scrolled .nav-inner {
-            padding: 1rem clamp(1.5rem, 5vw, 4rem);
-        }
-
-        .nav-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2rem clamp(1.5rem, 5vw, 4rem);
-            transition: padding 0.3s ease;
-        }
-
-        .logo {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--white);
-            letter-spacing: 0.05em;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--white);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--white);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            background: var(--black);
-            color: var(--white);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding-bottom: 4rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            padding: 0 clamp(1.5rem, 5vw, 4rem);
-        }
-
-        .hero-label {
-            display: inline-block;
-            margin-bottom: 2rem;
-            color: var(--gray);
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 12vw, 10rem);
-            line-height: 0.9;
-            margin-bottom: 3rem;
-            max-width: 12ch;
-        }
-
-        .hero h1 em {
-            font-style: italic;
-            color: var(--accent);
-        }
-
-        .hero-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 2rem;
-            padding: 0 clamp(1.5rem, 5vw, 4rem);
-        }
-
-        .hero-intro {
-            max-width: 45ch;
-            color: var(--gray);
-            font-size: 1.125rem;
-            line-height: 1.7;
-        }
-
-        .hero-cta {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--white);
-            transition: gap 0.3s ease;
-        }
-
-        .hero-cta:hover {
-            gap: 1.5rem;
-        }
-
-        .hero-cta span {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .arrow {
-            width: 24px;
-            height: 24px;
-            transition: transform 0.3s ease;
-        }
-
-        .hero-cta:hover .arrow {
-            transform: translateX(4px);
-        }
-
-        /* Scroll indicator */
-        .scroll-indicator {
-            position: absolute;
-            right: clamp(1.5rem, 5vw, 4rem);
-            top: 50%;
-            transform: translateY(-50%);
-            writing-mode: vertical-rl;
-        }
-
-        .scroll-indicator span {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: var(--gray);
-        }
-
-        .scroll-line {
-            width: 1px;
-            height: 60px;
-            background: var(--gray);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .scroll-line::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 30%;
-            background: var(--white);
-            animation: scrollDown 2s ease-in-out infinite;
-        }
-
-        @keyframes scrollDown {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(400%); }
-        }
-
-        /* Section base */
-        section {
-            padding: clamp(4rem, 10vw, 8rem) 0;
-        }
-
-        .section-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-bottom: 4rem;
-            align-items: end;
-        }
-
-        .section-header h2 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1;
-        }
-
-        .section-header p {
-            color: var(--gray);
-            font-size: 1.125rem;
-            line-height: 1.7;
-            max-width: 50ch;
-        }
-
-        /* About Section */
-        #about {
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: clamp(2rem, 8vw, 6rem);
-        }
-
-        .about-image {
-            aspect-ratio: 4/5;
-            background: var(--gray-light);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            border: 1px dashed var(--gray);
-        }
-
-        .image-placeholder .mono {
-            color: var(--gray);
-            margin-bottom: 1rem;
-        }
-
-        .image-placeholder p {
-            color: var(--gray);
-            font-size: 0.875rem;
-            max-width: 30ch;
-        }
-
-        .about-content {
-            padding-top: 2rem;
-        }
-
-        .about-text {
-            font-size: 1.5rem;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            font-family: 'Instrument Serif', Georgia, serif;
-        }
-
-        .about-text em {
-            font-style: italic;
-            color: var(--accent);
-        }
-
-        .expertise-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .expertise-item {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--black);
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .expertise-item:hover {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        /* Services Section */
-        #services {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        #services .section-header p {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .services-list {
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .service-item {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 4rem;
-            padding: 3rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            align-items: start;
-            transition: background 0.3s ease;
-            cursor: default;
-        }
-
-        .service-item:hover {
-            background: rgba(255,255,255,0.02);
-        }
-
-        .service-number {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--accent);
-        }
-
-        .service-content h3 {
-            font-size: clamp(1.5rem, 3vw, 2.5rem);
-            margin-bottom: 1rem;
-        }
-
-        .service-content p {
-            color: rgba(255,255,255,0.5);
-            max-width: 50ch;
-            line-height: 1.7;
-        }
-
-        .service-tags {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            text-align: right;
-        }
-
-        .service-tags span {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Ventures Section */
-        #ventures {
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .ventures-list {
-            display: grid;
-            gap: 1px;
-            background: var(--gray-light);
-        }
-
-        .venture-row {
-            display: grid;
-            grid-template-columns: 160px 1fr auto;
-            gap: 3rem;
-            padding: 2rem;
-            background: var(--white);
-            align-items: center;
-            transition: background 0.3s ease;
-        }
-
-        .venture-row:hover {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        .venture-role {
-            color: var(--gray);
-        }
-
-        .venture-info h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .venture-info p {
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        .venture-row:hover .venture-role,
-        .venture-row:hover .venture-info p {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .venture-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gray);
-            transition: color 0.3s ease, gap 0.3s ease;
-        }
-
-        .venture-row:hover .venture-link {
-            color: var(--accent);
-        }
-
-        @media (max-width: 1024px) {
-            .venture-row {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-        }
-
-        /* Insights Section */
-        #insights {
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .insight-card {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: clamp(2rem, 6vw, 4rem);
-            align-items: center;
-            padding: 3rem;
-            border: 1px solid var(--gray-light);
-            transition: all 0.3s ease;
-        }
-
-        .insight-card:hover {
-            background: var(--black);
-            color: var(--white);
-            border-color: var(--black);
-        }
-
-        .insight-card:hover .insight-label,
-        .insight-card:hover .insight-description {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .insight-card:hover .insight-link {
-            color: var(--accent);
-        }
-
-        .insight-label {
-            color: var(--gray);
-            margin-bottom: 0.75rem;
-        }
-
-        .insight-card h3 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
-
-        .insight-description {
-            color: var(--gray);
-            font-size: 1rem;
-            line-height: 1.7;
-            max-width: 50ch;
-            margin-bottom: 1.5rem;
-        }
-
-        .insight-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--black);
-            transition: color 0.3s ease, gap 0.3s ease;
-        }
-
-        .insight-card:hover .insight-link {
-            color: var(--accent);
-        }
-
-        .insight-link:hover {
-            gap: 0.75rem;
-        }
-
-        .insight-visual {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 16/10;
-            background: var(--black);
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .insight-card:hover .insight-visual {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .insight-visual-inner {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .insight-stat {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: clamp(3rem, 5vw, 4.5rem);
-            color: var(--accent);
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-
-        .insight-stat-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255,255,255,0.4);
-        }
-
-        @media (max-width: 1024px) {
-            .insight-card {
-                grid-template-columns: 1fr;
-            }
-
-            .insight-visual {
-                order: -1;
-            }
-        }
-
-        /* Speaking Section */
-        #speaking {
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .speaking-grid {
-            display: grid;
-            gap: 1px;
-            background: var(--gray-light);
-        }
-
-        .speaking-item {
-            display: grid;
-            grid-template-columns: 200px 1fr auto;
-            gap: 3rem;
-            padding: 2rem;
-            background: var(--white);
-            transition: background 0.3s ease;
-        }
-
-        .speaking-item:hover {
-            background: var(--black);
-            color: var(--white);
-        }
-
-        .speaking-item:hover .speaking-meta,
-        .speaking-item:hover .speaking-link {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .speaking-item:hover .speaking-link:hover {
-            color: var(--accent);
-        }
-
-        .speaking-meta {
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-
-        .speaking-meta strong {
-            display: block;
-            color: var(--black);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .speaking-item:hover .speaking-meta strong {
-            color: var(--white);
-        }
-
-        .speaking-content h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .speaking-content p {
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        .speaking-item:hover .speaking-content p {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .speaking-link {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            align-self: center;
-            transition: color 0.3s ease;
-        }
-
-        .speaking-link:hover {
-            color: var(--accent);
-        }
-
-        /* Contact Section */
-        #contact {
-            background: var(--black);
-            color: var(--white);
-            padding: clamp(6rem, 15vw, 12rem) 0;
-        }
-
-        .contact-headline {
-            font-size: clamp(2.5rem, 8vw, 6rem);
-            line-height: 1.1;
-            margin-bottom: 4rem;
-            max-width: 20ch;
-        }
-
-        .contact-headline em {
-            font-style: italic;
-            color: var(--accent);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-
-        .contact-card {
-            padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .contact-card:hover {
-            border-color: var(--accent);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .contact-card .mono {
-            color: rgba(255,255,255,0.4);
-            margin-bottom: 1rem;
-        }
-
-        .contact-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-card p {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.875rem;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--black);
-            color: var(--white);
-            padding: 2rem 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-inner p {
-            color: rgba(255,255,255,0.4);
-            font-size: 0.875rem;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .footer-links a {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: rgba(255,255,255,0.4);
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--white);
-        }
-
-        /* Mobile menu button */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .mobile-menu span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: var(--white);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .mobile-menu span:first-child {
-            transform: translateY(-4px);
-        }
-
-        .mobile-menu span:last-child {
-            transform: translateY(4px);
-        }
-
-        .mobile-menu.active span:first-child {
-            transform: translateY(1px) rotate(45deg);
-        }
-
-        .mobile-menu.active span:last-child {
-            transform: translateY(-1px) rotate(-45deg);
-        }
-
-        /* Mobile menu overlay */
-        .mobile-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: var(--black);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mobile-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .mobile-overlay nav {
-            position: static;
-            mix-blend-mode: normal;
-        }
-
-        .mobile-overlay-links {
-            list-style: none;
-            text-align: center;
-        }
-
-        .mobile-overlay-links li {
-            margin: 1.25rem 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mobile-overlay.active .mobile-overlay-links li {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(1) { transition-delay: 0.1s; }
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(2) { transition-delay: 0.15s; }
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(3) { transition-delay: 0.2s; }
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(4) { transition-delay: 0.25s; }
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(5) { transition-delay: 0.3s; }
-        .mobile-overlay.active .mobile-overlay-links li:nth-child(6) { transition-delay: 0.35s; }
-
-        .mobile-overlay-links a {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            color: var(--white);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .mobile-overlay-links a:hover {
-            color: var(--accent);
-        }
-
-        .mobile-overlay-footer {
-            position: absolute;
-            bottom: 3rem;
-            text-align: center;
-        }
-
-        .mobile-overlay-footer a {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--gray);
-            margin: 0 1rem;
-            transition: color 0.2s ease;
-        }
-
-        .mobile-overlay-footer a:hover {
-            color: var(--white);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .section-header {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .about-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .service-item {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .service-tags {
-                flex-direction: row;
-                text-align: left;
-            }
-
-            .speaking-item {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .mobile-menu {
-                display: flex;
-            }
-
-            .hero h1 {
-                font-size: clamp(2.5rem, 15vw, 5rem);
-            }
-
-            .scroll-indicator {
-                display: none;
-            }
-
-            .footer-inner {
-                flex-direction: column;
-                gap: 1.5rem;
-                text-align: center;
-            }
-        }
-
-        @media (max-height: 600px) and (max-width: 768px) {
-            .mobile-overlay-links li {
-                margin: 0.75rem 0;
-            }
-
-            .mobile-overlay-links a {
-                font-size: clamp(1.75rem, 6vw, 2.5rem);
-            }
-
-            .mobile-overlay-footer {
-                bottom: 1.5rem;
-            }
-        }
-
-        /* Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adam Fonsica — iGaming &amp; Lottery Consultant</title>
+<meta name="description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, market entry, and applied AI.">
+<meta name="theme-color" content="#2B292B">
+<link rel="canonical" href="https://fonsica.se/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fonsica.se/">
+<meta property="og:title" content="Adam Fonsica — iGaming &amp; Lottery Consultant">
+<meta property="og:description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, market entry, and applied AI.">
+<meta property="og:image" content="https://fonsica.se/images/brand/fonsica-og-1200x630.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fonsica. Bridging gaming and gambling. Adam Fonsica, iGaming and lottery consultant">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Adam Fonsica — iGaming &amp; Lottery Consultant">
+<meta name="twitter:description" content="Strategic consulting for iGaming and lottery operators. 15+ years of experience in product development, digital transformation, market entry, and applied AI.">
+<meta name="twitter:image" content="https://fonsica.se/images/brand/fonsica-og-1200x630.jpg">
+<meta name="twitter:image:alt" content="Fonsica. Bridging gaming and gambling. Adam Fonsica, iGaming and lottery consultant">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="images/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="images/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400..600&family=Schibsted+Grotesk:wght@400..800&display=swap">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ==========================================================================
+   10 · AFTER HOURS: one portrait, one conversation
+   Tokens
+   ========================================================================== */
+:root {
+  --ground: #2B292B;          /* page ground, matches the photo's backdrop edges */
+  --ground-0: rgba(43, 41, 43, 0);
+  --raised: #343133;          /* bands */
+  --lift: #4A4547;            /* soft glow behind the head */
+  --bone: #ECE7E1;            /* primary text */
+  --ash: #A59F99;             /* secondary text: 5.5:1 on ground, 4.9:1 on raised */
+  --hair: #45403F;            /* hairlines */
+  --teal: #2DD4BF;            /* the signal */
+
+  --sans: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --edge: 20px;               /* chrome inset (wordmark, nav, caption) */
+  --gl: 20px;                 /* story gutter, left */
+  --gr: 20px;                 /* story gutter, right */
+  --header-h: 64px;
+  --base: 44px;               /* shared bottom line: caption and hero CTA */
+
+  --cam-dur: 1.1s;
+  --cam-ease: cubic-bezier(.45, 0, .2, 1);  /* no overshoot: every in-between frame stays inside the crop */
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--ground); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--bone);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
+  font-weight: 400;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3, p, ul, ol, figure { margin: 0; }
+h1, h2, h3, .contact-main { text-wrap: balance; }   /* headings and list/item titles: no lone last word */
+p { text-wrap: pretty; }
+ul, ol { padding: 0; list-style: none; }
+img { display: block; max-width: 100%; height: auto; }
+picture { display: block; }
+a { color: inherit; }
+::selection { background: var(--teal); color: var(--ground); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 2px; }
+main:focus { outline: none; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip {
+  position: fixed; top: 12px; left: 12px; z-index: 100;
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
+  background: var(--bone); color: var(--ground);
+  font: 600 15px/1 var(--sans); text-decoration: none; border-radius: 999px;
+  transform: translateY(-200%);
+}
+.skip:focus { transform: none; }
+
+/* Mono voices: structure in caps, facts in their own case */
+.label {
+  font-family: var(--mono); font-size: 12px; line-height: 1.4; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ash);
+}
+.meta {
+  font-family: var(--mono); font-size: 13px; line-height: 1.5; font-weight: 400;
+  letter-spacing: .02em; color: var(--ash);
+}
+
+/* Links: bone text, teal underline */
+.link {
+  display: inline-flex; align-items: center; gap: 9px; min-height: 44px;
+  color: var(--bone); font-weight: 500;
+  text-decoration: underline; text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px; text-underline-offset: .32em;
+}
+.link:hover { text-decoration-thickness: 2px; }
+.ext { flex: none; width: 10px; height: 10px; color: var(--ash); }
+.link:hover .ext { color: var(--bone); }
+
+/* ==========================================================================
+   Masthead: wordmark (top-left), nav (top-right), menu toggle (mobile)
+   ========================================================================== */
+.masthead {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--edge);
+}
+.masthead::before {             /* solid bar once the page has scrolled (mobile) */
+  content: ""; position: absolute; inset: 0; z-index: -2;
+  background: var(--ground); border-bottom: 1px solid var(--hair);
+  opacity: 0; transition: opacity .3s ease;
+}
+.masthead.is-scrolled::before { opacity: 1; }
+
+.wordmark {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--bone); text-decoration: none; line-height: 1;
+}
+/* Logo: "Fonsica" outlined from Schibsted Grotesk 800; the i-dot carries the site's teal signal.
+   The SVG is the ink box (0.808 em tall), so this matches the type size used in the header. */
+.wordmark .logo { display: block; width: auto; height: calc(clamp(21px, 1.7vw, 25px) * .808); overflow: visible; }
+.logo-dot { fill: var(--teal); }
+
+/* The full name opens the hero label; the role stays on one line */
+.hero-name { color: var(--bone); }
+.hero-role { white-space: nowrap; }
+@media (max-width: 599px) { .hero-name { display: block; } .hero-sep { display: none; } }
+
+.menu-toggle {
+  display: inline-flex; align-items: center; gap: 12px;
+  min-height: 44px; min-width: 44px; margin-right: -10px; padding: 0 10px;
+  background: none; border: 0; color: var(--bone); cursor: pointer;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  border-radius: 4px;
+}
+.menu-toggle-icon { position: relative; width: 18px; height: 8px; }
+.menu-toggle-icon::before, .menu-toggle-icon::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor;
+  transition: transform .25s ease, top .25s ease;
+}
+.menu-toggle-icon::before { top: 0; }
+.menu-toggle-icon::after { top: 6.5px; }
+.menu-open .menu-toggle-icon::before { top: 3.25px; transform: rotate(45deg); }
+.menu-open .menu-toggle-icon::after { top: 3.25px; transform: rotate(-45deg); }
+
+/* Mobile overlay navigation */
+.nav {
+  position: fixed; inset: 0; z-index: -1;
+  display: flex; flex-direction: column;
+  padding: calc(var(--header-h) + 24px) var(--gl) 48px;
+  background: var(--ground);
+  overflow-y: auto; overscroll-behavior: contain;
+  visibility: hidden; opacity: 0;
+  transition: opacity .25s ease, visibility 0s linear .25s;
+}
+.menu-open .nav { visibility: visible; opacity: 1; transition: opacity .25s ease; }
+.nav ul { margin-block: auto; border-top: 1px solid var(--hair); }   /* centred when it fits, scrollable when it doesn't */
+.nav li { border-bottom: 1px solid var(--hair); }
+.nav a {
+  display: flex; align-items: baseline; gap: 18px; min-height: 64px; padding: 14px 0;
+  color: var(--bone); text-decoration: none;
+  font-weight: 700; font-size: clamp(2rem, 8.6vw, 3rem); line-height: 1.05; letter-spacing: -.03em;
+}
+.nav-idx {
+  flex: none; width: 24px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.nav a.is-active { color: var(--teal); }
+.menu-open, .menu-open body { overflow: hidden; }
+
+/* ==========================================================================
+   Stage: the portrait panel + the story
+   ========================================================================== */
+.panel {
+  position: relative; overflow: hidden;
+  /* placeholder that matches the studio backdrop while the photo loads */
+  background: radial-gradient(70% 55% at 52% 26%, var(--lift) 0%, var(--ground) 72%);
+}
+.frame {
+  /* HARD CROP: only the top 1200 of 1402 px can ever be inside this box.
+     The box clips its own image, so the camera can move the box, never the crop. */
+  position: relative; width: 100%;
+  aspect-ratio: 1122 / 1200;
+  max-height: max(72svh, 440px);   /* wider than 1122/1200 only ever crops more, never less */
+  overflow: hidden;
+}
+.frame img { width: 100%; height: auto; }
+.panel::after {                    /* fade into the ground at the bottom */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(to top, var(--ground) 0%, rgba(43, 41, 43, .8) 14%, var(--ground-0) 46%);
+}
+.doc, .caption { display: none; }
+
+.story { container: story / inline-size; }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero {
+  position: relative; z-index: 3;
+  margin-top: calc(-1 * clamp(80px, 17vw, 150px));
+  padding: 0 var(--gr) 24px var(--gl);
+}
+.hero-label {
+  font-family: var(--mono); font-size: 13px; line-height: 1.4; letter-spacing: .04em; color: var(--ash);
+  margin-bottom: 20px;
+}
+.hero-title {
+  font-weight: 800; font-size: clamp(3rem, 9vw, 6.5rem); line-height: .98; letter-spacing: -.045em;
+}
+.hero-title span { display: block; }
+.hero-intro {
+  margin-top: 28px; max-width: 29em;
+  font-size: clamp(1.125rem, 1.35vw, 1.3125rem); line-height: 1.5; color: var(--bone);
+}
+.hero-cta { margin-top: 36px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 56px; padding: 0 30px;
+  background: var(--bone); color: var(--ground);
+  font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -.005em;
+  text-decoration: none; border-radius: 999px;
+  transition: background-color .2s ease;
+}
+.btn:hover { background: var(--teal); }
+.btn:focus-visible { outline-offset: 4px; }
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+.section { padding: 104px var(--gr) 104px var(--gl); }
+.section-head { display: flex; flex-direction: column; }
+.section-title {
+  font-weight: 700; font-size: clamp(2.5rem, 4.4vw, 4.25rem); line-height: 1; letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.idx {
+  flex: none; margin-bottom: 20px;
+  font-family: var(--mono); font-size: 12px; line-height: 1; font-weight: 500; letter-spacing: .12em;
+  color: var(--ash); font-variant-numeric: tabular-nums;
+}
+.section-intro {
+  margin-top: 24px; max-width: 32em;
+  font-size: clamp(1.125rem, 1.25vw, 1.25rem); line-height: 1.55; color: var(--ash);
+}
+
+/* About */
+.about-lead {
+  margin-top: 40px; max-width: 26em;
+  font-size: clamp(1.3125rem, 1.75vw, 1.625rem); line-height: 1.42; letter-spacing: -.01em; color: var(--bone);
+}
+.about-body { margin-top: 22px; max-width: 34em; color: var(--ash); }
+.expertise {
+  margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--hair);
+  display: flex; flex-wrap: wrap; gap: 6px 0;
+  font-weight: 500; font-size: clamp(1.0625rem, 1.3vw, 1.25rem); line-height: 1.5; letter-spacing: -.005em;
+}
+.expertise li:not(:last-child)::after {
+  content: "/"; content: "/" / "";
+  margin: 0 .55em; color: var(--hair); font-weight: 400;
+}
+
+/* Services */
+.services { margin-top: 56px; border-top: 1px solid var(--hair); }
+.service {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px;
+  padding: 30px 0 32px; border-bottom: 1px solid var(--hair);
+}
+.service-num {
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; color: var(--ash);
+  padding-top: .72em; font-variant-numeric: tabular-nums;
+}
+.service h3 {
+  font-weight: 600; font-size: clamp(1.375rem, 1.9vw, 1.75rem); line-height: 1.2; letter-spacing: -.018em;
+}
+.service p { margin-top: 12px; max-width: 34em; color: var(--ash); }
+.tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+
+@container story (min-width: 800px) {
+  .service { grid-template-columns: 40px minmax(0, .9fr) minmax(0, 1.1fr); column-gap: 12px; }
+  .service-body { display: contents; }
+  .service h3 { padding-right: 32px; }
+  .service p { margin-top: 0; padding-top: .35em; }
+  .service .tags { grid-column: 3; }
+}
+
+/* Insights: the raised band */
+.band { background: var(--raised); }
+.insight { margin-top: 64px; }
+.insight-label { display: flex; align-items: center; gap: 12px; }
+.live { position: relative; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+.live::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--teal);
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .live::after { animation: live 2.6s cubic-bezier(.2, .6, .3, 1) infinite; }
+}
+@keyframes live {
+  0% { transform: scale(.5); opacity: .9; }
+  80%, 100% { transform: scale(1.6); opacity: 0; }
+}
+.stat { margin-top: 28px; }
+.stat-num {
+  display: block; color: var(--bone);
+  font-weight: 800; font-size: clamp(5rem, 10.5vw, 10rem); line-height: .82; letter-spacing: -.055em;
+  font-variant-numeric: lining-nums;
+}
+.stat-label { display: block; margin-top: 22px; }
+.insight-body { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--hair); }
+.insight h3 { font-weight: 600; font-size: clamp(1.5rem, 2.1vw, 1.875rem); line-height: 1.15; letter-spacing: -.02em; }
+.insight p { margin-top: 14px; max-width: 32em; color: var(--ash); }
+.insight .link { margin-top: 18px; }
+
+
+/* Speaking */
+.doc-inline { margin: 48px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); }
+.doc-inline img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.doc-inline figcaption { padding: 14px var(--gr) 0 var(--gl); }
+.talks { margin-top: 56px; border-top: 1px solid var(--hair); }
+.talk { display: grid; row-gap: 10px; padding: 28px 0 24px; border-bottom: 1px solid var(--hair); }
+.talk-meta { display: flex; flex-wrap: wrap; gap: 2px 18px; }
+.talk h3 { font-weight: 600; font-size: clamp(1.25rem, 1.7vw, 1.5rem); line-height: 1.25; letter-spacing: -.015em; }
+.talk p { margin-top: 8px; max-width: 34em; color: var(--ash); }
+.talk .link { margin-top: 6px; }
+
+@container story (min-width: 640px) {
+  .talk { grid-template-columns: 160px minmax(0, 1fr); column-gap: 28px; }
+  .talk-meta { flex-direction: column; padding-top: .3em; }
+}
+
+/* Ventures: a quiet list */
+.ventures { margin-top: 56px; border-top: 1px solid var(--hair); }
+.venture { display: grid; row-gap: 6px; padding: 26px 0 22px; border-bottom: 1px solid var(--hair); }
+.venture h3 { font-weight: 600; font-size: clamp(1.25rem, 1.7vw, 1.5rem); line-height: 1.25; letter-spacing: -.015em; }
+.venture p { max-width: 34em; color: var(--ash); }
+.venture .link { font-family: var(--mono); font-size: 13px; font-weight: 400; letter-spacing: .02em; }
+
+@container story (min-width: 640px) {
+  .venture { grid-template-columns: 160px minmax(0, 1fr); column-gap: 28px; }
+  .venture-role { grid-row: 1 / span 3; padding-top: .45em; }
+}
+@container story (min-width: 1000px) {
+  .venture { grid-template-columns: 160px minmax(0, 1fr) auto; }
+  .venture-role { grid-row: 1 / span 2; }
+  .venture .link { grid-column: 3; grid-row: 1; align-self: start; margin-top: -8px; }
+}
+
+/* Contact */
+.contact-title {
+  font-weight: 800; font-size: clamp(2.75rem, 5.4vw, 5.5rem); line-height: .98; letter-spacing: -.045em;
+}
+.contact-list { margin-top: 56px; border-top: 1px solid var(--hair); }
+.contact-item {
+  display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 6px;
+  padding: 24px 0 26px; border-bottom: 1px solid var(--hair);
+  color: var(--bone); text-decoration: none;
+}
+.contact-main {
+  justify-self: start;
+  font-weight: 600; font-size: clamp(1.5rem, 2.4vw, 2.125rem); line-height: 1.15; letter-spacing: -.02em;
+  text-decoration: underline; text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px; text-underline-offset: .2em;
+  overflow-wrap: anywhere;
+}
+.contact-main .ext { display: inline-block; width: 12px; height: 12px; margin-left: 10px; vertical-align: .35em; }
+.contact-item:hover .contact-main { text-decoration-thickness: 2px; }
+.contact-desc { color: var(--ash); }
+
+@container story (min-width: 640px) {
+  .contact-item { grid-template-columns: 160px minmax(0, 1fr); column-gap: 28px; }
+  .contact-item .label { padding-top: .9em; grid-row: 1 / span 2; }
+}
+
+/* Footer */
+.site-footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 32px;
+  padding: 20px var(--gr) 28px var(--gl);
+  border-top: 1px solid var(--hair);
+}
+.site-footer ul { display: flex; gap: 28px; }
+.site-footer a {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; min-width: 44px;
+  color: var(--bone); text-decoration: underline; text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px; text-underline-offset: .32em;
+  font-family: var(--mono); font-size: 13px; letter-spacing: .02em;
+}
+.site-footer a:hover { text-decoration-thickness: 2px; }
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+@media (min-width: 640px) {
+  :root { --edge: 32px; --gl: 40px; --gr: 40px; --header-h: 72px; }
+  .section { padding-block: 128px; }
+}
+
+/* ==========================================================================
+   Desktop: the split screen
+   ========================================================================== */
+@media (min-width: 1024px) {
+  :root {
+    --edge: clamp(28px, 2.8vw, 48px);
+    --gl: clamp(64px, 6vw, 112px);
+    --gr: clamp(40px, 5.5vw, 120px);
+    --header-h: 88px;
+  }
+
+  /* masthead mirrors the stage grid: wordmark over the panel, nav over the story */
+  .masthead {
+    display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+    align-items: center; padding: 0;
+  }
+  .masthead::before { display: none; }
+  .wordmark { grid-column: 1; grid-row: 1; justify-self: start; margin-left: var(--edge); }
+  .menu-toggle { display: none; }
+  .nav {
+    position: static; z-index: auto; grid-column: 2; grid-row: 1;
+    height: var(--header-h); padding: 0 var(--edge) 0 var(--gl);
+    flex-direction: row; justify-content: flex-end; align-items: center;
+    background: linear-gradient(to bottom, var(--ground) 0%, var(--ground) 64%, var(--ground-0) 100%);
+    overflow: visible; visibility: visible; opacity: 1; transition: none;
+  }
+  .nav ul { display: flex; align-items: center; gap: clamp(16px, 1.9vw, 34px); margin: 0; border: 0; }
+  .nav li { border: 0; }
+  .nav a {
+    position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0;
+    font-family: var(--mono); font-size: 12px; font-weight: 500; line-height: 1;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ash);
+    transition: color .2s ease;
+  }
+  .nav a:hover { color: var(--bone); }
+  .nav a::before {
+    content: ""; position: absolute; left: -12px; top: 50%;
+    width: 5px; height: 5px; margin-top: -3px; border-radius: 50%; background: var(--teal);
+    opacity: 0; transform: scale(.3); transition: opacity .3s ease, transform .3s ease;
+  }
+  .nav a.is-active { color: var(--teal); }
+  .nav a.is-active::before { opacity: 1; transform: none; }
+  .nav-idx { display: none; }
+
+  .stage { display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); }
+
+  .panel {
+    position: sticky; top: 0; align-self: start;
+    height: 100vh; height: 100svh;
+  }
+  .frame {
+    /* the crop box: as wide as the panel or as tall as the viewport, whichever is larger,
+       always anchored at the top and centred horizontally */
+    --fw: max(100%, calc(100svh * 1122 / 1200));
+    position: absolute; top: 0; left: calc(50% - var(--fw) / 2);
+    width: var(--fw); max-height: none;
+    transform-origin: 52.14% 28.75%;     /* face centre (585, 345) of the 1122 x 1200 crop */
+    transform: translate(var(--tx, 0%), var(--ty, 0%)) scale(var(--s, 1));
+  }
+  .js .frame { transition: transform var(--cam-dur) var(--cam-ease), opacity .7s ease .3s; }
+  .js .panel.is-intro .frame { transition-duration: 1.9s, .7s; }
+
+  /* Camera frames. Scale only goes up from the base frame and every translate stays
+     inside the margin that scale creates, so no edge of the crop box can enter the panel. */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .panel[data-shot="intro"] .frame    { --s: 1.045; }
+    .panel[data-shot="about"] .frame        { --s: 1.12; --ty: -1%; }
+    .panel[data-shot="services"] .frame     { --s: 1.05; --tx: -1.8%; }
+    .panel[data-shot="insights"] .frame     { --s: 1.18; --tx: 2.5%; --ty: -2%; }
+    .panel[data-shot="speaking"] .frame,
+    .panel[data-shot="ventures"] .frame     { --s: 1.06; --tx: 1.5%; }
+    .panel[data-shot="contact"] .frame      { --s: 1.25; --ty: 4%; }
+  }
+
+  .panel::after {
+    z-index: 3;
+    background:
+      linear-gradient(to left, var(--ground) 0%, var(--ground-0) 17%),
+      linear-gradient(to top, var(--ground) 0%, var(--ground) 9%, rgba(43, 41, 43, .82) 15%, var(--ground-0) 36%);
+  }
+
+  /* B-roll: the keynote photo crossfades in for Speaking */
+  .panel.doc-ready .doc {
+    display: block; position: absolute; inset: 0; z-index: 2;
+    opacity: 0; transform: scale(1.05);
+    transition: opacity .7s ease, transform 1.8s var(--cam-ease);
+  }
+  .doc picture, .doc img { width: 100%; height: 100%; }
+  .doc img { object-fit: cover; object-position: 27% 50%; }
+  .doc::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(to left, var(--ground) 0%, var(--ground-0) 34%),
+      linear-gradient(to bottom, rgba(43, 41, 43, .72) 0%, var(--ground-0) 20%),
+      rgba(43, 41, 43, .14);
+  }
+  .panel[data-shot="speaking"] .doc {
+    opacity: 1; transform: none;
+    transition: opacity 1s var(--cam-ease), transform 1.8s var(--cam-ease);
+  }
+  /* the portrait dims a little ahead of the keynote coming up: a dissolve without a ghosted face.
+     Only once the keynote has loaded, so the panel can never go blank. */
+  .panel.doc-loaded[data-shot="speaking"] .frame {
+    opacity: 0;
+    transition: transform var(--cam-dur) var(--cam-ease), opacity .55s ease;
+  }
+
+  /* Lower-third caption */
+  .caption {
+    display: block; position: absolute; z-index: 4;
+    left: var(--edge); bottom: var(--base); right: 22%;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .caption.is-swapping { opacity: 0; transform: translateY(4px); }
+  .caption-title {
+    display: block; font-family: var(--mono); font-size: 13px; line-height: 1.5; letter-spacing: .02em; color: var(--bone);
+  }
+  .caption-index {
+    display: none; margin-top: 6px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.5; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-variant-numeric: tabular-nums;
+  }
+  .js .caption-index { display: block; }
+
+  .story { min-width: 0; }
+  .hero {
+    margin-top: 0; min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 132px var(--gr) var(--base) var(--gl);
+  }
+  .hero-title { font-size: clamp(3rem, 7.2vw, 6.5rem); }
+  .section { padding-block: clamp(120px, 16vh, 184px); }
+  .section-head { flex-direction: row; align-items: baseline; }
+  .section-title { min-width: 0; }
+  .idx { width: 44px; margin: 0 0 0 -44px; }
+
+  .doc-inline { display: none; }
+  .band { background: linear-gradient(90deg, var(--ground) 0, var(--raised) var(--gl)); }
+
+  .contact {
+    min-height: 92vh; min-height: 92svh;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+
+  /* end credits: full width, aligned to the chrome edges */
+  .site-footer { padding: 18px var(--edge) 22px; }
+}
+
+/* ==========================================================================
+   Reduced motion: no reframing, no transitions; the keynote photo simply cuts in
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
+  .frame { transform: none !important; }
+  .doc { transform: none !important; }
+}
+</style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-inner">
-            <a href="#" class="logo">Fonsica</a>
-            <ul class="nav-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#insights">Insights</a></li>
-                <li><a href="#speaking">Speaking</a></li>
-                <li><a href="#ventures">Ventures</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <div class="mobile-menu" id="mobile-menu-btn">
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
+<a class="skip" href="#main">Skip to content</a>
 
-    <!-- Mobile Overlay Menu -->
-    <div class="mobile-overlay" id="mobile-overlay">
-        <ul class="mobile-overlay-links">
-            <li><a href="#about" class="mobile-nav-link">About</a></li>
-            <li><a href="#services" class="mobile-nav-link">Services</a></li>
-            <li><a href="#insights" class="mobile-nav-link">Insights</a></li>
-            <li><a href="#speaking" class="mobile-nav-link">Speaking</a></li>
-            <li><a href="#ventures" class="mobile-nav-link">Ventures</a></li>
-            <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
-        </ul>
-        <div class="mobile-overlay-footer">
-            <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank">LinkedIn</a>
-            <a href="mailto:adam@fonsica.se">Email</a>
-        </div>
+<header class="masthead" id="masthead">
+  <a class="wordmark" href="#top" aria-label="Fonsica"><svg class="logo" viewBox="133 -1628 7267 1655" aria-hidden="true" focusable="false"><path fill="currentColor" d="M133.0 0.0V-1440.0H1171.0V-1133.0H494.0V-877.0H1080.0V-570.0H494.0V0.0Z M1754.84 27.0Q1586.84 27.0 1458.84 -45.0Q1330.84 -117.0 1259.34 -245.0Q1187.84 -373.0 1187.84 -540.0Q1187.84 -708.0 1259.34 -835.5Q1330.84 -963.0 1458.84 -1035.0Q1586.84 -1107.0 1754.84 -1107.0Q1922.84 -1107.0 2050.84 -1035.0Q2178.84 -963.0 2250.84 -835.5Q2322.84 -708.0 2322.84 -540.0Q2322.84 -372.0 2250.84 -244.5Q2178.84 -117.0 2050.34 -45.0Q1921.84 27.0 1754.84 27.0ZM1755.84 -224.0Q1849.84 -224.0 1904.84 -309.0Q1959.84 -394.0 1959.84 -540.0Q1959.84 -686.0 1904.84 -771.0Q1849.84 -856.0 1754.84 -856.0Q1660.84 -856.0 1605.84 -771.0Q1550.84 -686.0 1550.84 -540.0Q1550.84 -394.0 1605.84 -309.0Q1660.84 -224.0 1755.84 -224.0Z M2426.68 0.0V-1080.0H2767.68V-829.0L2759.68 -874.0Q2811.68 -986.0 2900.18 -1046.5Q2988.68 -1107.0 3114.68 -1107.0Q3244.68 -1107.0 3324.18 -1047.5Q3403.68 -988.0 3439.68 -884.5Q3475.68 -781.0 3475.68 -649.0V0.0H3125.68V-628.0Q3125.68 -736.0 3094.18 -792.0Q3062.68 -848.0 2981.68 -848.0Q2880.68 -848.0 2829.18 -755.5Q2777.68 -663.0 2777.68 -467.0V0.0Z M4073.5199999999995 27.0Q3949.5199999999995 27.0 3836.0199999999995 -7.0Q3722.5199999999995 -41.0 3644.5199999999995 -115.0Q3566.5199999999995 -189.0 3546.5199999999995 -309.0L3857.5199999999995 -371.0Q3865.5199999999995 -294.0 3913.5199999999995 -254.0Q3961.5199999999995 -214.0 4058.5199999999995 -214.0Q4151.5199999999995 -214.0 4192.5199999999995 -246.0Q4233.5199999999995 -278.0 4233.5199999999995 -320.0Q4233.5199999999995 -357.0 4199.5199999999995 -388.5Q4165.5199999999995 -420.0 4074.5199999999995 -433.0L3988.5199999999995 -445.0Q3929.5199999999995 -453.0 3860.5199999999995 -468.0Q3791.5199999999995 -483.0 3729.5199999999995 -514.5Q3667.5199999999995 -546.0 3628.5199999999995 -603.0Q3589.5199999999995 -660.0 3589.5199999999995 -752.0Q3589.5199999999995 -860.0 3647.5199999999995 -939.5Q3705.5199999999995 -1019.0 3811.5199999999995 -1063.0Q3917.5199999999995 -1107.0 4059.5199999999995 -1107.0Q4182.5199999999995 -1107.0 4288.0199999999995 -1072.0Q4393.5199999999995 -1037.0 4466.0199999999995 -967.5Q4538.5199999999995 -898.0 4559.5199999999995 -794.0L4252.5199999999995 -731.0Q4245.5199999999995 -764.0 4228.5199999999995 -796.5Q4211.5199999999995 -829.0 4175.0199999999995 -850.5Q4138.5199999999995 -872.0 4073.5199999999995 -872.0Q4003.5199999999995 -872.0 3966.5199999999995 -845.5Q3929.5199999999995 -819.0 3929.5199999999995 -778.0Q3929.5199999999995 -743.0 3956.5199999999995 -721.5Q3983.5199999999995 -700.0 4027.5199999999995 -687.5Q4071.5199999999995 -675.0 4122.5199999999995 -667.0L4226.5199999999995 -652.0Q4312.5199999999995 -640.0 4392.5199999999995 -605.0Q4472.5199999999995 -570.0 4524.0199999999995 -504.0Q4575.5199999999995 -438.0 4575.5199999999995 -331.0Q4575.5199999999995 -213.0 4509.5199999999995 -133.0Q4443.5199999999995 -53.0 4329.5199999999995 -13.0Q4215.5199999999995 27.0 4073.5199999999995 27.0Z M4678.36 0.0V-1080.0H5029.36V0.0Z M5714.2 27.0Q5536.2 27.0 5406.7 -42.0Q5277.2 -111.0 5206.7 -238.5Q5136.2 -366.0 5136.2 -541.0Q5136.2 -716.0 5206.2 -843.0Q5276.2 -970.0 5405.2 -1038.5Q5534.2 -1107.0 5711.2 -1107.0Q5836.2 -1107.0 5946.7 -1062.5Q6057.2 -1018.0 6135.2 -929.0Q6213.2 -840.0 6238.2 -705.0L5910.2 -639.0Q5892.2 -750.0 5840.2 -803.0Q5788.2 -856.0 5710.2 -856.0Q5599.2 -856.0 5549.2 -765.5Q5499.2 -675.0 5499.2 -536.0Q5499.2 -397.0 5548.7 -310.5Q5598.2 -224.0 5710.2 -224.0Q5785.2 -224.0 5838.2 -269.5Q5891.2 -315.0 5917.2 -414.0L6232.2 -362.0Q6213.2 -258.0 6161.7 -183.5Q6110.2 -109.0 6037.2 -63.0Q5964.2 -17.0 5880.7 5.0Q5797.2 27.0 5714.2 27.0Z M6647.04 26.0Q6546.04 26.0 6455.54 -8.0Q6365.04 -42.0 6309.04 -114.0Q6253.04 -186.0 6253.04 -301.0Q6253.04 -425.0 6324.54 -505.5Q6396.04 -586.0 6526.54 -626.0Q6657.04 -666.0 6837.04 -666.0H6977.04L6959.04 -634.0V-698.0Q6959.04 -796.0 6925.54 -841.0Q6892.04 -886.0 6815.04 -886.0Q6740.04 -886.0 6701.04 -846.0Q6662.04 -806.0 6650.04 -729.0L6300.04 -786.0Q6320.04 -877.0 6381.54 -950.0Q6443.04 -1023.0 6554.54 -1066.0Q6666.04 -1109.0 6834.04 -1109.0Q6982.04 -1109.0 7087.54 -1065.0Q7193.04 -1021.0 7249.54 -915.0Q7306.04 -809.0 7306.04 -622.0V-306.0Q7306.04 -272.0 7315.54 -261.0Q7325.04 -250.0 7356.04 -250.0H7400.04V0.0H7244.04Q7108.04 0.0 7041.04 -65.5Q6974.04 -131.0 6974.04 -258.0V-298.0L7038.04 -271.0Q7026.04 -227.0 7002.54 -176.0Q6979.04 -125.0 6936.04 -79.0Q6893.04 -33.0 6822.54 -3.5Q6752.04 26.0 6647.04 26.0ZM6752.04 -202.0Q6817.04 -202.0 6864.04 -231.0Q6911.04 -260.0 6937.04 -315.0Q6963.04 -370.0 6963.04 -448.0V-477.0H6854.04Q6758.04 -477.0 6705.04 -452.0Q6652.04 -427.0 6631.54 -391.0Q6611.04 -355.0 6611.04 -322.0Q6611.04 -300.0 6622.04 -272.0Q6633.04 -244.0 6663.04 -223.0Q6693.04 -202.0 6752.04 -202.0Z"/><path class="logo-dot" d="M4854.36 -1188.0Q4752.36 -1188.0 4693.36 -1247.0Q4634.36 -1306.0 4634.36 -1408.0Q4634.36 -1510.0 4693.36 -1569.0Q4752.36 -1628.0 4854.36 -1628.0Q4956.36 -1628.0 5015.36 -1569.0Q5074.36 -1510.0 5074.36 -1408.0Q5074.36 -1306.0 5015.36 -1247.0Q4956.36 -1188.0 4854.36 -1188.0Z"/></svg></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+    <span class="menu-toggle-icon" aria-hidden="true"></span>
+    <span class="menu-toggle-label">Menu</span>
+  </button>
+  <nav class="nav" id="site-nav" aria-label="Primary">
+    <ul>
+      <li><a href="#about"><span class="nav-idx" aria-hidden="true">01</span>About</a></li>
+      <li><a href="#services"><span class="nav-idx" aria-hidden="true">02</span>Services</a></li>
+      <li><a href="#insights"><span class="nav-idx" aria-hidden="true">03</span>Insights</a></li>
+      <li><a href="#speaking"><span class="nav-idx" aria-hidden="true">04</span>Speaking</a></li>
+      <li><a href="#ventures"><span class="nav-idx" aria-hidden="true">05</span>Ventures</a></li>
+      <li><a href="#contact"><span class="nav-idx" aria-hidden="true">06</span>Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main" class="stage" tabindex="-1">
+
+  <div class="panel" data-shot="intro">
+    <div class="frame">
+      <picture>
+        <source type="image/webp"
+          srcset="images/portraits/2026-10-19/web/adam-studio-charcoal-480.webp 480w,
+                  images/portraits/2026-10-19/web/adam-studio-charcoal-800.webp 800w,
+                  images/portraits/2026-10-19/web/adam-studio-charcoal-1122.webp 1122w"
+          sizes="(min-width: 1024px) 117vh, 100vw">
+        <img src="images/portraits/2026-10-19/adam-studio-charcoal.jpg" width="1122" height="1402" alt="Adam Fonsica" fetchpriority="high">
+      </picture>
     </div>
+    <div class="doc" aria-hidden="true">
+      <picture>
+        <source type="image/webp"
+          srcset="images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-768.webp 768w,
+                  images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-1200.webp 1200w,
+                  images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-1600.webp 1600w, images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-2560.webp 2560w"
+          sizes="178vh">
+        <img src="images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-1600.jpg" width="1600" height="900" alt="" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <p class="caption" aria-hidden="true">
+      <span class="caption-title">Adam Fonsica</span>
+      <span class="caption-index">00 / Intro</span>
+    </p>
+  </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="scroll-indicator">
-            <span class="mono">
-                Scroll
-                <div class="scroll-line"></div>
-            </span>
-        </div>
+  <div class="story">
 
-        <div class="hero-content">
-            <span class="mono hero-label">iGaming & Lottery Consultant</span>
-            <h1>Bridging <em>gaming</em> and gambling</h1>
-        </div>
-
-        <div class="hero-bottom">
-            <p class="hero-intro">
-                15+ years helping lottery operators and iGaming companies
-                innovate, expand, and connect with the next generation of players.
-            </p>
-            <a href="#contact" class="hero-cta">
-                <span>Start a conversation</span>
-                <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </a>
-        </div>
+    <section id="top" class="hero" aria-labelledby="hero-title" data-shot="hero" data-index="00" data-name="Intro">
+      <p class="hero-label"><span class="hero-name">Adam Fonsica</span><span class="hero-sep" aria-hidden="true"> · </span><span class="hero-role">iGaming &amp; Lottery Consultant</span></p>
+      <h1 id="hero-title" class="hero-title"><span>Bridging</span> <span>gaming and</span> <span>gambling</span></h1>
+      <p class="hero-intro">15+ years helping lottery operators and iGaming companies innovate, expand, and connect with the next generation of players.</p>
+      <p class="hero-cta"><a class="btn" href="#contact">Start a conversation</a></p>
     </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-image reveal">
-                    <img src="images/BA3823E9-2356-4C6E-A471-8863015F6E4F (1).jpeg" alt="Adam Fonsica" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="about-content reveal">
-                    <p class="about-text">
-                        My work sits between <em>traditional gaming</em> and modern gambling. Knowing both worlds helps operators build products that feel right to today's players and true to the heritage of lottery.
-                    </p>
-                    <p class="about-text">
-                        I've shaped products and strategies for some of the Nordics' most successful lottery brands, and for <em>new markets</em> in the UAE and North America.
-                    </p>
-                    <div class="expertise-list">
-                        <span class="expertise-item">iLottery</span>
-                        <span class="expertise-item">Product Strategy</span>
-                        <span class="expertise-item">Game Design</span>
-                        <span class="expertise-item">Digital Transformation</span>
-                        <span class="expertise-item">Market Entry</span>
-                        <span class="expertise-item">Player Experience</span>
-                        <span class="expertise-item">Applied AI</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section id="about" class="section" aria-labelledby="about-title" data-shot="about" data-index="01" data-name="About">
+      <div class="section-head"><span class="idx" aria-hidden="true">01</span><h2 id="about-title" class="section-title">About</h2></div>
+      <p class="about-lead">My work sits between traditional gaming and modern gambling. Knowing both worlds helps operators build products that feel right to today's players and true to the heritage of lottery.</p>
+      <p class="about-body">I've shaped products and strategies for some of the Nordics' most successful lottery brands, and for new markets in the UAE and North America.</p>
+      <ul class="expertise" aria-label="Expertise">
+        <li>iLottery</li>
+        <li>Product Strategy</li>
+        <li>Game Design</li>
+        <li>Digital Transformation</li>
+        <li>Market Entry</li>
+        <li>Player Experience</li>
+        <li>Applied AI</li>
+      </ul>
     </section>
 
-    <!-- Services Section -->
-    <section id="services">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>What I do</h2>
-                <p>Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming.</p>
-            </div>
-
-            <div class="services-list">
-                <div class="service-item reveal">
-                    <span class="service-number">01</span>
-                    <div class="service-content">
-                        <h3>Product Strategy & Development</h3>
-                        <p>From concept to launch: building products players love and that drive sustainable revenue. Product roadmaps, game design consultation, player experience optimization, and competitive positioning.</p>
-                    </div>
-                    <div class="service-tags">
-                        <span>Roadmaps</span>
-                        <span>Game Design</span>
-                        <span>UX Strategy</span>
-                    </div>
-                </div>
-
-                <div class="service-item reveal">
-                    <span class="service-number">02</span>
-                    <div class="service-content">
-                        <h3>Market Entry & Licensing</h3>
-                        <p>Navigate new markets with confidence. I provide guidance on regulatory landscapes, market opportunity assessment, go-to-market strategy, and partnership identification.</p>
-                    </div>
-                    <div class="service-tags">
-                        <span>Regulation</span>
-                        <span>Go-to-market</span>
-                        <span>Partnerships</span>
-                    </div>
-                </div>
-
-                <div class="service-item reveal">
-                    <span class="service-number">03</span>
-                    <div class="service-content">
-                        <h3>Applied AI & Automation</h3>
-                        <p>Practical AI, tested in my own companies before it reaches yours. At my ventures, agents run support, content, analytics, and bookkeeping. For gaming and lottery teams, that experience becomes audits, workflow design, and hands-on implementation.</p>
-                    </div>
-                    <div class="service-tags">
-                        <span>AI Audits</span>
-                        <span>Agent Workflows</span>
-                        <span>Implementation</span>
-                    </div>
-                </div>
-
-                <div class="service-item reveal">
-                    <span class="service-number">04</span>
-                    <div class="service-content">
-                        <h3>Advisory & Board Roles</h3>
-                        <p>Strategic guidance for companies at any stage, from startups seeking direction to established operators pursuing growth. Available for advisory, board participation, and interim executive roles.</p>
-                    </div>
-                    <div class="service-tags">
-                        <span>Advisory</span>
-                        <span>Board</span>
-                        <span>Due Diligence</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section id="services" class="section" aria-labelledby="services-title" data-shot="services" data-index="02" data-name="Services">
+      <div class="section-head"><span class="idx" aria-hidden="true">02</span><h2 id="services-title" class="section-title">What I do</h2></div>
+      <p class="section-intro">Strategic consulting for operators looking to modernize, expand, or rethink their approach to lottery and gaming.</p>
+      <ol class="services">
+        <li class="service">
+          <span class="service-num" aria-hidden="true">01</span>
+          <div class="service-body">
+            <h3>Product Strategy &amp; Development</h3>
+            <p>From concept to launch: building products players love and that drive sustainable revenue. Product roadmaps, game design consultation, player experience optimization, and competitive positioning.</p>
+            <ul class="tags label"><li>Roadmaps</li><li>Game Design</li><li>UX Strategy</li></ul>
+          </div>
+        </li>
+        <li class="service">
+          <span class="service-num" aria-hidden="true">02</span>
+          <div class="service-body">
+            <h3>Market Entry &amp; Licensing</h3>
+            <p>Navigate new markets with confidence. I provide guidance on regulatory landscapes, market opportunity assessment, go-to-market strategy, and partnership identification.</p>
+            <ul class="tags label"><li>Regulation</li><li>Go-to-market</li><li>Partnerships</li></ul>
+          </div>
+        </li>
+        <li class="service">
+          <span class="service-num" aria-hidden="true">03</span>
+          <div class="service-body">
+            <h3>Applied AI &amp; Automation</h3>
+            <p>Practical AI, tested in my own companies before it reaches yours. At my ventures, agents run support, content, analytics, and bookkeeping. For gaming and lottery teams, that experience becomes audits, workflow design, and hands-on implementation.</p>
+            <ul class="tags label"><li>AI Audits</li><li>Agent Workflows</li><li>Implementation</li></ul>
+          </div>
+        </li>
+        <li class="service">
+          <span class="service-num" aria-hidden="true">04</span>
+          <div class="service-body">
+            <h3>Advisory &amp; Board Roles</h3>
+            <p>Strategic guidance for companies at any stage, from startups seeking direction to established operators pursuing growth. Available for advisory, board participation, and interim executive roles.</p>
+            <ul class="tags label"><li>Advisory</li><li>Board</li><li>Due Diligence</li></ul>
+          </div>
+        </li>
+      </ol>
     </section>
 
-    <!-- Insights Section -->
-    <section id="insights">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>Insights</h2>
-                <p>Analysis of the trends, platforms, and mechanics shaping iGaming and lottery.</p>
-            </div>
-
-            <a href="/insights/stake-engine/" class="insight-card reveal">
-                <div>
-                    <span class="mono insight-label">Latest</span>
-                    <h3>Stake Engine Game Intelligence</h3>
-                    <p class="insight-description">Daily tracking of every game on Stake Engine's indie RGS platform: category efficiency, top performers, and where the gaps are.</p>
-                    <span class="insight-link">
-                        Read the analysis
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </span>
-                </div>
-                <div class="insight-visual">
-                    <div class="insight-visual-inner">
-                        <div class="insight-stat">3,000+</div>
-                        <div class="insight-stat-label">Games tracked</div>
-                    </div>
-                </div>
-            </a>
+    <section id="insights" class="section band" aria-labelledby="insights-title" data-shot="insights" data-index="03" data-name="Insights">
+      <div class="section-head"><span class="idx" aria-hidden="true">03</span><h2 id="insights-title" class="section-title">Insights</h2></div>
+      <p class="section-intro">Analysis of the trends, platforms, and mechanics shaping iGaming and lottery.</p>
+      <article class="insight" aria-labelledby="insight-title">
+        <p class="insight-label label"><span class="live" aria-hidden="true"></span>Latest</p>
+        <p class="stat"><span class="stat-num">5,000+</span><span class="stat-label label">Games tracked</span></p>
+        <div class="insight-body">
+          <h3 id="insight-title">Stake Engine Game Intelligence</h3>
+          <p>Daily tracking of every game on Stake Engine's indie RGS platform: category efficiency, top performers, and where the gaps are.</p>
+          <a class="link" href="/insights/stake-engine/">Read the analysis</a>
         </div>
+      </article>
     </section>
 
-    <!-- Speaking Section -->
-    <section id="speaking">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>Speaking & Media</h2>
-                <p>Talks and interviews on the future of lotteries, Gen Z engagement, and digital transformation.</p>
-            </div>
-
-            <div class="speaking-hero reveal" style="margin-bottom: 3rem; overflow: hidden;">
-                <img src="images/IMG_5139.jpeg" alt="Adam Fonsica speaking at conference" style="width: 100%; height: auto; display: block;">
-            </div>
-
-            <div class="speaking-grid">
-                <a href="https://sigma.world/news/can-modernizing-luck-bring-the-worlds-oldest-gamble-online/" target="_blank" class="speaking-item reveal">
-                    <div class="speaking-meta">
-                        <strong>Dec 2025</strong>
-                        Colombo, Sri Lanka
-                    </div>
-                    <div class="speaking-content">
-                        <h3>Modernising Digital Lottery for Gen Z</h3>
-                        <p>Keynote at SiGMA South Asia on moving the world's oldest gamble into a digital-first era</p>
-                    </div>
-                    <span class="speaking-link">
-                        Read article
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://www.gamingnewscanada.ca/p/random-state-bets-on-ontario-with" target="_blank" class="speaking-item reveal">
-                    <div class="speaking-meta">
-                        <strong>Jul 2025</strong>
-                        Podcast
-                    </div>
-                    <div class="speaking-content">
-                        <h3>Gaming News Canada Show</h3>
-                        <p>From poker to running an online lottery and bingo business</p>
-                    </div>
-                    <span class="speaking-link">
-                        Listen now
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://sigma.world/news/uae-ilottery-launch-random-state-coo-adam-fonsica-shares-vision/" target="_blank" class="speaking-item reveal">
-                    <div class="speaking-meta">
-                        <strong>Jun 2025</strong>
-                        SiGMA News
-                    </div>
-                    <div class="speaking-content">
-                        <h3>UAE iLottery Launch: Exclusive Interview</h3>
-                        <p>Gamifying the future of lottery in one of the world's most dynamic emerging markets</p>
-                    </div>
-                    <span class="speaking-link">
-                        Read article
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://sbcevents.com/sbc-summit-2024/first-pitch/" target="_blank" class="speaking-item reveal">
-                    <div class="speaking-meta">
-                        <strong>2024</strong>
-                        Lisbon, Portugal
-                    </div>
-                    <div class="speaking-content">
-                        <h3>SBC Summit First Pitch, Finalist</h3>
-                        <p>Selected as a finalist in SBC's startup pitch competition at SBC Summit 2024</p>
-                    </div>
-                    <span class="speaking-link">
-                        Learn more
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-            </div>
-        </div>
+    <section id="speaking" class="section" aria-labelledby="speaking-title" data-shot="speaking" data-index="04" data-name="Speaking">
+      <div class="section-head"><span class="idx" aria-hidden="true">04</span><h2 id="speaking-title" class="section-title">Speaking &amp; Media</h2></div>
+      <p class="section-intro">Talks and interviews on the future of lotteries, Gen Z engagement, and digital transformation.</p>
+      <figure class="doc-inline">
+        <picture>
+          <source type="image/webp"
+            srcset="images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-mobile-600.webp 600w,
+                    images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-mobile-900.webp 900w,
+                    images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-mobile-1200.webp 1200w"
+            sizes="100vw">
+          <img src="images/editorial/2026-10-20/web/adam-fonsica-speaking-retouched-mobile-1200.jpg" width="1200" height="900" alt="Adam Fonsica giving a talk to an audience" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+      <ol class="talks">
+        <li class="talk">
+          <p class="talk-meta meta"><time datetime="2025-12">Dec 2025</time><span>Colombo, Sri Lanka</span></p>
+          <div>
+            <h3>Modernising Digital Lottery for Gen Z</h3>
+            <p>Keynote at SiGMA South Asia on moving the world's oldest gamble into a digital-first era</p>
+            <a class="link" href="https://sigma.world/news/can-modernizing-luck-bring-the-worlds-oldest-gamble-online/" target="_blank" rel="noopener">Read article<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+          </div>
+        </li>
+        <li class="talk">
+          <p class="talk-meta meta"><time datetime="2025-07">Jul 2025</time><span>Podcast</span></p>
+          <div>
+            <h3>Gaming News Canada Show</h3>
+            <p>From poker to running an online lottery and bingo business</p>
+            <a class="link" href="https://www.gamingnewscanada.ca/p/random-state-bets-on-ontario-with" target="_blank" rel="noopener">Listen now<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+          </div>
+        </li>
+        <li class="talk">
+          <p class="talk-meta meta"><time datetime="2025-06">Jun 2025</time><span>SiGMA News</span></p>
+          <div>
+            <h3>UAE iLottery Launch: Exclusive Interview</h3>
+            <p>Gamifying the future of lottery in one of the world's most dynamic emerging markets</p>
+            <a class="link" href="https://sigma.world/news/uae-ilottery-launch-random-state-coo-adam-fonsica-shares-vision/" target="_blank" rel="noopener">Read article<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+          </div>
+        </li>
+        <li class="talk">
+          <p class="talk-meta meta"><time datetime="2024">2024</time><span>Lisbon, Portugal</span></p>
+          <div>
+            <h3>SBC Summit First Pitch, Finalist</h3>
+            <p>Selected as a finalist in SBC's startup pitch competition at SBC Summit 2024</p>
+            <a class="link" href="https://sbcevents.com/sbc-summit-2024/first-pitch/" target="_blank" rel="noopener">Learn more<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+          </div>
+        </li>
+      </ol>
     </section>
 
-    <!-- Ventures Section -->
-    <section id="ventures">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>Ventures</h2>
-                <p>The companies I help build and run, from B2B gaming to consumer products.</p>
-            </div>
-
-            <div class="ventures-list">
-                <a href="https://randomstate.com" target="_blank" rel="noopener" class="venture-row reveal">
-                    <span class="mono venture-role">Co-founder</span>
-                    <div class="venture-info">
-                        <h3>Random State</h3>
-                        <p>B2B iGaming supplier behind iLottery and bingo launches in the UAE and North America.</p>
-                    </div>
-                    <span class="venture-link">
-                        randomstate.com
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://modready.gg" target="_blank" rel="noopener" class="venture-row reveal">
-                    <span class="mono venture-role">Co-founder</span>
-                    <div class="venture-info">
-                        <h3>Modready</h3>
-                        <p>Gameserver hosting for modded gaming communities.</p>
-                    </div>
-                    <span class="venture-link">
-                        modready.gg
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://apps.apple.com/se/app/id6793058263" target="_blank" rel="noopener" class="venture-row reveal">
-                    <span class="mono venture-role">Founder</span>
-                    <div class="venture-info">
-                        <h3>Nōte de Parfum</h3>
-                        <p>Fragrance discovery for iOS.</p>
-                    </div>
-                    <span class="venture-link">
-                        App Store
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://kustfangst.se" target="_blank" rel="noopener" class="venture-row reveal">
-                    <span class="mono venture-role">Founder</span>
-                    <div class="venture-info">
-                        <h3>Kustfångst</h3>
-                        <p>Reserve fish and shellfish straight from local boats along the Swedish coast.</p>
-                    </div>
-                    <span class="venture-link">
-                        kustfangst.se
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-
-                <a href="https://boosterfynd.se" target="_blank" rel="noopener" class="venture-row reveal">
-                    <span class="mono venture-role">Founder</span>
-                    <div class="venture-info">
-                        <h3>Boosterfynd</h3>
-                        <p>Price comparison for trading card boosters across Swedish retailers.</p>
-                    </div>
-                    <span class="venture-link">
-                        boosterfynd.se
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                        </svg>
-                    </span>
-                </a>
-            </div>
-        </div>
+    <section id="ventures" class="section" aria-labelledby="ventures-title" data-shot="ventures" data-index="05" data-name="Ventures">
+      <div class="section-head"><span class="idx" aria-hidden="true">05</span><h2 id="ventures-title" class="section-title">Ventures</h2></div>
+      <p class="section-intro">The companies I help build and run, from B2B gaming to consumer products.</p>
+      <ul class="ventures">
+        <li class="venture">
+          <p class="venture-role label">Co-founder</p>
+          <h3>Random State</h3>
+          <p>B2B iGaming supplier behind iLottery and bingo launches in the UAE and North America.</p>
+          <a class="link" href="https://randomstate.com" target="_blank" rel="noopener">randomstate.com<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+        </li>
+        <li class="venture">
+          <p class="venture-role label">Co-founder</p>
+          <h3>Modready</h3>
+          <p>Gameserver hosting for modded gaming communities.</p>
+          <a class="link" href="https://modready.gg" target="_blank" rel="noopener">modready.gg<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+        </li>
+        <li class="venture">
+          <p class="venture-role label">Founder</p>
+          <h3>Nōte de Parfum</h3>
+          <p>Fragrance discovery for iOS.</p>
+          <a class="link" href="https://apps.apple.com/se/app/id6793058263" target="_blank" rel="noopener">App Store<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+        </li>
+        <li class="venture">
+          <p class="venture-role label">Founder</p>
+          <h3>Kustfångst</h3>
+          <p>Reserve fish and shellfish straight from local boats along the Swedish coast.</p>
+          <a class="link" href="https://kustfangst.se" target="_blank" rel="noopener">kustfangst.se<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+        </li>
+        <li class="venture">
+          <p class="venture-role label">Founder</p>
+          <h3>Boosterfynd</h3>
+          <p>Price comparison for trading card boosters across Swedish retailers.</p>
+          <a class="link" href="https://boosterfynd.se" target="_blank" rel="noopener">boosterfynd.se<span class="sr-only"> (opens in a new tab)</span><svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+        </li>
+      </ul>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact">
-        <div class="container">
-            <h2 class="contact-headline reveal">Let's build something <em>remarkable</em> together</h2>
-
-            <p style="color: rgba(255,255,255,0.6); font-size: 1.125rem; margin-bottom: 3rem; max-width: 50ch;" class="reveal">A quick question or a bigger project, it starts with a message.</p>
-
-            <div class="contact-grid">
-                <a href="mailto:adam@fonsica.se" class="contact-card reveal">
-                    <span class="mono">Email</span>
-                    <h3>adam@fonsica.se</h3>
-                    <p>For inquiries and proposals</p>
-                </a>
-
-                <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank" class="contact-card reveal">
-                    <span class="mono">LinkedIn</span>
-                    <h3>Connect with me</h3>
-                    <p>Say hello or drop a DM</p>
-                </a>
-
-                <a href="mailto:adam@fonsica.se?subject=Let's%20talk" class="contact-card reveal">
-                    <span class="mono">Schedule</span>
-                    <h3>Book a call</h3>
-                    <p>Reach out and we'll find a time</p>
-                </a>
-            </div>
-        </div>
+    <section id="contact" class="section contact" aria-labelledby="contact-title" data-shot="contact" data-index="06" data-name="Contact">
+      <div class="section-head"><span class="idx" aria-hidden="true">06</span><h2 id="contact-title" class="section-title contact-title">Let's build something remarkable together</h2></div>
+      <p class="section-intro">A quick question or a bigger project, it starts with a message.</p>
+      <ul class="contact-list">
+        <li>
+          <a class="contact-item" href="mailto:adam@fonsica.se">
+            <span class="label">Email</span>
+            <span class="contact-main">adam@fonsica.se</span>
+            <span class="contact-desc">For inquiries and proposals</span>
+          </a>
+        </li>
+        <li>
+          <a class="contact-item" href="https://www.linkedin.com/in/adamfonsica/" target="_blank" rel="noopener">
+            <span class="label">LinkedIn</span>
+            <span class="contact-main">Connect with me<svg class="ext" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M3 1h6v6M9 1 1 9" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span>
+            <span class="contact-desc">Say hello or drop a DM<span class="sr-only"> (opens in a new tab)</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="contact-item" href="mailto:adam@fonsica.se?subject=Let's%20talk">
+            <span class="label">Schedule</span>
+            <span class="contact-main">Book a call</span>
+            <span class="contact-desc">Reach out and we'll find a time</span>
+          </a>
+        </li>
+      </ul>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-inner">
-                <p>&copy; 2026 Fonsica Group AB, Sweden</p>
-                <div class="footer-links">
-                    <a href="https://www.linkedin.com/in/adamfonsica/" target="_blank">LinkedIn</a>
-                    <a href="mailto:adam@fonsica.se">Email</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+  </div>
+</main>
 
-    <script>
-        // Navigation scroll effect
-        const nav = document.querySelector('nav');
-        function checkNavScroll() {
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        }
-        window.addEventListener('scroll', checkNavScroll);
-        checkNavScroll();
+<footer class="site-footer">
+  <p class="meta">© 2026 Fonsica Group AB, Sweden</p>
+  <ul>
+    <li><a href="https://www.linkedin.com/in/adamfonsica/" target="_blank" rel="noopener">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></li>
+    <li><a href="mailto:adam@fonsica.se">Email</a></li>
+  </ul>
+</footer>
 
-        // Reveal animations on scroll
-        const reveals = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
+<script>
+(() => {
+  'use strict';
+  const root = document.documentElement;
+  const desk = matchMedia('(min-width: 1024px)');
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
 
-        reveals.forEach(el => observer.observe(el));
+  const panel = document.querySelector('.panel');
+  const portrait = panel.querySelector('.frame img');
+  const caption = panel.querySelector('.caption');
+  const capTitle = caption.querySelector('.caption-title');
+  const capIndex = caption.querySelector('.caption-index');
+  const sections = Array.from(document.querySelectorAll('.story > section[data-shot]'));
+  const navLinks = Array.from(document.querySelectorAll('.nav a[href^="#"]'));
 
-        // Mobile menu
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileOverlay = document.getElementById('mobile-overlay');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+  /* ---------- Scrollspy + camera ---------- */
+  let current = null;
+  let ready = false;          // first camera move waits for the portrait
+  let shotTimer = 0;
+  let swapTimer = 0;
 
-        function toggleMobileMenu() {
-            mobileMenuBtn.classList.toggle('active');
-            mobileOverlay.classList.toggle('active');
-            document.body.style.overflow = mobileOverlay.classList.contains('active') ? 'hidden' : '';
-        }
+  const sectionAtCentre = () => {
+    const mid = window.innerHeight / 2;
+    for (const s of sections) {
+      const r = s.getBoundingClientRect();
+      if (r.top <= mid && r.bottom > mid) return s;
+    }
+    return null;
+  };
 
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+  const setNav = (id) => {
+    for (const a of navLinks) {
+      const on = a.hash === '#' + id;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    }
+  };
 
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector(link.getAttribute('href'));
-                toggleMobileMenu();
-                setTimeout(() => {
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }, 300);
-            });
-        });
+  const setCaption = (title, index) => {
+    if (capTitle.textContent === title && capIndex.textContent === index) return;
+    clearTimeout(swapTimer);
+    if (still.matches || !desk.matches) {
+      capTitle.textContent = title; capIndex.textContent = index; return;
+    }
+    caption.classList.add('is-swapping');
+    swapTimer = setTimeout(() => {
+      capTitle.textContent = title; capIndex.textContent = index;
+      caption.classList.remove('is-swapping');
+    }, 180);
+  };
 
-        // Smooth scroll for desktop
-        document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-    </script>
+  const applyShot = (s) => {
+    if (!s) return;
+    panel.dataset.shot = s.dataset.shot;
+    setCaption(s.dataset.caption || 'Adam Fonsica', s.dataset.index + ' / ' + s.dataset.name);
+  };
+
+  const update = () => {
+    const s = sectionAtCentre();
+    if (!s || s === current) return;
+    current = s;
+    setNav(s.id);
+    clearTimeout(shotTimer);
+    // short settle so a fast jump through several sections becomes one camera move
+    if (ready) shotTimer = setTimeout(() => applyShot(current), 140);
+  };
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(update, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+    sections.forEach((s) => io.observe(s));
+  }
+  window.addEventListener('resize', update, { passive: true });
+
+  const begin = () => {
+    if (ready) return;
+    ready = true;
+    current = current || sectionAtCentre() || sections[0];
+    if (desk.matches && !still.matches) {
+      panel.classList.add('is-intro');
+      setTimeout(() => panel.classList.remove('is-intro'), 2000);
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => applyShot(current)));
+  };
+  if (portrait.complete && portrait.naturalWidth) begin();
+  else {
+    portrait.addEventListener('load', begin, { once: true });
+    portrait.addEventListener('error', begin, { once: true });
+    setTimeout(begin, 2500);
+  }
+
+  /* Keynote photo: only start loading it once the page itself has finished */
+  const docImg = panel.querySelector('.doc img');
+  const markLoaded = () => panel.classList.add('doc-loaded');
+  if (docImg) {
+    if (docImg.complete && docImg.naturalWidth) markLoaded();
+    else docImg.addEventListener('load', markLoaded, { once: true });
+  }
+  const enableDoc = () => setTimeout(() => panel.classList.add('doc-ready'), 300);
+  if (document.readyState === 'complete') enableDoc();
+  else window.addEventListener('load', enableDoc, { once: true });
+
+  /* ---------- Masthead state ---------- */
+  const header = document.getElementById('masthead');
+  const sentinel = document.createElement('div');
+  sentinel.setAttribute('aria-hidden', 'true');
+  sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:16px;pointer-events:none;';
+  document.body.prepend(sentinel);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => header.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sentinel);
+  }
+
+  /* ---------- Mobile menu ---------- */
+  const toggle = header.querySelector('.menu-toggle');
+  const toggleLabel = toggle.querySelector('.menu-toggle-label');
+  const nav = document.getElementById('site-nav');
+  const outside = [document.getElementById('main'), document.querySelector('.site-footer'), document.querySelector('.skip')];
+  const isOpen = () => root.classList.contains('menu-open');
+
+  const openMenu = () => {
+    root.classList.add('menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggleLabel.textContent = 'Close';
+    outside.forEach((el) => { if (el) el.inert = true; });
+    const first = nav.querySelector('a');
+    if (first) first.focus();
+  };
+  const closeMenu = (returnFocus) => {
+    root.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggleLabel.textContent = 'Menu';
+    outside.forEach((el) => { if (el) el.inert = false; });
+    if (returnFocus) toggle.focus();
+  };
+
+  toggle.addEventListener('click', () => (isOpen() ? closeMenu(true) : openMenu()));
+  header.addEventListener('click', (e) => {
+    if (isOpen() && e.target.closest('a')) closeMenu(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); return; }
+    if (e.key !== 'Tab') return;
+    const items = Array.from(header.querySelectorAll('a[href], button')).filter((el) => el.getClientRects().length);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    else if (!header.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  });
+  const onDeskChange = () => { if (desk.matches && isOpen()) closeMenu(false); update(); };
+  if (desk.addEventListener) desk.addEventListener('change', onDeskChange);
+  else if (desk.addListener) desk.addListener(onDeskChange);
+})();
+</script>
 </body>
 </html>

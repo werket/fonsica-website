@@ -1,0 +1,4 @@
+# GitHub Pages (Jekyll) build settings for fonsica.se.
+# Internal project files that must not be served on the public site.
+exclude:
+  - CLAUDE.md
