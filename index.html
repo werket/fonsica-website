@@ -503,17 +503,21 @@ main:focus { outline: none; }
       linear-gradient(to top, var(--ground) 0%, var(--ground) 9%, rgba(43, 41, 43, .82) 15%, var(--ground-0) 36%);
   }
 
-  /* Keep the approved retouch within the original photo's detail limits instead of
-     magnifying a landscape photo to fill the entire height of the desktop panel. */
+  /* B-roll: the keynote photo crossfades in for Speaking */
   .panel.doc-ready .doc {
-    display: grid; place-items: center; position: absolute; inset: 0; z-index: 4;
-    padding: var(--header-h) var(--edge) calc(var(--base) + 64px);
-    background: var(--ground);
-    opacity: 0; transform: scale(.985);
+    display: block; position: absolute; inset: 0; z-index: 2;
+    opacity: 0; transform: scale(1.05);
     transition: opacity .7s ease, transform 1.8s var(--cam-ease);
   }
-  .doc picture { display: block; width: min(100%, 640px); aspect-ratio: 16 / 9; }
-  .doc img { display: block; width: 100%; height: 100%; object-fit: cover; box-shadow: 0 24px 60px rgba(0, 0, 0, .38); }
+  .doc picture, .doc img { width: 100%; height: 100%; }
+  .doc img { object-fit: cover; object-position: 27% 50%; }
+  .doc::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(to left, var(--ground) 0%, var(--ground-0) 34%),
+      linear-gradient(to bottom, rgba(43, 41, 43, .72) 0%, var(--ground-0) 20%),
+      rgba(43, 41, 43, .14);
+  }
   .panel[data-shot="speaking"] .doc {
     opacity: 1; transform: none;
     transition: opacity 1s var(--cam-ease), transform 1.8s var(--cam-ease);
@@ -616,7 +620,7 @@ main:focus { outline: none; }
           srcset="images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-768.webp 768w,
                   images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-1200.webp 1200w,
                   images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-1600.webp 1600w, images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-2560.webp 2560w"
-          sizes="(min-width: 1024px) 640px, 100vw">
+          sizes="178vh">
         <img src="images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-1600.jpg" width="1600" height="900" alt="" loading="lazy" decoding="async">
       </picture>
     </div>
