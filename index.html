@@ -341,8 +341,13 @@ main:focus { outline: none; }
 
 
 /* Speaking */
-.doc-inline { margin: 48px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); }
-.doc-inline img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.doc-inline { margin: 48px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); overflow: hidden; }
+.doc-inline img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+  transition: opacity 1.1s ease, transform 1.8s var(--cam-ease);
+}
+/* B-roll on phones: the image fades in and settles as it scrolls into view */
+.doc-inline.is-pending img { opacity: 0; transform: scale(1.05); }
 .doc-inline figcaption { padding: 14px var(--gr) 0 var(--gl); }
 .talks { margin-top: 56px; border-top: 1px solid var(--hair); }
 .talk { display: grid; row-gap: 10px; padding: 28px 0 24px; border-bottom: 1px solid var(--hair); }
@@ -503,7 +508,7 @@ main:focus { outline: none; }
       linear-gradient(to top, var(--ground) 0%, var(--ground) 9%, rgba(43, 41, 43, .82) 15%, var(--ground-0) 36%);
   }
 
-  /* B-roll: the keynote photo crossfades in for Speaking */
+  /* B-roll: the atlas board crossfades in for Insights, the keynote photo for Speaking */
   .panel.doc-ready .doc {
     display: block; position: absolute; inset: 0; z-index: 2;
     opacity: 0; transform: scale(1.05);
@@ -511,20 +516,23 @@ main:focus { outline: none; }
   }
   .doc picture, .doc img { width: 100%; height: 100%; }
   .doc img { object-fit: cover; object-position: 27% 50%; }
-  .doc::after {
+  .doc[data-for="insights"] img { object-position: 50% 42%; }
+  .doc[data-for="speaking"]::after {
     content: ""; position: absolute; inset: 0;
     background:
       linear-gradient(to left, var(--ground) 0%, var(--ground-0) 34%),
       linear-gradient(to bottom, rgba(43, 41, 43, .72) 0%, var(--ground-0) 20%),
       rgba(43, 41, 43, .14);
   }
-  .panel[data-shot="speaking"] .doc {
+  .panel[data-shot="insights"] .doc[data-for="insights"],
+  .panel[data-shot="speaking"] .doc[data-for="speaking"] {
     opacity: 1; transform: none;
     transition: opacity 1s var(--cam-ease), transform 1.8s var(--cam-ease);
   }
-  /* the portrait dims a little ahead of the keynote coming up: a dissolve without a ghosted face.
-     Only once the keynote has loaded, so the panel can never go blank. */
-  .panel.doc-loaded[data-shot="speaking"] .frame {
+  /* the portrait dims a little ahead of the B-roll coming up: a dissolve without a ghosted face.
+     Only once that image has loaded, so the panel can never go blank. */
+  .panel.loaded-insights[data-shot="insights"] .frame,
+  .panel.loaded-speaking[data-shot="speaking"] .frame {
     opacity: 0;
     transition: transform var(--cam-dur) var(--cam-ease), opacity .55s ease;
   }
@@ -614,7 +622,18 @@ main:focus { outline: none; }
         <img src="images/portraits/2026-10-19/adam-studio-charcoal.jpg" width="1122" height="1402" alt="Adam Fonsica" fetchpriority="high">
       </picture>
     </div>
-    <div class="doc" aria-hidden="true">
+    <div class="doc" data-for="insights" aria-hidden="true">
+      <picture>
+        <source type="image/webp"
+          srcset="images/insights/ilottery/ilottery-atlas-board-800.webp 800w,
+                  images/insights/ilottery/ilottery-atlas-board-1200.webp 1200w,
+                  images/insights/ilottery/ilottery-atlas-board-1600.webp 1600w,
+                  images/insights/ilottery/ilottery-atlas-board-2000.webp 2000w"
+          sizes="80vh">
+        <img src="images/insights/ilottery/ilottery-atlas-board-1600.jpg" width="1600" height="2000" alt="" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="doc" data-for="speaking" aria-hidden="true">
       <picture>
         <source type="image/webp"
           srcset="images/editorial/2026-10-22/web/adam-fonsica-speaking-selected-768.webp 768w,
@@ -693,16 +712,26 @@ main:focus { outline: none; }
       </ol>
     </section>
 
-    <section id="insights" class="section band" aria-labelledby="insights-title" data-shot="insights" data-index="03" data-name="Insights">
+    <section id="insights" class="section band" aria-labelledby="insights-title" data-shot="insights" data-index="03" data-name="Insights" data-caption="iLottery Atlas">
       <div class="section-head"><span class="idx" aria-hidden="true">03</span><h2 id="insights-title" class="section-title">Insights</h2></div>
       <p class="section-intro">Analysis of the trends, platforms, and mechanics shaping iGaming and lottery.</p>
+      <figure class="doc-inline">
+        <picture>
+          <source type="image/webp"
+            srcset="images/insights/ilottery/ilottery-atlas-board-inline-600.webp 600w,
+                    images/insights/ilottery/ilottery-atlas-board-inline-900.webp 900w,
+                    images/insights/ilottery/ilottery-atlas-board-inline-1200.webp 1200w"
+            sizes="100vw">
+          <img src="images/insights/ilottery/ilottery-atlas-board-inline-1200.jpg" width="1200" height="900" alt="The iLottery Atlas map of North America. States and provinces that sell eInstants online are raised in teal." loading="lazy" decoding="async">
+        </picture>
+      </figure>
       <article class="insight" aria-labelledby="insight-title">
-        <p class="insight-label label"><span class="live" aria-hidden="true"></span>Latest</p>
-        <p class="stat"><span class="stat-num">5,000+</span><span class="stat-label label">Games tracked</span></p>
+        <p class="insight-label label"><span class="live" aria-hidden="true"></span>Latest · Beta</p>
+        <p class="stat"><span class="stat-num">177</span><span class="stat-label label">Lotteries mapped</span></p>
         <div class="insight-body">
-          <h3 id="insight-title">Stake Engine Game Intelligence</h3>
-          <p>Daily tracking of every game on Stake Engine's indie RGS platform: category efficiency, top performers, and where the gaps are.</p>
-          <a class="link" href="/insights/stake-engine/">Read the analysis</a>
+          <h3 id="insight-title">iLottery Atlas</h3>
+          <p>Where lotteries sell online, how fast eInstants grow, what players get back and who builds the games.</p>
+          <a class="link" href="/insights/ilottery/">Explore the atlas</a>
         </div>
       </article>
     </section>
@@ -922,12 +951,34 @@ main:focus { outline: none; }
     setTimeout(begin, 2500);
   }
 
-  /* Keynote photo: only start loading it once the page itself has finished */
-  const docImg = panel.querySelector('.doc img');
-  const markLoaded = () => panel.classList.add('doc-loaded');
-  if (docImg) {
-    if (docImg.complete && docImg.naturalWidth) markLoaded();
-    else docImg.addEventListener('load', markLoaded, { once: true });
+  /* B-roll images: only start loading them once the page itself has finished */
+  panel.querySelectorAll('.doc').forEach((doc) => {
+    const img = doc.querySelector('img');
+    const markLoaded = () => panel.classList.add('loaded-' + doc.dataset.for);
+    if (img.complete && img.naturalWidth) markLoaded();
+    else img.addEventListener('load', markLoaded, { once: true });
+  });
+
+  /* Phones: the inline B-roll fades in once it is in view and its image has arrived */
+  if ('IntersectionObserver' in window && !still.matches) {
+    const reveal = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        reveal.unobserve(e.target);
+        const img = e.target.querySelector('img');
+        const show = () => e.target.classList.remove('is-pending');
+        if (img.complete && img.naturalWidth) show();
+        else {
+          img.addEventListener('load', show, { once: true });
+          img.addEventListener('error', show, { once: true });
+        }
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    document.querySelectorAll('.doc-inline').forEach((fig) => {
+      if (getComputedStyle(fig).display === 'none') return;   // desktop shows these in the panel
+      fig.classList.add('is-pending');
+      reveal.observe(fig);
+    });
   }
   const enableDoc = () => setTimeout(() => panel.classList.add('doc-ready'), 300);
   if (document.readyState === 'complete') enableDoc();
