@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fonsica.ilottery-atlas</string>
+
+    <!-- Rebuild, check and publish the iLottery Atlas (see update_atlas.py) -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/adamfonsica/Projects/fonsica-website/_pipeline/ilottery/update_atlas.py</string>
+        <string>--publish</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/adamfonsica/Projects/fonsica-website</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>FONSICA_DATA</key>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data</string>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <!-- Run when a delivery lands in the research folder (update FONSICA_DATA and these
+         paths if the folder moves) -->
+    <key>WatchPaths</key>
+    <array>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data</string>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/einstant_games_catalog.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/lotteries_suppliers.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/ilottery_contracts.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/history_tables/eInstant_sales_by_lottery_year.csv</string>
+    </array>
+
+    <!-- Fallback every six hours; unchanged data exits in a second -->
+    <key>StartInterval</key>
+    <integer>21600</integer>
+    <key>ThrottleInterval</key>
+    <integer>120</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/adamfonsica/Projects/fonsica-website/_pipeline/logs/ilottery-update.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/adamfonsica/Projects/fonsica-website/_pipeline/logs/ilottery-update.log</string>
+</dict>
+</plist>

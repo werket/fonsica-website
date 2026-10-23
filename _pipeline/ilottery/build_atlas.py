@@ -16,15 +16,29 @@ import argparse
 import csv
 import gzip
 import json
+import math
 import os
 import re
 import statistics
 import sys
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
+from decimal import ROUND_HALF_UP, Decimal
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(REPO, "insights", "ilottery", "atlas.json")
 PAGE = os.path.join(REPO, "insights", "ilottery", "index.html")
+
+# Every file the build reads, relative to the data folder (update_atlas.py watches these)
+INPUTS = [
+    "einstant_games_catalog.csv", "lotteries_suppliers.csv", "studio_master.csv",
+    "studio_market_share_by_region.csv", "ilottery_contracts.csv", "prize_tables_all.csv.gz",
+    "history_tables/eInstant_sales_by_lottery_year.csv",
+    "history_tables/digital_instant_revenue_by_market_year.csv",
+    "history_tables/lottery_einstant_launch.csv",
+    "history_tables/michigan/michigan_launch_curves.csv",
+    "history_tables/michigan/michigan_provider_share_month.csv",
+    "history_tables/michigan/michigan_rank_month.csv",
+]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -661,13 +675,84 @@ def check_page(atlas):
     return len(missing)
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--data", help="path to the fonsica-data folder")
-    ap.add_argument("--check", action="store_true", help="build and validate, but do not write")
-    args = ap.parse_args()
-    data = find_data_dir(args.data)
+# ---------------------------------------------------------------------------
+# Static numbers: write the current values into the page, so readers without
+# JavaScript and search engines see the same figures as the charts
+# ---------------------------------------------------------------------------
 
+def js_round(x):
+    """Math.round: halves go up, as in the page script."""
+    return math.floor(x + 0.5)
+
+
+def js_fixed(x, digits):
+    """Number.prototype.toFixed for the values used here (halves go up)."""
+    q = Decimal(repr(x)).quantize(Decimal(1).scaleb(-digits), rounding=ROUND_HALF_UP)
+    return f"{q:.{digits}f}"
+
+
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def fmt_value(v, fmt):
+    """Python twin of FMT in insights/ilottery/index.html. Keep the two in step."""
+    if fmt == "int":
+        return f"{js_round(v):,}"
+    if fmt == "x":
+        return js_fixed(v, 1)
+    if fmt == "bn":
+        return js_fixed(v / 1000, 1)
+    if fmt == "date":
+        d = datetime.fromisoformat(str(v).replace("Z", "+00:00")) if "T" in str(v) else datetime.fromisoformat(str(v))
+        return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
+    if fmt == "abs0":
+        return str(abs(js_round(v)))
+    if fmt == "pct0":
+        return str(js_round(v))
+    if fmt == "k":
+        return f"{js_round(v / 1000)}k"
+    return f"{js_round(v):,}" if isinstance(v, (int, float)) else str(v)
+
+
+def render_page_numbers(html, atlas):
+    def swap(m):
+        tag, attrs, text = m.group(1), m.group(2), m.group(3)
+        key = re.search(r'data-k="([^"]+)"', attrs).group(1)
+        fmt = re.search(r'data-fmt="([^"]+)"', attrs)
+        value = lookup(atlas, key)
+        if value is None:
+            return m.group(0)
+        return f"<{tag}{attrs}>{fmt_value(value, fmt.group(1) if fmt else None)}</{tag}>"
+    return re.sub(r'<(span|dd)(\s[^>]*data-k="[^"]+"[^>]*)>([^<]*)</\1>', swap, html)
+
+
+# Verified rows left out of the page on purpose, so update reports stop suggesting them
+MOVES_SKIPPED = [
+    ("New York Lottery", "Brightstar", "central-system extension; New York sells no eInstants"),
+    ("Virginia Lottery", "Random State", "Adam's own studio: left out, see the disclosure on the page"),
+]
+
+
+def candidate_moves(data):
+    """Verified 2026 contract rows that MOVES does not publish yet: they need English copy."""
+    known = [(lot_key, ven_key) for _, lot_key, ven_key, *_ in MOVES] + [(lk, vk) for lk, vk, _ in MOVES_SKIPPED]
+    out = []
+    for r in read_csv(data, "ilottery_contracts.csv"):
+        if not r["confidence"].startswith("Verifierad") or "2026" not in r["start_or_award"]:
+            continue
+        if any(lk in r["lottery"] and vk in r["vendor"] for lk, vk in known):
+            continue
+        out.append({"lottery": r["lottery"], "vendor": r["vendor"], "when": r["start_or_award"],
+                    "status": r["status"], "url": r["source_url"]})
+    return out
+
+
+class BuildRefused(Exception):
+    pass
+
+
+def build(data):
+    """Everything the page needs, from the research folder. Raises BuildRefused on bad data."""
     catalog = build_catalog(data)
     atlas = {
         "meta": {
@@ -707,6 +792,16 @@ def main():
         "launch_m12": round(atlas["launch"]["_raw"][12]),
     }
     del atlas["launch"]["_raw"]
+    rtp = {r["lottery"]: r["median"] for r in catalog["rtp"]}
+    na = next((r for r in atlas["studios"]["regions"] if r["region"] == "North America"), None)
+    atlas["copy"].update({
+        "rtp_se_pct": rtp.get("Svenska Spel"),
+        "rtp_pa_pct": rtp.get("Pennsylvania Lottery"),
+        "rtp_min_pct": min(rtp.values()),
+        "rtp_max_pct": max(rtp.values()),
+        "rtp_na_min_pct": min(r["median"] for r in catalog["rtp"] if r["region"] == "North America"),
+        "na_top3_pct": r1(sum(s["share"] for s in na["studios"][:3])) if na else None,
+    })
 
     # Guard rails: refuse to publish a broken or suspiciously small build
     problems = []
@@ -720,7 +815,24 @@ def main():
         problems.append("atlas.json is larger than 200 KB: game-level data may have leaked in")
     problems += [f"{n} data-k keys missing"] if (n := check_page(atlas)) else []
     if problems:
-        sys.exit("Build refused: " + "; ".join(problems))
+        raise BuildRefused("; ".join(problems))
+    return atlas
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--data", help="path to the fonsica-data folder")
+    ap.add_argument("--check", action="store_true", help="build and validate, but do not write")
+    args = ap.parse_args()
+    data = find_data_dir(args.data)
+    try:
+        atlas = build(data)
+    except BuildRefused as e:
+        sys.exit(f"Build refused: {e}")
+
+    import claims  # same folder; kept apart because it mirrors the page copy
+    for failure in claims.check(atlas):
+        print(f"  ! copy no longer holds: {failure}", file=sys.stderr)
 
     reg, cat = atlas["register"], atlas["catalog"]
     print(f"register  {reg['lotteries']} lotteries · {reg['totals']}")
@@ -731,10 +843,18 @@ def main():
     if args.check:
         print("check only, nothing written")
         return
+    write(atlas)
+    print(f"wrote {os.path.relpath(OUT, REPO)} ({os.path.getsize(OUT) / 1024:.1f} KB) and the page's static numbers")
+
+
+def write(atlas):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(atlas, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"wrote {os.path.relpath(OUT, REPO)} ({os.path.getsize(OUT) / 1024:.1f} KB)")
+    html = open(PAGE, encoding="utf-8").read()
+    updated = render_page_numbers(html, atlas)
+    if updated != html:
+        open(PAGE, "w", encoding="utf-8").write(updated)
 
 
 if __name__ == "__main__":
