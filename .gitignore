@@ -31,3 +31,7 @@ llm_work.zip
 fonsica-data.*/
 insights_ready/
 insights_ready.zip
+
+# GitHub Actions: the private research checkout and the handled-delivery marker
+.research/
+.atlas-seen

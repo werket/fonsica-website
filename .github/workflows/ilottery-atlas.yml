@@ -1,0 +1,94 @@
+# iLottery Atlas: rebuild /insights/ilottery/ from the research bot's latest delivery.
+#
+# The bot pushes to the private repo werket/fonsica-insights. Every hour this job checks that
+# repo out with a read-only deploy key, rebuilds the atlas, checks every sentence on the page
+# against the data (_pipeline/ilottery/claims.py) and publishes only when all checks pass.
+# A stopped delivery fails the run, which GitHub emails, once per delivery.
+#
+# This repo is public, so its logs and job summaries are too: the scripts print aggregates
+# and counts only. Never add steps that print or upload the research data.
+
+name: iLottery Atlas
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Publish even if this delivery was already handled (tests the whole chain)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: ilottery-atlas
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the website
+        uses: actions/checkout@v4
+
+      - name: Check out the research data (private, read only)
+        uses: actions/checkout@v4
+        with:
+          repository: werket/fonsica-insights
+          ssh-key: ${{ secrets.FONSICA_INSIGHTS_DEPLOY_KEY }}
+          path: .research
+          persist-credentials: false
+
+      - name: Identify the delivery
+        id: data
+        run: echo "sha=$(git -C .research rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Skip a delivery that was already handled
+        id: seen
+        uses: actions/cache/restore@v4
+        with:
+          path: .atlas-seen
+          key: atlas-${{ steps.data.outputs.sha }}-${{ hashFiles('insights/ilottery/index.html', '_pipeline/ilottery/*.py') }}
+          lookup-only: true
+
+      - name: Set up Python
+        if: steps.seen.outputs.cache-hit != 'true' || inputs.force
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the image tools (uses the runner's Chrome)
+        if: steps.seen.outputs.cache-hit != 'true' || inputs.force
+        run: pip install --quiet playwright pillow
+
+      - name: Rebuild, check and publish
+        id: atlas
+        if: steps.seen.outputs.cache-hit != 'true' || inputs.force
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python3 _pipeline/ilottery/update_atlas.py --publish --data .research/data ${{ inputs.force && '--force-publish' || '' }}
+
+      - name: Remember the handled delivery
+        if: always() && contains(fromJSON('["published", "unchanged", "blocked"]'), steps.atlas.outputs.outcome)
+        run: echo "${{ steps.data.outputs.sha }}" > .atlas-seen
+
+      - name: Save the marker
+        if: always() && contains(fromJSON('["published", "unchanged", "blocked"]'), steps.atlas.outputs.outcome)
+        uses: actions/cache/save@v4
+        with:
+          path: .atlas-seen
+          key: ${{ steps.seen.outputs.cache-primary-key }}
+
+      - name: Ask GitHub Pages to rebuild
+        if: steps.atlas.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/${{ github.repository }}/pages/builds" --silent || echo "No extra Pages build requested; the push may already have started one"

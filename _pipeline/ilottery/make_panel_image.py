@@ -185,7 +185,8 @@ def main():
     atlas = json.load(open(ATLAS, encoding="utf-8"))
     os.makedirs(OUT, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
-        browser = p.chromium.launch()
+        # In Actions the runner's preinstalled Chrome is used (PLAYWRIGHT_CHANNEL=chrome)
+        browser = p.chromium.launch(channel=os.environ.get("PLAYWRIGHT_CHANNEL") or None)
         page = browser.new_page(device_scale_factor=2)
         for v in VARIANTS:
             img = render(page, build_svg(atlas["register"]["tiles"], v), v, tmp)

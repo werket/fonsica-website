@@ -2,15 +2,20 @@
 """Keep the iLottery Atlas current: rebuild, check and publish when the research data changes.
 
 The research bot works in its own container and pushes deliveries to the private repo
-werket/fonsica-insights. launchd (com.fonsica.ilottery-atlas) runs this every hour, at login
-and when the local copy changes: it fast-forwards ~/Projects/fonsica-insights from GitHub
-(this Mac only reads that repo), then rebuilds. Adam chose (2026-10-23) to publish
-automatically when every check passes. Anything else stops the run, leaves a report in
-_pipeline/logs/ and sends a notification; nothing is pushed.
+werket/fonsica-insights. GitHub Actions (.github/workflows/ilottery-atlas.yml) runs this every
+hour on a fresh checkout of that repo. The Mac's launchd job com.fonsica.ilottery-atlas, now
+disabled and kept as a fallback, did the same on ~/Projects/fonsica-insights after a git pull.
+Adam chose (2026-10-23) to publish automatically when every check passes. Anything else stops
+the run: on the Mac with a report in _pipeline/logs/ and a notification, in Actions with a
+failed run, which GitHub emails. Nothing is pushed.
 
   python3 _pipeline/ilottery/update_atlas.py             rebuild and write locally, no git
   python3 _pipeline/ilottery/update_atlas.py --publish   ... then commit and push the atlas files
   python3 _pipeline/ilottery/update_atlas.py --dry-run   report what would change, write nothing
+  --force-publish   publish even when only the build time changed (tests the whole chain)
+
+In Actions (GITHUB_ACTIONS=true) the job summary and the log are public, because the website
+repo is public: they carry aggregates and counts, never data-pack detail.
 
 Checks before anything goes out: the build guard rails (build_atlas.py), every sentence on
 the page (claims.py), and git: only the atlas files are committed, and only on top of
@@ -22,6 +27,7 @@ import fcntl
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -41,6 +47,7 @@ PUBLISH_PATHS = ["insights/ilottery/atlas.json", "insights/ilottery/index.html",
 COMMIT_PREFIX = "Update iLottery Atlas data"
 QUIET_SECONDS = 180      # a delivery is finished when no input has changed for this long
 MAX_WAIT_SECONDS = 1200
+CI = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
 def log(msg):
@@ -52,8 +59,26 @@ def git(*args):
 
 
 def notify(message):
+    if not shutil.which("osascript"):   # Actions reports through the run's status instead
+        return
     script = f'display notification {json.dumps(message)} with title "iLottery Atlas"'
     subprocess.run(["osascript", "-e", script], capture_output=True)
+
+
+def ci_output(**values):
+    """Hand the result to later steps of the Actions job (outcome, published)."""
+    path = os.environ.get("GITHUB_OUTPUT")
+    if path:
+        with open(path, "a", encoding="utf-8") as f:
+            f.writelines(f"{k}={v}\n" for k, v in values.items())
+
+
+def ci_summary(title, lines):
+    """Public job summary: aggregates and counts only."""
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if path:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(f"### iLottery Atlas: {title}\n\n" + "".join(f"- {line}\n" for line in lines) + "\n")
 
 
 def fingerprint(data):
@@ -192,6 +217,8 @@ def stop(fp, title, lines, retry=False):
     report = write_report(f"Stoppad: {title}", lines)
     log(f"STOPPED: {title}: {'; '.join(lines)} (report: {report})")
     notify(f"Publiceringen stoppades: {title}. Se rapporten i _pipeline/logs.")
+    ci_output(outcome="retry" if retry else "blocked")
+    ci_summary(f"stoppad ({title})", lines)
     if not retry:
         save_state(fp, f"blocked: {title}")
     return 1
@@ -223,6 +250,7 @@ def main():
     ap.add_argument("--publish", action="store_true", help="commit and push the atlas files")
     ap.add_argument("--dry-run", action="store_true", help="report what would change, write nothing")
     ap.add_argument("--force", action="store_true", help="run even if the data looks unchanged")
+    ap.add_argument("--force-publish", action="store_true", help="publish even if only the build time changed")
     args = ap.parse_args()
     os.makedirs(STATE_DIR, exist_ok=True)
 
@@ -234,12 +262,14 @@ def main():
             return 0
 
         data = ba.find_data_dir(args.data)
-        pulled = False if args.dry_run else sync_from_github(data)
+        # Actions checks the data out fresh; only the Mac's copy needs a pull and a settle
+        pulled = False if (args.dry_run or CI) else sync_from_github(data)
         fp = fingerprint(data)
         if fp == load_state().get("fingerprint") and not args.force:
             log("no new data")
+            ci_output(outcome="unchanged")
             return 0
-        if not pulled:   # a pull lands a whole commit at once; local writes may still be going on
+        if not pulled and not CI:   # a pull lands a whole commit at once; local writes may still be going on
             wait_for_quiet(data)
             fp = fingerprint(data)
 
@@ -256,8 +286,10 @@ def main():
 
         old = json.load(open(ba.OUT, encoding="utf-8"))
         candidates = ba.candidate_moves(data)
-        if comparable(old) == comparable(new):
+        if comparable(old) == comparable(new) and not args.force_publish:
             log("built and checked, nothing public changed")
+            ci_output(outcome="unchanged")
+            ci_summary("oförändrad", ["Byggd och kontrollerad, inget publikt ändrat"])
             if not args.dry_run:
                 save_state(fp, "unchanged")
             return 0
@@ -265,8 +297,11 @@ def main():
         changes = summarize(old, new)
         if args.dry_run:
             log("dry run, would publish:\n  " + "\n  ".join(changes))
-            for c in candidates:
-                log(f"candidate move: {c['lottery']} / {c['vendor']} / {c['when']}")
+            if CI:   # contract rows not on the page yet belong to the data pack
+                log(f"{len(candidates)} candidate moves need copy")
+            else:
+                for c in candidates:
+                    log(f"candidate move: {c['lottery']} / {c['vendor']} / {c['when']}")
             return 0
 
         if args.publish and (reason := git_preflight()):
@@ -291,6 +326,7 @@ def main():
             if not staged:
                 log("nothing to commit after writing")
                 save_state(fp, "unchanged")
+                ci_output(outcome="unchanged")
                 return 0
             day = new["meta"]["data_retrieved"] or datetime.now().strftime("%Y-%m-%d")
             if git("commit", "-q", "-m", f"{COMMIT_PREFIX} - {day}").returncode:
@@ -302,10 +338,12 @@ def main():
             status = f"Publicerad (commit {sha})"
 
         save_state(fp, status)
-        report = write_report(status, changes, candidates)
+        report = write_report(status, changes, () if CI else candidates)
         log(f"{status}: {'; '.join(changes)} (report: {report})")
         extra = f" {len(candidates)} nya avtal behöver text." if candidates else ""
         notify(f"{status}. {len(changes)} ändringar.{extra}")
+        ci_output(outcome="published" if args.publish else "written", published="true" if args.publish else "false")
+        ci_summary(status, changes + ([f"{len(candidates)} nya avtal behöver engelsk text (se datarepot)"] if candidates else []))
         return 0
 
 
