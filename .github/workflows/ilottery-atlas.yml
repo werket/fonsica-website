@@ -22,7 +22,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
 
 concurrency:
   group: ilottery-atlas
@@ -87,8 +86,5 @@ jobs:
           path: .atlas-seen
           key: ${{ steps.seen.outputs.cache-primary-key }}
 
-      - name: Ask GitHub Pages to rebuild
-        if: steps.atlas.outputs.published == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/${{ github.repository }}/pages/builds" --silent || echo "No extra Pages build requested; the push may already have started one"
+# The push itself starts GitHub Pages' own build; requesting another one only produced a
+# duplicate, errored build record (tested 2026-10-23).
