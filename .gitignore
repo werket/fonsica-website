@@ -21,3 +21,10 @@ design-proposals/
 
 # Shared project-memory handoffs (internal, never publish on fonsica.se)
 Agent_Context/
+
+# Fonsica Insights research data and LLM work packages (private, never publish)
+fonsica-data/
+fonsica-data.zip
+FonsicaInsights/
+llm_work/
+llm_work.zip

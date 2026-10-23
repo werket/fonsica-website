@@ -1,0 +1,1665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iLottery Atlas · Fonsica</title>
+<meta name="description" content="Where lotteries sell online, how fast eInstants grow, what players get back and who builds the games. A living dataset on the iLottery market by Adam Fonsica.">
+<meta name="theme-color" content="#2B292B">
+<link rel="canonical" href="https://fonsica.se/insights/ilottery/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fonsica.se/insights/ilottery/">
+<meta property="og:title" content="iLottery Atlas (beta)">
+<meta property="og:description" content="Where lotteries sell online, how fast eInstants grow, what players get back and who builds the games.">
+<meta property="og:image" content="https://fonsica.se/images/brand/fonsica-og-1200x630.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/images/brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/images/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400..600&family=Schibsted+Grotesk:wght@400..800&display=swap">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ==========================================================================
+   iLottery Atlas: the After Hours tokens, used for data
+   ========================================================================== */
+:root {
+  --ground: #2B292B;
+  --raised: #343133;
+  --lift: #4A4547;
+  --bone: #ECE7E1;
+  --ash: #A59F99;
+  --hair: #45403F;
+  --teal: #2DD4BF;
+
+  /* data roles */
+  --t-einstants: var(--teal);
+  --t-online: #2C655F;         /* teal mixed 35% into the ground */
+  --t-offline: #3E3A3C;
+  --t-none: transparent;
+  --muted-mark: #7A7470;       /* "other" bars, ranges */
+
+  --sans: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --edge: 20px;
+  --gl: 20px;
+  --gr: 20px;
+  --header-h: 64px;
+  --wrap: 1360px;
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Base (shared with the homepage)
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--ground); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--ground); color: var(--bone);
+  font-family: var(--sans); font-size: 17px; line-height: 1.65; font-weight: 400;
+  font-kerning: normal; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3, p, ul, ol, figure, dl, dd { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+::selection { background: var(--teal); color: var(--ground); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 2px; }
+main:focus { outline: none; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: fixed; top: 12px; left: 12px; z-index: 100;
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
+  background: var(--bone); color: var(--ground);
+  font: 600 15px/1 var(--sans); text-decoration: none; border-radius: 999px;
+  transform: translateY(-200%);
+}
+.skip:focus { transform: none; }
+
+.label {
+  font-family: var(--mono); font-size: 12px; line-height: 1.4; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ash);
+}
+.meta { font-family: var(--mono); font-size: 13px; line-height: 1.5; letter-spacing: .02em; color: var(--ash); }
+.num { font-variant-numeric: tabular-nums; }
+
+.link {
+  display: inline-flex; align-items: center; gap: 9px; min-height: 44px;
+  color: var(--bone); font-weight: 500;
+  text-decoration: underline; text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px; text-underline-offset: .32em;
+}
+.link:hover { text-decoration-thickness: 2px; }
+.ext { flex: none; width: 10px; height: 10px; color: var(--ash); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 56px; padding: 0 30px;
+  background: var(--bone); color: var(--ground);
+  font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -.005em;
+  text-decoration: none; border-radius: 999px; border: 0; cursor: pointer;
+  transition: background-color .2s ease;
+}
+.btn:hover { background: var(--teal); }
+.btn:focus-visible { outline-offset: 4px; }
+.btn-ghost {
+  background: none; color: var(--bone); box-shadow: inset 0 0 0 1px var(--hair);
+}
+.btn-ghost:hover { background: none; box-shadow: inset 0 0 0 1px var(--teal); }
+
+.beta {
+  display: inline-flex; align-items: center; gap: 7px; height: 24px; padding: 0 10px;
+  border-radius: 999px; box-shadow: inset 0 0 0 1px var(--teal);
+  font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--teal); vertical-align: middle;
+}
+
+/* ==========================================================================
+   Masthead (same chrome as the homepage, full width on this page)
+   ========================================================================== */
+.masthead {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--edge);
+}
+.masthead::before {
+  content: ""; position: absolute; inset: 0; z-index: -2;
+  background: var(--ground); border-bottom: 1px solid var(--hair);
+  opacity: 0; transition: opacity .3s ease;
+}
+.masthead.is-scrolled::before { opacity: 1; }
+.wordmark { display: inline-flex; align-items: center; min-height: 44px; color: var(--bone); text-decoration: none; line-height: 1; }
+.wordmark .logo { display: block; width: auto; height: calc(clamp(21px, 1.7vw, 25px) * .808); overflow: visible; }
+.logo-dot { fill: var(--teal); }
+
+.menu-toggle {
+  display: inline-flex; align-items: center; gap: 12px;
+  min-height: 44px; min-width: 44px; margin-right: -10px; padding: 0 10px;
+  background: none; border: 0; color: var(--bone); cursor: pointer;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  border-radius: 4px;
+}
+.menu-toggle-icon { position: relative; width: 18px; height: 8px; }
+.menu-toggle-icon::before, .menu-toggle-icon::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor;
+  transition: transform .25s ease, top .25s ease;
+}
+.menu-toggle-icon::before { top: 0; }
+.menu-toggle-icon::after { top: 6.5px; }
+.menu-open .menu-toggle-icon::before { top: 3.25px; transform: rotate(45deg); }
+.menu-open .menu-toggle-icon::after { top: 3.25px; transform: rotate(-45deg); }
+
+.nav {
+  position: fixed; inset: 0; z-index: -1;
+  display: flex; flex-direction: column;
+  padding: calc(var(--header-h) + 24px) var(--gl) 48px;
+  background: var(--ground);
+  overflow-y: auto; overscroll-behavior: contain;
+  visibility: hidden; opacity: 0;
+  transition: opacity .25s ease, visibility 0s linear .25s;
+}
+.menu-open .nav { visibility: visible; opacity: 1; transition: opacity .25s ease; }
+.nav ul { margin-block: auto; border-top: 1px solid var(--hair); }
+.nav li { border-bottom: 1px solid var(--hair); }
+.nav a {
+  display: flex; align-items: baseline; gap: 18px; min-height: 64px; padding: 14px 0;
+  color: var(--bone); text-decoration: none;
+  font-weight: 700; font-size: clamp(2rem, 8.6vw, 3rem); line-height: 1.05; letter-spacing: -.03em;
+}
+.nav-idx {
+  flex: none; width: 24px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.nav a.is-active { color: var(--teal); }
+.menu-open, .menu-open body { overflow: hidden; }
+
+/* ==========================================================================
+   Hero: title + the market at a glance (one square per lottery)
+   ========================================================================== */
+.wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gr) 0 var(--gl); }
+
+.hero { padding-top: calc(var(--header-h) + 48px); padding-bottom: 24px; }
+.hero-label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 22px; }
+.hero-title {
+  font-weight: 800; font-size: clamp(2.9rem, 8.4vw, 6.75rem); line-height: .96; letter-spacing: -.045em;
+}
+.hero-title span { display: block; }
+.hero-intro {
+  margin-top: 28px; max-width: 31em;
+  font-size: clamp(1.125rem, 1.35vw, 1.3125rem); line-height: 1.5; color: var(--bone);
+}
+.hero-meta { margin-top: 18px; }
+.hero-meta a { color: var(--bone); text-decoration-color: var(--teal); text-underline-offset: .3em; }
+
+.glance { margin-top: 56px; }
+.glance-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; }
+.glance-title { font-weight: 600; font-size: clamp(1.125rem, 1.4vw, 1.3125rem); letter-spacing: -.01em; }
+.units {
+  display: grid; gap: 28px 32px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+}
+.unit-group h3 { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-size: 14px; font-weight: 600; letter-spacing: 0; }
+.unit-group h3 .meta { font-size: 12px; }
+.unit-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.unit {
+  width: 14px; height: 14px; border-radius: 3px; padding: 0; border: 0; cursor: default;
+  background: var(--t-offline);
+}
+.unit.t-einstants { background: var(--t-einstants); }
+.unit.t-online { background: var(--t-online); }
+.unit.t-planned { background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--teal); }
+.unit:hover, .unit.is-hot { outline: 2px solid var(--bone); outline-offset: 1px; }
+.js .units .unit { opacity: 0; transform: scale(.6); }
+.js .units.is-in .unit { opacity: 1; transform: none; transition: opacity .5s ease, transform .5s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i) * 4ms); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.legend li { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .02em; color: var(--ash); }
+.key { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--t-offline); }
+.key.t-einstants { background: var(--t-einstants); }
+.key.t-online { background: var(--t-online); }
+.key.t-planned { background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--teal); }
+.key.t-none { background: none; box-shadow: inset 0 0 0 1px var(--hair); }
+.key.line { width: 16px; height: 2px; border-radius: 1px; background: var(--muted-mark); }
+.key.dot { width: 10px; height: 10px; border-radius: 50%; }
+.key.dot-teal { background: var(--teal); }
+.key.dot-bone { background: var(--bone); }
+.key.bar-mid { width: 16px; height: 8px; border-radius: 4px; background: rgba(236, 231, 225, .28); }
+.legend .n { color: var(--bone); }
+
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 56px; border-top: 1px solid var(--hair); }
+.kpi { display: flex; flex-direction: column-reverse; justify-content: flex-end; padding: 22px 16px 24px 0; border-bottom: 1px solid var(--hair); }
+.kpi dd { font-weight: 800; font-size: clamp(2.25rem, 4.4vw, 3.75rem); line-height: .95; letter-spacing: -.045em; color: var(--bone); }
+.kpi dt { margin-top: 12px; }
+
+/* ==========================================================================
+   Atlas layout: chapter rail + chapters
+   ========================================================================== */
+.rail { display: none; }
+.chapter { padding: 88px 0; border-top: 1px solid var(--hair); }
+.kicker { display: flex; gap: 14px; align-items: baseline; margin-bottom: 22px; }
+.kicker .idx { color: var(--teal); }
+.chapter-title {
+  max-width: 19em;
+  font-weight: 700; font-size: clamp(2rem, 3.9vw, 3.5rem); line-height: 1.02; letter-spacing: -.035em;
+}
+.dek { margin-top: 24px; max-width: 36em; font-size: clamp(1.0625rem, 1.25vw, 1.25rem); line-height: 1.55; color: var(--ash); }
+.dek strong { color: var(--bone); font-weight: 600; }
+
+.fig { margin-top: 48px; }
+.fig + .fig { margin-top: 72px; }
+.fig-title { font-weight: 600; font-size: clamp(1.125rem, 1.4vw, 1.3125rem); line-height: 1.3; letter-spacing: -.012em; }
+.fig-sub { margin-top: 4px; }
+.fig-body { margin-top: 24px; }
+.fig-foot { margin-top: 18px; display: grid; gap: 4px; }
+.fig-foot a { color: var(--ash); text-decoration-color: var(--hair); text-underline-offset: .25em; }
+.fig-foot a:hover { color: var(--bone); text-decoration-color: var(--teal); }
+
+details.table-view { margin-top: 14px; }
+details.table-view summary {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; list-style: none;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ash);
+}
+details.table-view summary::-webkit-details-marker { display: none; }
+details.table-view summary::before { content: "+"; width: 12px; color: var(--teal); }
+details.table-view[open] summary::before { content: "−"; }
+details.table-view summary:hover { color: var(--bone); }
+.table-scroll { overflow-x: auto; margin-top: 8px; }
+table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.data th, table.data td { padding: 9px 16px 9px 0; border-bottom: 1px solid var(--hair); text-align: left; vertical-align: top; }
+table.data th { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); }
+table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px;
+  border: 0; border-radius: 999px; background: none; cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--hair);
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ash);
+  transition: color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.chip:hover { color: var(--bone); box-shadow: inset 0 0 0 1px var(--ash); }
+.chip[aria-pressed="true"], .chip[aria-selected="true"] { color: var(--ground); background: var(--bone); box-shadow: none; }
+
+.note { margin-top: 28px; padding: 18px 0 0; border-top: 1px solid var(--hair); max-width: 44em; color: var(--ash); font-size: 15px; }
+.note strong { color: var(--bone); font-weight: 600; }
+
+/* Tooltip */
+.tip {
+  position: fixed; z-index: 60; pointer-events: none;
+  min-width: 140px; max-width: 280px; padding: 10px 12px 11px;
+  background: var(--raised); border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--hair), 0 12px 28px rgba(0, 0, 0, .35);
+  font-size: 13px; line-height: 1.4; color: var(--ash);
+  opacity: 0; transform: translateY(4px); transition: opacity .12s ease, transform .12s ease;
+}
+.tip.is-on { opacity: 1; transform: none; }
+.tip-v { display: block; color: var(--bone); font-weight: 700; font-size: 16px; letter-spacing: -.01em; }
+.tip-k { display: block; color: var(--bone); font-weight: 600; }
+.tip-row { display: flex; align-items: center; gap: 8px; }
+.tip-row + .tip-row { margin-top: 3px; }
+.tip-s { display: block; margin-top: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: .02em; }
+
+/* ==========================================================================
+   01 North America map
+   ========================================================================== */
+.map-layout { display: grid; gap: 36px; }
+.tilemap {
+  display: grid; gap: 4px; margin-top: 20px;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  grid-template-rows: auto 10px;
+  grid-auto-rows: auto;
+  max-width: 660px;
+}
+.tile {
+  aspect-ratio: 1; min-width: 0; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: clamp(9px, 1.25vw, 12px); font-weight: 600; letter-spacing: .02em;
+  background: var(--t-offline); color: var(--ash);
+  transition: opacity .25s ease, box-shadow .2s ease;
+}
+.tile.t-einstants { background: var(--t-einstants); color: var(--ground); }
+.tile.t-online { background: var(--t-online); color: var(--bone); }
+.tile.t-planned { background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--teal); color: var(--bone); }
+.tile.t-none { background: none; box-shadow: inset 0 0 0 1px var(--hair); color: #77716C; }
+.tile:hover, .tile.is-sel { box-shadow: 0 0 0 2px var(--bone); }
+.tile.t-planned:hover, .tile.t-planned.is-sel { box-shadow: inset 0 0 0 1.5px var(--teal), 0 0 0 2px var(--bone); }
+.tilemap.is-filtered .tile:not(.is-match) { opacity: .18; }
+.tilemap.is-filtered .tile.is-match { box-shadow: 0 0 0 2px var(--bone); }
+.map-caption { display: flex; justify-content: space-between; max-width: 660px; margin-top: 10px; }
+
+.map-side { display: grid; gap: 28px; align-content: start; }
+.detail { min-height: 196px; padding: 20px 22px 22px; background: var(--raised); border-radius: 6px; }
+.detail h4 { margin: 0; font-weight: 700; font-size: 1.375rem; line-height: 1.15; letter-spacing: -.02em; }
+.detail dl { margin-top: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; font-size: 14px; }
+.detail dt { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); padding-top: .2em; }
+.detail dd { color: var(--bone); }
+.detail .status { display: inline-flex; align-items: center; gap: 8px; }
+.detail-empty { color: var(--ash); font-size: 15px; }
+
+.vendors h4 { margin: 0 0 6px; }
+.vendor {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline;
+  padding: 12px 0; border: 0; border-bottom: 1px solid var(--hair); background: none; cursor: pointer; text-align: left;
+}
+.vendor-name { font-weight: 600; font-size: 15px; }
+.vendor-n { font-family: var(--mono); font-size: 12px; color: var(--ash); font-variant-numeric: tabular-nums; }
+.vendor-codes { grid-column: 1 / -1; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: var(--ash); }
+.vendor:hover .vendor-name, .vendor[aria-pressed="true"] .vendor-name { color: var(--teal); }
+.vendor[aria-pressed="true"] { box-shadow: inset 2px 0 0 var(--teal); padding-left: 12px; }
+
+/* ==========================================================================
+   02 Growth
+   ========================================================================== */
+.series-picker { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 118px), 1fr)); }
+.series {
+  display: grid; gap: 2px; padding: 14px 14px 12px; text-align: left; cursor: pointer;
+  border: 0; border-radius: 6px; background: none; box-shadow: inset 0 0 0 1px var(--hair);
+  transition: box-shadow .2s ease, background-color .2s ease;
+}
+.series:hover { box-shadow: inset 0 0 0 1px var(--ash); }
+.series[aria-pressed="true"] { background: var(--raised); box-shadow: inset 0 0 0 1px var(--teal); }
+.series-name { font-weight: 600; font-size: 14px; }
+.series-x { font-weight: 800; font-size: 1.75rem; line-height: 1.05; letter-spacing: -.04em; color: var(--bone); }
+.series-x.down { color: var(--ash); }
+.series-per { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: var(--ash); }
+.series svg { display: block; width: 100%; height: 30px; margin-top: 8px; overflow: visible; }
+
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart .grid line { stroke: var(--hair); stroke-width: 1; shape-rendering: crispEdges; }
+.chart .axis text, .chart text.axis { font-family: var(--mono); font-size: 11px; fill: var(--ash); letter-spacing: .02em; }
+.chart text.val { font-family: var(--mono); font-size: 12px; font-weight: 500; fill: var(--bone); }
+.chart text.ann { font-family: var(--sans); font-size: 13px; fill: var(--ash); }
+.chart .line { fill: none; stroke: var(--teal); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .area { fill: var(--teal); opacity: .1; }
+.chart .band { fill: var(--teal); opacity: .14; }
+.chart .pt { fill: var(--teal); stroke: var(--ground); stroke-width: 2; }
+.chart .pt.hollow { fill: var(--ground); stroke: var(--teal); stroke-width: 2; }
+.chart .cross { stroke: var(--ash); stroke-width: 1; }
+.chart .hit { fill: transparent; cursor: crosshair; }
+.chart .line.anim { animation: draw 1.4s cubic-bezier(.45, 0, .2, 1) both; }
+.chart .hit { touch-action: pan-y; }
+@keyframes draw { from { stroke-dashoffset: var(--len); stroke-dasharray: var(--len); } to { stroke-dashoffset: 0; stroke-dasharray: var(--len); } }
+
+.growth-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-top: 36px; }
+.counter { display: grid; gap: 1px; margin-top: 56px; background: var(--hair); border-radius: 6px; overflow: hidden; }
+.counter > div { padding: 22px 22px 24px; background: var(--ground); }
+.counter .big { color: var(--bone); font-weight: 800; font-size: clamp(2.25rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -.045em; }
+.counter h3 { margin-top: 10px; font-weight: 600; font-size: 1.0625rem; letter-spacing: -.01em; }
+.counter p { margin-top: 8px; color: var(--ash); font-size: 15px; }
+.counter a { color: var(--ash); text-decoration-color: var(--hair); text-underline-offset: .25em; font-family: var(--mono); font-size: 12px; }
+
+/* ==========================================================================
+   03 Payout: dot and range rows
+   ========================================================================== */
+.rtp { --lo: 40; --hi: 100; }
+.rtp-axis, .rtp-row { display: grid; grid-template-columns: minmax(118px, 30%) minmax(0, 1fr); column-gap: 16px; align-items: center; }
+.rtp-axis .track { position: relative; height: 22px; }
+.rtp-axis .track span { position: absolute; transform: translateX(-50%); font-family: var(--mono); font-size: 11px; color: var(--ash); }
+@media (max-width: 639px) {
+  .rtp .rtp-axis .track span.minor { display: none; }
+  .rtp .rtp-axis, .rtp .rtp-row { grid-template-columns: minmax(0, 42%) minmax(0, 1fr); column-gap: 12px; }
+  .rtp .rtp-name { white-space: normal; font-size: 13px; line-height: 1.3; padding: 5px 0; }
+}
+.rtp-row { min-height: 30px; border-radius: 4px; cursor: default; }
+.rtp-row:hover, .rtp-row:focus-visible { background: rgba(236, 231, 225, .045); }
+.rtp-name { font-size: 14px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rtp-name .cc { margin-left: 6px; font-family: var(--mono); font-size: 11px; color: var(--ash); }
+.rtp-row .track {
+  position: relative; height: 30px;
+  background-image: linear-gradient(to right, var(--hair) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+  background-position: 0 0;
+}
+.rtp-range { position: absolute; top: 14px; height: 2px; border-radius: 1px; background: var(--muted-mark); }
+.rtp-iqr { position: absolute; top: 11px; height: 8px; border-radius: 4px; background: rgba(236, 231, 225, .28); }
+.rtp-med {
+  position: absolute; top: 10px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--ground);
+}
+.rtp-med.na { background: var(--teal); }
+.rtp-med.eu { background: var(--bone); }
+.rtp-rows { display: grid; gap: 2px; margin-top: 6px; }
+.rtp-split { margin: 10px 0 8px; display: grid; grid-template-columns: minmax(118px, 30%) minmax(0, 1fr); column-gap: 16px; }
+
+/* ==========================================================================
+   04 Studios
+   ========================================================================== */
+.studio-layout { display: grid; gap: 48px; }
+.bars { display: grid; gap: 14px; margin-top: 22px; }
+.bar-row { display: grid; grid-template-columns: minmax(120px, 34%) minmax(0, 1fr); column-gap: 16px; align-items: center; }
+.bar-name { font-size: 14px; line-height: 1.25; }
+.bar-track { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.bar {
+  flex: none; height: 18px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--teal);
+  transform-origin: left center;
+}
+.bar.other { background: var(--muted-mark); }
+.js .bars .bar { transform: scaleX(0); }
+.js .bars.is-in .bar { transform: none; transition: transform .9s cubic-bezier(.2, .8, .2, 1); }
+.bar-val { flex: none; font-family: var(--mono); font-size: 12px; color: var(--bone); font-variant-numeric: tabular-nums; }
+.coverage { margin-top: 18px; }
+
+.reach li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.reach li:first-child { border-top: 1px solid var(--hair); }
+.reach .n { font-weight: 700; font-size: 1.25rem; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.reach .s { display: block; font-family: var(--mono); font-size: 11px; color: var(--ash); letter-spacing: .02em; }
+
+.split { display: grid; gap: 10px; margin-top: 18px; }
+.split-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 40px; gap: 12px; align-items: center; }
+.split-bar { display: flex; gap: 2px; height: 18px; }
+.split-bar span { height: 100%; }
+.split-bar .a { background: var(--teal); border-radius: 4px 0 0 4px; }
+.split-bar .b { background: var(--muted-mark); border-radius: 0 4px 4px 0; }
+
+/* ==========================================================================
+   06 Moves
+   ========================================================================== */
+.moves { margin-top: 22px; border-top: 1px solid var(--hair); }
+.move { display: grid; gap: 4px 24px; padding: 18px 0 20px; border-bottom: 1px solid var(--hair); }
+.move[hidden] { display: none; }
+.move-when { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--ash); }
+.move h3 { font-weight: 600; font-size: 1.125rem; line-height: 1.3; letter-spacing: -.012em; }
+.move h3 .v { color: var(--ash); font-weight: 400; }
+.move p { color: var(--ash); font-size: 15px; }
+.move a { font-family: var(--mono); font-size: 12px; color: var(--ash); text-decoration-color: var(--hair); text-underline-offset: .25em; }
+.move a:hover { color: var(--bone); text-decoration-color: var(--teal); }
+
+/* ==========================================================================
+   07 Data pack
+   ========================================================================== */
+.pack { margin-top: 44px; display: grid; gap: 1px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); background: var(--hair); border-radius: 6px; overflow: hidden; }
+.pack > div { padding: 22px 22px 24px; background: var(--ground); }
+.pack .big { color: var(--bone); font-weight: 800; font-size: clamp(1.875rem, 3vw, 2.5rem); line-height: 1; letter-spacing: -.045em; }
+.pack h3 { margin-top: 10px; font-weight: 600; font-size: 1rem; }
+.pack p { margin-top: 6px; color: var(--ash); font-size: 14px; line-height: 1.5; }
+
+.locked { position: relative; margin-top: 44px; border-radius: 6px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--hair); }
+.locked table.data { font-size: 13px; }
+.locked table.data th, .locked table.data td { padding: 11px 14px; }
+.locked .ghost td span { display: block; height: 9px; border-radius: 3px; background: var(--raised); }
+.locked-veil {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 64%;
+  display: grid; place-items: end center; padding: 0 20px 22px; text-align: center;
+  background: linear-gradient(to bottom, rgba(43, 41, 43, 0) 0%, rgba(43, 41, 43, .92) 46%, var(--ground) 100%);
+}
+.locked-veil p { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--bone); }
+.cta-row { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.fine { margin-top: 18px; color: var(--ash); font-size: 14px; max-width: 44em; }
+
+/* ==========================================================================
+   Method + contact + footer
+   ========================================================================== */
+.method { display: grid; gap: 36px; margin-top: 44px; }
+.method h3 { font-weight: 600; font-size: 1.0625rem; margin-bottom: 10px; }
+.method p, .method li { color: var(--ash); font-size: 15px; }
+.grades li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 6px 0; }
+.grade { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--hair); font-family: var(--mono); font-size: 12px; color: var(--bone); }
+.disclose { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--hair); display: grid; gap: 10px; max-width: 46em; color: var(--ash); font-size: 15px; }
+.disclose a { color: var(--bone); text-decoration-color: var(--teal); text-underline-offset: .25em; }
+
+.contact { padding-top: 112px; padding-bottom: 120px; border-top: 1px solid var(--hair); }
+.contact-title { font-weight: 800; font-size: clamp(2.5rem, 5vw, 4.75rem); line-height: .98; letter-spacing: -.045em; max-width: 13em; }
+.contact .dek { max-width: 32em; }
+
+.site-footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 32px;
+  padding: 20px var(--gr) 28px var(--gl); border-top: 1px solid var(--hair);
+}
+.site-footer ul { display: flex; gap: 28px; }
+.site-footer a {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; min-width: 44px;
+  color: var(--bone); text-decoration: underline; text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px; text-underline-offset: .32em;
+  font-family: var(--mono); font-size: 13px; letter-spacing: .02em;
+}
+
+/* Reveal */
+.js .reveal { opacity: 0; transform: translateY(14px); }
+.js .reveal.is-in { opacity: 1; transform: none; transition: opacity .8s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+@media (min-width: 640px) {
+  :root { --edge: 32px; --gl: 40px; --gr: 40px; --header-h: 72px; }
+  .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpi { padding-right: 24px; }
+  .chapter { padding: 112px 0; }
+  .counter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .move { grid-template-columns: 120px minmax(0, 1fr); }
+  .move-when { grid-row: 1 / span 3; padding-top: .3em; }
+  .method { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .map-layout { grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr); align-items: start; }
+  .studio-layout { grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr); }
+  .method { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   Desktop: masthead row, rail beside the chapters
+   ========================================================================== */
+@media (min-width: 1024px) {
+  :root { --edge: clamp(28px, 2.8vw, 48px); --gl: clamp(40px, 4vw, 72px); --gr: clamp(40px, 4vw, 72px); --header-h: 88px; }
+  .menu-toggle { display: none; }
+  .nav {
+    position: static; z-index: auto; height: var(--header-h); padding: 0;
+    flex-direction: row; justify-content: flex-end; align-items: center;
+    background: none; overflow: visible; visibility: visible; opacity: 1; transition: none;
+  }
+  .nav ul { display: flex; align-items: center; gap: clamp(16px, 1.9vw, 34px); margin: 0; border: 0; }
+  .nav li { border: 0; }
+  .nav a {
+    position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0;
+    font-family: var(--mono); font-size: 12px; font-weight: 500; line-height: 1;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ash);
+    transition: color .2s ease;
+  }
+  .nav a:hover { color: var(--bone); }
+  .nav a::before {
+    content: ""; position: absolute; left: -12px; top: 50%;
+    width: 5px; height: 5px; margin-top: -3px; border-radius: 50%; background: var(--teal);
+    opacity: 0; transform: scale(.3); transition: opacity .3s ease, transform .3s ease;
+  }
+  .nav a.is-active { color: var(--teal); }
+  .nav a.is-active::before { opacity: 1; transform: none; }
+  .nav-idx { display: none; }
+
+  .hero { padding-top: calc(var(--header-h) + 72px); }
+  .glance { margin-top: 72px; }
+
+  .atlas { display: grid; grid-template-columns: minmax(180px, 21fr) minmax(0, 79fr); column-gap: clamp(32px, 4vw, 72px); }
+  .rail {
+    display: block; position: sticky; top: calc(var(--header-h) + 32px); align-self: start;
+    padding-top: 96px;
+  }
+  .rail-label { margin-bottom: 14px; }
+  .rail ol { border-top: 1px solid var(--hair); }
+  .rail li { border-bottom: 1px solid var(--hair); }
+  .rail ol a {
+    display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: baseline; gap: 6px;
+    padding: 11px 0; color: var(--ash); text-decoration: none; font-size: 14px; line-height: 1.3;
+    transition: color .2s ease;
+  }
+  .rail ol a .idx { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+  .rail ol a:hover { color: var(--bone); }
+  .rail ol a.is-active { color: var(--bone); }
+  .rail ol a.is-active .idx { color: var(--teal); }
+  .rail .rail-cta { margin-top: 28px; display: grid; gap: 10px; }
+  .rail .btn { min-height: 48px; padding: 0 22px; font-size: 15px; }
+  .chapter { padding: clamp(112px, 14vh, 160px) 0; }
+  .atlas .chapter:first-child { border-top: 0; padding-top: 96px; }
+
+  .site-footer { padding: 18px var(--edge) 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
+  .js .reveal, .js .units .unit, .js .bars .bar { opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead" id="masthead">
+  <a class="wordmark" href="/" aria-label="Fonsica, home"><svg class="logo" viewBox="133 -1628 7267 1655" aria-hidden="true" focusable="false"><path fill="currentColor" d="M133.0 0.0V-1440.0H1171.0V-1133.0H494.0V-877.0H1080.0V-570.0H494.0V0.0Z M1754.84 27.0Q1586.84 27.0 1458.84 -45.0Q1330.84 -117.0 1259.34 -245.0Q1187.84 -373.0 1187.84 -540.0Q1187.84 -708.0 1259.34 -835.5Q1330.84 -963.0 1458.84 -1035.0Q1586.84 -1107.0 1754.84 -1107.0Q1922.84 -1107.0 2050.84 -1035.0Q2178.84 -963.0 2250.84 -835.5Q2322.84 -708.0 2322.84 -540.0Q2322.84 -372.0 2250.84 -244.5Q2178.84 -117.0 2050.34 -45.0Q1921.84 27.0 1754.84 27.0ZM1755.84 -224.0Q1849.84 -224.0 1904.84 -309.0Q1959.84 -394.0 1959.84 -540.0Q1959.84 -686.0 1904.84 -771.0Q1849.84 -856.0 1754.84 -856.0Q1660.84 -856.0 1605.84 -771.0Q1550.84 -686.0 1550.84 -540.0Q1550.84 -394.0 1605.84 -309.0Q1660.84 -224.0 1755.84 -224.0Z M2426.68 0.0V-1080.0H2767.68V-829.0L2759.68 -874.0Q2811.68 -986.0 2900.18 -1046.5Q2988.68 -1107.0 3114.68 -1107.0Q3244.68 -1107.0 3324.18 -1047.5Q3403.68 -988.0 3439.68 -884.5Q3475.68 -781.0 3475.68 -649.0V0.0H3125.68V-628.0Q3125.68 -736.0 3094.18 -792.0Q3062.68 -848.0 2981.68 -848.0Q2880.68 -848.0 2829.18 -755.5Q2777.68 -663.0 2777.68 -467.0V0.0Z M4073.5199999999995 27.0Q3949.5199999999995 27.0 3836.0199999999995 -7.0Q3722.5199999999995 -41.0 3644.5199999999995 -115.0Q3566.5199999999995 -189.0 3546.5199999999995 -309.0L3857.5199999999995 -371.0Q3865.5199999999995 -294.0 3913.5199999999995 -254.0Q3961.5199999999995 -214.0 4058.5199999999995 -214.0Q4151.5199999999995 -214.0 4192.5199999999995 -246.0Q4233.5199999999995 -278.0 4233.5199999999995 -320.0Q4233.5199999999995 -357.0 4199.5199999999995 -388.5Q4165.5199999999995 -420.0 4074.5199999999995 -433.0L3988.5199999999995 -445.0Q3929.5199999999995 -453.0 3860.5199999999995 -468.0Q3791.5199999999995 -483.0 3729.5199999999995 -514.5Q3667.5199999999995 -546.0 3628.5199999999995 -603.0Q3589.5199999999995 -660.0 3589.5199999999995 -752.0Q3589.5199999999995 -860.0 3647.5199999999995 -939.5Q3705.5199999999995 -1019.0 3811.5199999999995 -1063.0Q3917.5199999999995 -1107.0 4059.5199999999995 -1107.0Q4182.5199999999995 -1107.0 4288.0199999999995 -1072.0Q4393.5199999999995 -1037.0 4466.0199999999995 -967.5Q4538.5199999999995 -898.0 4559.5199999999995 -794.0L4252.5199999999995 -731.0Q4245.5199999999995 -764.0 4228.5199999999995 -796.5Q4211.5199999999995 -829.0 4175.0199999999995 -850.5Q4138.5199999999995 -872.0 4073.5199999999995 -872.0Q4003.5199999999995 -872.0 3966.5199999999995 -845.5Q3929.5199999999995 -819.0 3929.5199999999995 -778.0Q3929.5199999999995 -743.0 3956.5199999999995 -721.5Q3983.5199999999995 -700.0 4027.5199999999995 -687.5Q4071.5199999999995 -675.0 4122.5199999999995 -667.0L4226.5199999999995 -652.0Q4312.5199999999995 -640.0 4392.5199999999995 -605.0Q4472.5199999999995 -570.0 4524.0199999999995 -504.0Q4575.5199999999995 -438.0 4575.5199999999995 -331.0Q4575.5199999999995 -213.0 4509.5199999999995 -133.0Q4443.5199999999995 -53.0 4329.5199999999995 -13.0Q4215.5199999999995 27.0 4073.5199999999995 27.0Z M4678.36 0.0V-1080.0H5029.36V0.0Z M5714.2 27.0Q5536.2 27.0 5406.7 -42.0Q5277.2 -111.0 5206.7 -238.5Q5136.2 -366.0 5136.2 -541.0Q5136.2 -716.0 5206.2 -843.0Q5276.2 -970.0 5405.2 -1038.5Q5534.2 -1107.0 5711.2 -1107.0Q5836.2 -1107.0 5946.7 -1062.5Q6057.2 -1018.0 6135.2 -929.0Q6213.2 -840.0 6238.2 -705.0L5910.2 -639.0Q5892.2 -750.0 5840.2 -803.0Q5788.2 -856.0 5710.2 -856.0Q5599.2 -856.0 5549.2 -765.5Q5499.2 -675.0 5499.2 -536.0Q5499.2 -397.0 5548.7 -310.5Q5598.2 -224.0 5710.2 -224.0Q5785.2 -224.0 5838.2 -269.5Q5891.2 -315.0 5917.2 -414.0L6232.2 -362.0Q6213.2 -258.0 6161.7 -183.5Q6110.2 -109.0 6037.2 -63.0Q5964.2 -17.0 5880.7 5.0Q5797.2 27.0 5714.2 27.0Z M6647.04 26.0Q6546.04 26.0 6455.54 -8.0Q6365.04 -42.0 6309.04 -114.0Q6253.04 -186.0 6253.04 -301.0Q6253.04 -425.0 6324.54 -505.5Q6396.04 -586.0 6526.54 -626.0Q6657.04 -666.0 6837.04 -666.0H6977.04L6959.04 -634.0V-698.0Q6959.04 -796.0 6925.54 -841.0Q6892.04 -886.0 6815.04 -886.0Q6740.04 -886.0 6701.04 -846.0Q6662.04 -806.0 6650.04 -729.0L6300.04 -786.0Q6320.04 -877.0 6381.54 -950.0Q6443.04 -1023.0 6554.54 -1066.0Q6666.04 -1109.0 6834.04 -1109.0Q6982.04 -1109.0 7087.54 -1065.0Q7193.04 -1021.0 7249.54 -915.0Q7306.04 -809.0 7306.04 -622.0V-306.0Q7306.04 -272.0 7315.54 -261.0Q7325.04 -250.0 7356.04 -250.0H7400.04V0.0H7244.04Q7108.04 0.0 7041.04 -65.5Q6974.04 -131.0 6974.04 -258.0V-298.0L7038.04 -271.0Q7026.04 -227.0 7002.54 -176.0Q6979.04 -125.0 6936.04 -79.0Q6893.04 -33.0 6822.54 -3.5Q6752.04 26.0 6647.04 26.0ZM6752.04 -202.0Q6817.04 -202.0 6864.04 -231.0Q6911.04 -260.0 6937.04 -315.0Q6963.04 -370.0 6963.04 -448.0V-477.0H6854.04Q6758.04 -477.0 6705.04 -452.0Q6652.04 -427.0 6631.54 -391.0Q6611.04 -355.0 6611.04 -322.0Q6611.04 -300.0 6622.04 -272.0Q6633.04 -244.0 6663.04 -223.0Q6693.04 -202.0 6752.04 -202.0Z"/><path class="logo-dot" d="M4854.36 -1188.0Q4752.36 -1188.0 4693.36 -1247.0Q4634.36 -1306.0 4634.36 -1408.0Q4634.36 -1510.0 4693.36 -1569.0Q4752.36 -1628.0 4854.36 -1628.0Q4956.36 -1628.0 5015.36 -1569.0Q5074.36 -1510.0 5074.36 -1408.0Q5074.36 -1306.0 5015.36 -1247.0Q4956.36 -1188.0 4854.36 -1188.0Z"/></svg></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+    <span class="menu-toggle-icon" aria-hidden="true"></span>
+    <span class="menu-toggle-label">Menu</span>
+  </button>
+  <nav class="nav" id="site-nav" aria-label="Primary">
+    <ul>
+      <li><a href="/#about"><span class="nav-idx" aria-hidden="true">01</span>About</a></li>
+      <li><a href="/#services"><span class="nav-idx" aria-hidden="true">02</span>Services</a></li>
+      <li><a href="/#insights" class="is-active" aria-current="page"><span class="nav-idx" aria-hidden="true">03</span>Insights</a></li>
+      <li><a href="/#speaking"><span class="nav-idx" aria-hidden="true">04</span>Speaking</a></li>
+      <li><a href="/#ventures"><span class="nav-idx" aria-hidden="true">05</span>Ventures</a></li>
+      <li><a href="/#contact"><span class="nav-idx" aria-hidden="true">06</span>Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <section class="hero wrap" aria-labelledby="atlas-title">
+    <p class="hero-label"><span class="label">Insights · iLottery Atlas</span><span class="beta" title="Figures are revised as sources are verified">Beta</span></p>
+    <h1 id="atlas-title" class="hero-title"><span>The iLottery</span> <span>market, mapped</span></h1>
+    <p class="hero-intro">Where lotteries sell online, how fast eInstants grow, what players get back and who builds the games. Compiled from lottery lobbies, game rules, annual reports and public records, with a confidence grade on every figure.</p>
+    <p class="hero-meta meta">By Adam Fonsica · Data retrieved <span data-k="meta.data_retrieved" data-fmt="date">23 Oct 2026</span> · <a href="#method">How it's built</a></p>
+
+    <figure class="glance" aria-labelledby="glance-title">
+      <div class="glance-head">
+        <h2 id="glance-title" class="glance-title">The <span data-k="register.lotteries">177</span> lotteries in the register, one square each</h2>
+        <ul class="legend" aria-label="Status">
+          <li><span class="key t-einstants"></span>eInstants online <span class="n" data-k="register.totals.einstants">72</span></li>
+          <li><span class="key t-online"></span>Other games online <span class="n" data-k="register.totals.online">56</span></li>
+          <li><span class="key t-planned"></span>Planned <span class="n" data-k="register.totals.planned">4</span></li>
+          <li><span class="key t-offline"></span>Not online <span class="n" data-k="register.totals.offline">45</span></li>
+        </ul>
+      </div>
+      <div class="units" id="units" role="img" aria-label="Unit chart of 177 lotteries by region and online status. The table below lists every lottery."></div>
+      <details class="table-view">
+        <summary>Show all lotteries</summary>
+        <div class="table-scroll"><table class="data" id="units-table"><thead><tr><th>Lottery</th><th>Country or state</th><th>Region</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+      </details>
+    </figure>
+
+    <dl class="kpis">
+      <div class="kpi"><dt class="label">Lotteries in the register</dt><dd data-k="register.lotteries">177</dd></div>
+      <div class="kpi"><dt class="label">Online lobbies read</dt><dd data-k="catalog.lotteries">59</dd></div>
+      <div class="kpi"><dt class="label">eInstant games catalogued</dt><dd data-k="catalog.games" data-fmt="int">4,360</dd></div>
+      <div class="kpi"><dt class="label">Studios identified</dt><dd data-k="studios.count">57</dd></div>
+    </dl>
+  </section>
+
+  <div class="atlas wrap">
+    <nav class="rail" aria-label="Chapters">
+      <p class="label rail-label">Chapters</p>
+      <ol>
+        <li><a href="#online"><span class="idx">01</span>Who sells online</a></li>
+        <li><a href="#growth"><span class="idx">02</span>Growth</a></li>
+        <li><a href="#payout"><span class="idx">03</span>Payouts</a></li>
+        <li><a href="#studios"><span class="idx">04</span>Studios</a></li>
+        <li><a href="#launch"><span class="idx">05</span>Launch curve</a></li>
+        <li><a href="#moves"><span class="idx">06</span>2026 moves</a></li>
+        <li><a href="#data"><span class="idx">07</span>The data pack</a></li>
+        <li><a href="#method"><span class="idx">08</span>Method</a></li>
+      </ol>
+      <div class="rail-cta">
+        <a class="btn" href="#data">Request the data</a>
+      </div>
+    </nav>
+
+    <div class="chapters">
+
+      <!-- 01 ============================================================ -->
+      <section id="online" class="chapter" aria-labelledby="online-title">
+        <p class="kicker label"><span class="idx">01</span>Who sells online</p>
+        <h2 id="online-title" class="chapter-title reveal"><span data-k="copy.us_einstant_jurisdictions">13</span> US jurisdictions sell eInstants online. The four biggest lotteries do not.</h2>
+        <p class="dek reveal">The eInstant states account for a third of US lottery sales: <strong>$<span data-k="copy.us_einstant_sales_m" data-fmt="bn">35.5</span> billion</strong> in FY2024. California, New York, Florida and Texas sell the same amount again, $<span data-k="copy.us_big4_sales_m" data-fmt="bn">35.5</span> billion, and none of them offers eInstants online.</p>
+
+        <figure class="fig reveal" aria-labelledby="map-title">
+          <h3 id="map-title" class="fig-title">North America by online status</h3>
+          <p class="fig-sub meta">Select a state or province. Select a platform to see where it runs.</p>
+          <div class="fig-body map-layout">
+            <div>
+              <ul class="legend" aria-label="Status">
+                <li><span class="key t-einstants"></span>eInstants online</li>
+                <li><span class="key t-online"></span>Other games online</li>
+                <li><span class="key t-planned"></span>Planned</li>
+                <li><span class="key t-offline"></span>Not online</li>
+                <li><span class="key t-none"></span>No state lottery</li>
+              </ul>
+              <div class="tilemap" id="tilemap" role="group" aria-label="Tile map of Canadian provinces and US states. Use the arrow keys to move between tiles."></div>
+              <p class="map-caption meta"><span>Top row: Canada</span><span>Below: United States</span></p>
+            </div>
+            <div class="map-side">
+              <div class="detail" id="detail" aria-live="polite">
+                <p class="label">Selected</p>
+                <p class="detail-empty" style="margin-top:10px">Pick a tile to see the lottery, its platform, when eInstants launched and its FY2024 sales.</p>
+              </div>
+              <div class="vendors">
+                <p class="label" style="margin-bottom:6px">iLottery platform</p>
+                <div id="vendors"></div>
+              </div>
+            </div>
+          </div>
+          <div class="fig-foot meta">
+            <span>Status checked 22 Oct 2026. FY2024 sales are total lottery sales, all products, compiled by gamblingatlas.org from annual reports. Launch dates from lottery and trade press.</span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="map-table"><thead><tr><th>State or province</th><th>Lottery</th><th>Status</th><th>Platform</th><th>eInstants since</th><th class="r">FY2024 sales</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+      </section>
+
+      <!-- 02 ============================================================ -->
+      <section id="growth" class="chapter" aria-labelledby="growth-title">
+        <p class="kicker label"><span class="idx">02</span>Growth</p>
+        <h2 id="growth-title" class="chapter-title reveal">In Kentucky, Georgia and Virginia, eInstant sales roughly tripled in three years</h2>
+        <p class="dek reveal">From FY2022 to FY2025, eInstant sales grew <strong><span data-k="copy.ky_x" data-fmt="x">3.5</span> times</strong> in Kentucky, <span data-k="copy.ga_x" data-fmt="x">2.8</span> times in Georgia and <span data-k="copy.va_x" data-fmt="x">2.6</span> times in Virginia. North Carolina grew <span data-k="copy.nc_x" data-fmt="x">2.3</span> times in a single year. Pennsylvania and New Hampshire grew more slowly, and Michigan shrank.</p>
+
+        <figure class="fig reveal" aria-labelledby="growth-fig-title">
+          <h3 id="growth-fig-title" class="sr-only">eInstant sales by lottery and fiscal year</h3>
+          <div class="series-picker" id="series-picker" role="group" aria-label="Choose a lottery"></div>
+          <div class="growth-head">
+            <p class="fig-title" id="growth-chart-title">Virginia Lottery</p>
+            <p class="meta" id="growth-chart-sub">Online instant ticket sales, USD</p>
+          </div>
+          <div class="chart" id="growth-chart" style="margin-top:14px"></div>
+          <div class="fig-foot meta">
+            <span>Fiscal years ending in June (Michigan: September). Hollow points are grade C, from a single secondary source. Metrics differ between lotteries, so compare the shape and the multiple, not the levels.</span>
+            <span id="growth-sources"></span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="growth-table"><thead><tr><th>Lottery</th><th>Metric</th><th>Fiscal year</th><th class="r">USD m</th><th>Grade</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+
+        <div class="counter reveal">
+          <div>
+            <p class="big">−<span data-k="copy.mi_drop_pct" data-fmt="abs0">30</span>%</p>
+            <h3>Michigan, since its FY2021 peak</h3>
+            <p>eInstant net win peaked in FY2021, the year the state opened online casino in January, and was <span data-k="copy.mi_drop_pct" data-fmt="abs0">30</span>% lower by FY2025.</p>
+            <a href="https://www.michigan.gov/mgcb/news/2021/01/22/online-gaming-and-sports-betting-are-now-live-in-michigan-as-sen--hertel-places-first-wager" target="_blank" rel="noopener">Source: Michigan Gaming Control Board<span class="sr-only"> (opens in a new tab)</span></a>
+          </div>
+          <div>
+            <p class="big">−<span data-k="copy.alc_drop_pct" data-fmt="abs0">11</span>%</p>
+            <h3>Atlantic Canada, 2025/26</h3>
+            <p>Digital instant revenue fell while the lottery's wider iGames business grew. The annual report points to fewer launches and players moving to casino.</p>
+            <a href="https://annualreport.alc.ca/en/2026" target="_blank" rel="noopener">Source: Atlantic Lottery annual report<span class="sr-only"> (opens in a new tab)</span></a>
+          </div>
+        </div>
+
+        <figure class="fig reveal" aria-labelledby="uk-title">
+          <h3 id="uk-title" class="fig-title">In the UK, digital instants are now a third of all instant sales</h3>
+          <p class="fig-sub meta">The National Lottery, Interactive Instant Win Games as a share of all instants (scratchcards plus digital), calendar years</p>
+          <div class="chart" id="uk-chart" style="margin-top:22px"></div>
+          <div class="fig-foot meta">
+            <span>Grade A. Source: <a href="https://www.gamblingcommission.gov.uk/about-us/freedomofinformation/nl-sales-data-2015-to-2025" target="_blank" rel="noopener">Gambling Commission, National Lottery sales data released under FOI<span class="sr-only"> (opens in a new tab)</span></a></span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="uk-table"><thead><tr><th>Year</th><th class="r">Digital instants, GBP m</th><th class="r">Share of all instants</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+      </section>
+
+      <!-- 03 ============================================================ -->
+      <section id="payout" class="chapter" aria-labelledby="payout-title">
+        <p class="kicker label"><span class="idx">03</span>Payouts</p>
+        <h2 id="payout-title" class="chapter-title reveal">A Swedish eInstant pays back 50%. A Pennsylvanian one pays back 89%.</h2>
+        <p class="dek reveal">Across the <span data-k="copy.rtp_lotteries">26</span> lotteries that publish return to player (RTP) for their eInstants, the median game pays back between 50% and 92% of what is staked. <strong>North American lotteries pay back 78% or more.</strong> In Europe, only Italy goes above 74%. For a studio, that means a different maths model in almost every market.</p>
+
+        <figure class="fig reveal" aria-labelledby="rtp-title">
+          <h3 id="rtp-title" class="fig-title">Return to player by lottery</h3>
+          <ul class="legend" style="margin-top:12px" aria-label="Key">
+            <li><span class="key dot dot-teal"></span>Median, North America</li>
+            <li><span class="key dot dot-bone"></span>Median, Europe and Asia-Pacific</li>
+            <li><span class="key bar-mid"></span>Middle half of games</li>
+            <li><span class="key line"></span>Lowest to highest game</li>
+          </ul>
+          <div class="rtp fig-body" id="rtp"></div>
+          <div class="fig-foot meta">
+            <span>RTP published for <span data-k="catalog.rtp_games" data-fmt="int">1,703</span> of <span data-k="catalog.games" data-fmt="int">4,360</span> catalogued games. Lotteries with fewer than five games with a published RTP are left out. Source: each lottery's game rules and lobby data.</span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="rtp-table"><thead><tr><th>Lottery</th><th>Region</th><th class="r">Games</th><th class="r">Median</th><th class="r">Middle half</th><th class="r">Range</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+      </section>
+
+      <!-- 04 ============================================================ -->
+      <section id="studios" class="chapter" aria-labelledby="studios-title">
+        <p class="kicker label"><span class="idx">04</span>Studios</p>
+        <h2 id="studios-title" class="chapter-title reveal">Three studios make 88% of the eInstants in North American lobbies</h2>
+        <p class="dek reveal">IWG, NeoGames and Brightstar together account for 88% of live titles where the studio is known. In the Nordics, Fennica Gaming alone makes more than half. The picture is a count of games in the lobby, not of sales.</p>
+
+        <div class="studio-layout fig reveal">
+          <figure aria-labelledby="share-title">
+            <h3 id="share-title" class="fig-title">Share of live titles by studio</h3>
+            <div class="controls" id="region-tabs" role="tablist" aria-label="Region" style="margin-top:16px"></div>
+            <div class="bars" id="studio-bars" role="tabpanel"></div>
+            <p class="coverage meta" id="studio-coverage"></p>
+            <details class="table-view">
+              <summary>Show the table</summary>
+              <div class="table-scroll"><table class="data" id="studio-table"><thead><tr><th>Region</th><th>Studio</th><th class="r">Live titles</th><th class="r">Share</th></tr></thead><tbody></tbody></table></div>
+            </details>
+          </figure>
+          <div>
+            <h3 class="fig-title">Widest reach</h3>
+            <p class="fig-sub meta">Lotteries where the studio has live eInstants</p>
+            <ol class="reach" id="reach" style="margin-top:16px"></ol>
+            <h3 class="fig-title" style="margin-top:44px">Titles are not sales</h3>
+            <p class="fig-sub meta" style="max-width:30em">Where wagers per game are public, the shares move. IWG's share of Michigan's eInstant wagers, against NeoGames:</p>
+            <div class="split" id="mi-split"></div>
+            <ul class="legend" style="margin-top:14px">
+              <li><span class="key" style="background:var(--teal)"></span>IWG</li>
+              <li><span class="key" style="background:var(--muted-mark)"></span>NeoGames</li>
+            </ul>
+          </div>
+        </div>
+        <p class="note reveal">A game live at three lotteries counts three times. Studios are identified from lottery feeds, game rules and supplier releases; where none of these names the studio, the game is left out of the shares.</p>
+      </section>
+
+      <!-- 05 ============================================================ -->
+      <section id="launch" class="chapter" aria-labelledby="launch-title">
+        <p class="kicker label"><span class="idx">05</span>Launch curve</p>
+        <h2 id="launch-title" class="chapter-title reveal">Most eInstants sell best in their first month</h2>
+        <p class="dek reveal">Michigan published sales for every eInstant from 2019 to 2021. Of <span data-k="launch.games">64</span> games launched in that window, <strong><span data-k="launch.peak_launch_month">42</span> peaked in their launch month</strong> and <span data-k="launch.peak_within_two">61</span> within two months. Three months in, the typical game sold <span data-k="copy.launch_m3" data-fmt="pct0">28</span>% of its peak. After a year, <span data-k="copy.launch_m12" data-fmt="pct0">12</span>%.</p>
+
+        <figure class="fig reveal" aria-labelledby="curve-title">
+          <h3 id="curve-title" class="fig-title">Monthly wagers as a share of each game's best month</h3>
+          <ul class="legend" style="margin-top:12px">
+            <li><span class="key line" style="background:var(--teal)"></span>Median game</li>
+            <li><span class="key" style="background:rgba(45,212,191,.28)"></span>Middle half of games</li>
+          </ul>
+          <div class="chart" id="curve-chart" style="margin-top:18px"></div>
+          <div class="fig-foot meta">
+            <span>Months since launch. Source: Michigan Lottery monthly game reports, January 2019 to October 2021, checked against the lottery's audited annual report (FY2020 within 1.7%).</span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="curve-table"><thead><tr><th>Month</th><th class="r">Median</th><th class="r">Middle half</th><th class="r">Games</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+        <p class="note reveal"><strong>What it means:</strong> a lobby lives on its release calendar. Most of a game's lifetime sales arrive early, so the cadence of new titles matters as much as the hit rate.</p>
+      </section>
+
+      <!-- 06 ============================================================ -->
+      <section id="moves" class="chapter" aria-labelledby="moves-title">
+        <p class="kicker label"><span class="idx">06</span>2026 moves</p>
+        <h2 id="moves-title" class="chapter-title reveal">Platforms and content: what changed in 2026</h2>
+        <p class="dek reveal">Contract awards, renewals and launches from public sources, newest first. Fennica Gaming stands out, with new eInstant deals in Québec, Estonia and Italy.</p>
+        <div class="fig reveal">
+          <div class="controls" id="move-filter" role="group" aria-label="Filter">
+            <button class="chip" type="button" data-kind="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-kind="platform" aria-pressed="false">Platforms</button>
+            <button class="chip" type="button" data-kind="content" aria-pressed="false">Content</button>
+            <button class="chip" type="button" data-kind="market" aria-pressed="false">Markets</button>
+          </div>
+          <ol class="moves" id="moves-list"></ol>
+        </div>
+      </section>
+
+      <!-- 07 ============================================================ -->
+      <section id="data" class="chapter" aria-labelledby="data-title">
+        <p class="kicker label"><span class="idx">07</span>The data pack</p>
+        <h2 id="data-title" class="chapter-title reveal">The atlas is free. The data behind it is available on request.</h2>
+        <p class="dek reveal">Lotteries, studios, platform suppliers and investors use game-level data to price games, plan portfolios and size markets. The full dataset comes as a data pack with a briefing, or as part of an advisory engagement.</p>
+
+        <div class="pack reveal">
+          <div><p class="big"><span data-k="pack.games" data-fmt="int">4,360</span></p><h3>Games</h3><p>Every eInstant in <span data-k="pack.lotteries">59</span> online lobbies: price points, top prize, RTP, studio, mechanics and source.</p></div>
+          <div><p class="big"><span data-k="pack.prize_rows" data-fmt="k">936k</span></p><h3>Prize-table rows</h3><p>Prize tiers and odds parsed from published game rules.</p></div>
+          <div><p class="big">Daily</p><h3>Lobby scans</h3><p>New games, removals and lobby movers, scanned every day since October 2026.</p></div>
+          <div><p class="big"><span data-k="pack.sales_points">145</span></p><h3>Sales data points</h3><p>eInstant and iLottery sales for <span data-k="pack.sales_sources">31</span> lotteries and markets back to 2015, each with source and grade.</p></div>
+          <div><p class="big"><span data-k="pack.contracts">26</span></p><h3>Contracts</h3><p>Platform and content contracts with terms, extensions and status.</p></div>
+          <div><p class="big"><span data-k="pack.michigan_game_months" data-fmt="int">3,158</span></p><h3>Game-months</h3><p>Michigan's per-game sales, 2019 to 2021: launch curves, lifetimes and provider shares.</p></div>
+        </div>
+
+        <div class="locked reveal">
+          <div class="table-scroll" style="margin-top:0">
+            <table class="data" id="sample-table">
+              <thead><tr><th>Game</th><th>Lottery</th><th>Studio</th><th>Price</th><th>Top prize</th><th class="r">RTP</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="locked-veil"><p><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 6V4a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span><span data-k="copy.games_more" data-fmt="int">4,357</span> more games in the data pack</span></p></div>
+        </div>
+
+        <div class="cta-row reveal">
+          <a class="btn" href="mailto:adam@fonsica.se?subject=iLottery%20Atlas%20data%20pack">Request the data pack</a>
+          <a class="btn btn-ghost" href="mailto:adam@fonsica.se?subject=iLottery%20market%20briefing">Book a market briefing</a>
+        </div>
+        <p class="fine reveal">Everything in the pack comes from public sources. Every row carries its source link, retrieval date and confidence grade, so it can be checked.</p>
+      </section>
+
+      <!-- Method ========================================================= -->
+      <section id="method" class="chapter" aria-labelledby="method-title">
+        <p class="kicker label"><span class="idx">08</span>Method</p>
+        <h2 id="method-title" class="chapter-title">How the atlas is built</h2>
+        <div class="method">
+          <div>
+            <h3>Sources</h3>
+            <p>Lottery lobbies and game rules, read from each lottery's public website or feed. Annual reports, financial statements and public records, including freedom-of-information releases. Procurement records and press releases from lotteries and suppliers.</p>
+          </div>
+          <div>
+            <h3>Confidence grades</h3>
+            <ul class="grades">
+              <li><span class="grade">A</span><span>Read from the lottery's own source and archived.</span></li>
+              <li><span class="grade">B</span><span>Official figures via a compilation, or the supplier's own release.</span></li>
+              <li><span class="grade">C</span><span>A single secondary source, such as trade press.</span></li>
+              <li><span class="grade">D</span><span>Derived or estimated. Not shown on this page.</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Limits</h3>
+            <p>The studio is identified for <span data-k="catalog.studio_known_pct" data-fmt="pct0">76</span>% of games and RTP is published for <span data-k="copy.rtp_share_pct" data-fmt="pct0">39</span>%. Sales metrics differ between lotteries, so levels are not compared across states. Daily lobby scans began in October 2026.</p>
+          </div>
+        </div>
+        <div class="disclose">
+          <p>We read what lotteries publish. We do not log in, get around blocks or ignore robots.txt.</p>
+          <p>Adam Fonsica is co-founder of Random State, an eInstant studio. The atlas uses public sources only and treats every studio the same way.</p>
+          <p>Spotted an error? Email <a href="mailto:adam@fonsica.se?subject=iLottery%20Atlas%20correction">adam@fonsica.se</a> and it will be corrected. Beta, built <span data-k="meta.built" data-fmt="date">23 Oct 2026</span>.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <section class="contact wrap" aria-labelledby="contact-title">
+    <h2 id="contact-title" class="contact-title">Need a view on a specific market?</h2>
+    <p class="dek">Market entry, platform choice, portfolio and pricing. The atlas is where it starts. The conversation is where it gets useful.</p>
+    <div class="cta-row">
+      <a class="btn" href="mailto:adam@fonsica.se?subject=iLottery%20Atlas">Start a conversation</a>
+      <a class="link" href="/#services">See services</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p class="meta">© 2026 Fonsica Group AB, Sweden</p>
+  <ul>
+    <li><a href="https://www.linkedin.com/in/adamfonsica/" target="_blank" rel="noopener">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></li>
+    <li><a href="mailto:adam@fonsica.se">Email</a></li>
+  </ul>
+</footer>
+
+<div class="tip" id="tip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const $ = (s, r = document) => r.querySelector(s);
+
+  /* ---------- DOM helpers: all data text goes in through textContent ---------- */
+  const h = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  const s = (tag, attrs, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const row = (cells, numeric = []) => {
+    const tr = h('tr');
+    cells.forEach((c, i) => tr.appendChild(h('td', numeric.includes(i) ? 'r' : '', c)));
+    return tr;
+  };
+
+  /* ---------- Formatting ---------- */
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const int = (v) => Math.round(v).toLocaleString('en-US');
+  const usd = (m) => (m >= 1000 ? '$' + (m / 1000).toFixed(m >= 10000 ? 1 : 2).replace(/\.?0+$/, '') + 'bn' : '$' + int(m) + 'm');
+  const usdAxis = (m) => (m === 0 ? '$0' : m >= 1000 ? '$' + (m / 1000).toFixed(1).replace(/\.0$/, '') + 'bn' : '$' + int(m) + 'm');
+  const monthLabel = (d, precision) => {
+    if (!d) return '—';
+    const [y, m] = d.split('-');
+    return precision === 'year' || !m ? y : MONTHS[+m - 1] + ' ' + y;
+  };
+  const dateLabel = (iso) => {
+    const d = new Date(iso);
+    return isNaN(d) ? iso : d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  };
+  const FMT = {
+    int, x: (v) => v.toFixed(1), bn: (v) => (v / 1000).toFixed(1), date: dateLabel,
+    abs0: (v) => String(Math.abs(Math.round(v))), pct0: (v) => String(Math.round(v)),
+    k: (v) => Math.round(v / 1000) + 'k',
+  };
+  const lookup = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+
+  const TIER = {
+    einstants: 'eInstants online', online: 'Other games online',
+    planned: 'Planned', offline: 'Not online', none: 'No state lottery',
+  };
+  const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return 'source'; } };
+
+  /* ---------- Tooltip ---------- */
+  const tip = $('#tip');
+  let tipOwner = null;
+  const showTip = (x, y, build, owner) => {
+    tip.replaceChildren();
+    build(tip);
+    tipOwner = owner || null;
+    tip.classList.add('is-on');
+    const r = tip.getBoundingClientRect();
+    let left = x + 14, top = y + 16;
+    if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+    if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+    tip.style.left = Math.max(8, left) + 'px';
+    tip.style.top = Math.max(8, top) + 'px';
+  };
+  const hideTip = () => { tip.classList.remove('is-on'); tipOwner = null; };
+  addEventListener('scroll', hideTip, { passive: true });
+  const tipAt = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+  // Mouse follows the pointer; touch and pen show on tap and stay until the next tap
+  // elsewhere; keyboard focus shows the same content at the mark.
+  const bindTip = (el, build, anchor) => {
+    el.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') showTip(e.clientX, e.clientY, build, el); });
+    el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTip(); });
+    el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') { const [x, y] = tipAt(anchor || el); showTip(x, y, build, el); } });
+    el.addEventListener('focus', () => { const [x, y] = tipAt(anchor || el); showTip(x, y, build, el); });
+    el.addEventListener('blur', hideTip);
+  };
+
+  /* ---------- Reveal on scroll ---------- */
+  const seen = (el, fn) => {
+    if (!('IntersectionObserver' in window) || still.matches) { fn(); return; }
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); }
+    }, { rootMargin: '0px 0px -12% 0px' });
+    io.observe(el);
+  };
+  document.querySelectorAll('.reveal').forEach((el) => seen(el, () => el.classList.add('is-in')));
+
+  /* ---------- Nice ticks ---------- */
+  const niceStep = (max, count) => {
+    const raw = max / count;
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const m = raw / p;
+    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+  };
+
+  /* ==========================================================================
+     Line chart (single series): growth, UK share, launch curve
+     ========================================================================== */
+  function lineChart(host, cfg) {
+    const draw = () => {
+      host.replaceChildren();
+      const W = host.clientWidth;
+      if (!W) return;
+      const H = cfg.height(W);
+      const m = { t: 26, r: cfg.right || 56, b: 30, l: cfg.left || 52 };
+      const pw = W - m.l - m.r, ph = H - m.t - m.b;
+      const pts = cfg.points;
+      const x0 = cfg.xDomain[0], x1 = cfg.xDomain[1];
+      const step = niceStep(cfg.yMax, cfg.yTicks || 4);
+      const yMax = Math.ceil(cfg.yMax * 1.04 / step) * step;
+      const X = (v) => m.l + (x1 === x0 ? pw / 2 : (v - x0) / (x1 - x0) * pw);
+      const Y = (v) => m.t + ph - v / yMax * ph;
+
+      const svg = s('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': cfg.label });
+      const grid = s('g', { class: 'grid' }, svg);
+      const axis = s('g', { class: 'axis' }, svg);
+      for (let v = 0; v <= yMax + 1e-9; v += step) {
+        s('line', { x1: m.l, x2: W - m.r + 8, y1: Y(v), y2: Y(v) }, grid);
+        const t = s('text', { x: m.l - 10, y: Y(v) + 4, 'text-anchor': 'end' }, axis);
+        t.textContent = cfg.yFmt(v);
+      }
+      const xt = cfg.xTicks(pw);
+      xt.forEach((v) => {
+        const t = s('text', { x: X(v), y: H - 8, 'text-anchor': 'middle' }, axis);
+        t.textContent = cfg.xFmt(v);
+      });
+
+      if (cfg.band) {
+        const top = cfg.band.map((b) => `${X(b.x)},${Y(b.hi)}`);
+        const bot = cfg.band.slice().reverse().map((b) => `${X(b.x)},${Y(b.lo)}`);
+        s('polygon', { class: 'band', points: top.concat(bot).join(' ') }, svg);
+      }
+      const solid = pts.filter((p) => !p.floor);
+      const d = solid.map((p, i) => (i ? 'L' : 'M') + X(p.x).toFixed(1) + ',' + Y(p.y).toFixed(1)).join('');
+      if (cfg.area && solid.length > 1) {
+        s('path', { class: 'area', d: d + `L${X(solid[solid.length - 1].x)},${Y(0)}L${X(solid[0].x)},${Y(0)}Z` }, svg);
+      }
+      const line = s('path', { class: 'line', d }, svg);
+
+      // Selective labels: first, last and anything the config marks
+      (cfg.annotations || []).forEach((a) => {
+        s('line', { class: 'cross', x1: X(a.x), x2: X(a.x), y1: Y(a.y) + 6, y2: Y(0) }, svg);
+      });
+      (cfg.labelled || []).forEach((p) => {
+        const t = s('text', { class: 'val', x: X(p.x), y: Y(p.y) - 12, 'text-anchor': p.anchor || 'middle' }, svg);
+        t.textContent = p.text;
+      });
+
+      if (cfg.dotR !== 0) {
+        pts.forEach((p) => s('circle', { class: 'pt' + (p.hollow ? ' hollow' : ''), cx: X(p.x), cy: Y(p.y), r: cfg.dotR || 4 }, svg));
+      } else {
+        (cfg.annotations || []).forEach((a) => s('circle', { class: 'pt', cx: X(a.x), cy: Y(a.y), r: 4 }, svg));
+      }
+      const cross = s('line', { class: 'cross', y1: m.t, y2: m.t + ph, opacity: 0 }, svg);
+      const hot = s('circle', { class: 'pt', r: 6, opacity: 0 }, svg);
+      const hit = s('rect', { class: 'hit', x: m.l - 10, y: 0, width: pw + 20, height: H }, svg);
+      host.appendChild(svg);
+
+      const nearest = (clientX) => {
+        const bx = svg.getBoundingClientRect().left;
+        const px = clientX - bx;
+        let best = pts[0], bd = Infinity;
+        pts.forEach((p) => { const dd = Math.abs(X(p.x) - px); if (dd < bd) { bd = dd; best = p; } });
+        return best;
+      };
+      const show = (p, cx, cy) => {
+        cross.setAttribute('x1', X(p.x)); cross.setAttribute('x2', X(p.x)); cross.setAttribute('opacity', 1);
+        hot.setAttribute('cx', X(p.x)); hot.setAttribute('cy', Y(p.y)); hot.setAttribute('opacity', 1);
+        const r = svg.getBoundingClientRect();
+        showTip(cx == null ? r.left + X(p.x) : cx, cy == null ? r.top + Y(p.y) : cy, (el) => cfg.tip(el, p), svg);
+      };
+      const off = () => { cross.setAttribute('opacity', 0); hot.setAttribute('opacity', 0); hideTip(); };
+      hit.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') show(nearest(e.clientX), e.clientX, e.clientY); });
+      hit.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') off(); });
+      hit.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') show(nearest(e.clientX)); });
+      svg.setAttribute('tabindex', '0');
+      let ki = pts.length - 1;
+      svg.addEventListener('focus', () => show(pts[ki]));
+      svg.addEventListener('blur', off);
+      svg.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        ki = Math.max(0, Math.min(pts.length - 1, ki + (e.key === 'ArrowRight' ? 1 : -1)));
+        show(pts[ki]);
+      });
+
+      if (!still.matches && cfg.animate) {
+        line.style.setProperty('--len', line.getTotalLength());
+        line.classList.add('anim');
+      }
+      cfg.animate = false;
+    };
+    let lastW = 0;
+    const ro = new ResizeObserver(() => {
+      const w = host.clientWidth;
+      if (Math.abs(w - lastW) < 2) return;
+      lastW = w; draw();
+    });
+    ro.observe(host);
+    return { redraw: (next) => { Object.assign(cfg, next); lastW = host.clientWidth; draw(); } };
+  }
+
+  const tipLines = (el, v, k, sub) => {
+    el.appendChild(h('span', 'tip-v', v));
+    if (k) el.appendChild(h('span', 'tip-k', k));
+    if (sub) el.appendChild(h('span', 'tip-s', sub));
+  };
+
+  /* ==========================================================================
+     Init with data
+     ========================================================================== */
+  function init(A) {
+    document.querySelectorAll('[data-k]').forEach((el) => {
+      const v = lookup(A, el.dataset.k);
+      if (v == null) return;
+      const f = FMT[el.dataset.fmt];
+      el.textContent = f ? f(v) : (typeof v === 'number' ? int(v) : String(v));
+    });
+
+    units(A.register);
+    tileMap(A.register);
+    growth(A.growth);
+    uk(A.uk);
+    rtp(A.catalog.rtp);
+    studios(A.studios);
+    curve(A.launch, A.copy);
+    moves(A.moves);
+    sample(A.pack.sample);
+  }
+
+  /* ---------- Hero: one square per lottery ---------- */
+  function units(reg) {
+    const host = $('#units');
+    const tbody = $('#units-table tbody');
+    let i = 0;
+    reg.regions.forEach((g) => {
+      const list = reg.units.filter((u) => u.region === g.region);
+      const box = h('div', 'unit-group');
+      const head = h('h3');
+      head.appendChild(h('span', '', g.region));
+      const count = h('span', 'meta num', `${g.einstants} of ${g.n}`);
+      count.title = `${g.einstants} of ${g.n} lotteries sell eInstants online`;
+      head.appendChild(count);
+      box.appendChild(head);
+      const grid = h('div', 'unit-grid');
+      list.forEach((u) => {
+        const b = h('span', 'unit t-' + u.tier);
+        b.style.setProperty('--i', i++);
+        bindTip(b, (el) => tipLines(el, u.name, u.place, TIER[u.tier]));
+        grid.appendChild(b);
+        tbody.appendChild(row([u.name, u.place, u.region, TIER[u.tier]]));
+      });
+      box.appendChild(grid);
+      host.appendChild(box);
+    });
+    seen(host, () => host.classList.add('is-in'));
+  }
+
+  /* ---------- 01: North America tile map ---------- */
+  const GRID = {
+    // Canada on top (row 1), United States below (rows 3 to 10)
+    BC: [1, 1], AB: [2, 1], SK: [3, 1], MB: [4, 1], ON: [6, 1], QC: [8, 1], ATL: [10, 1],
+    AK: [1, 3], ME: [11, 3],
+    VT: [10, 4], NH: [11, 4],
+    WA: [1, 5], ID: [2, 5], MT: [3, 5], ND: [4, 5], MN: [5, 5], IL: [6, 5], WI: [7, 5], MI: [8, 5], NY: [9, 5], RI: [10, 5], MA: [11, 5],
+    OR: [1, 6], NV: [2, 6], WY: [3, 6], SD: [4, 6], IA: [5, 6], IN: [6, 6], OH: [7, 6], PA: [8, 6], NJ: [9, 6], CT: [10, 6],
+    CA: [1, 7], UT: [2, 7], CO: [3, 7], NE: [4, 7], MO: [5, 7], KY: [6, 7], WV: [7, 7], VA: [8, 7], MD: [9, 7], DE: [10, 7],
+    AZ: [2, 8], NM: [3, 8], KS: [4, 8], AR: [5, 8], TN: [6, 8], NC: [7, 8], SC: [8, 8], DC: [9, 8],
+    OK: [4, 9], LA: [5, 9], MS: [6, 9], AL: [7, 9], GA: [8, 9],
+    HI: [1, 10], TX: [4, 10], FL: [9, 10],
+  };
+
+  function tileMap(reg) {
+    const host = $('#tilemap');
+    const detail = $('#detail');
+    const tbody = $('#map-table tbody');
+    const tiles = reg.tiles.filter((t) => GRID[t.code]).sort((a, b) => GRID[a.code][1] - GRID[b.code][1] || GRID[a.code][0] - GRID[b.code][0]);
+    const btns = [];
+
+    const fill = (t) => {
+      detail.replaceChildren();
+      detail.appendChild(h('p', 'label', t.country === 'CA' ? 'Canada' : 'United States'));
+      const title = h('h4', '', t.name);
+      title.style.marginTop = '8px';
+      detail.appendChild(title);
+      const dl = h('dl');
+      const add = (k, v, node) => { dl.appendChild(h('dt', '', k)); const dd = h('dd', '', node ? null : v); if (node) dd.appendChild(node); dl.appendChild(dd); };
+      if (t.lottery) add('Lottery', t.lottery);
+      const st = h('span', 'status');
+      st.appendChild(h('span', 'key t-' + t.tier));
+      st.appendChild(document.createTextNode(TIER[t.tier]));
+      add('Status', '', st);
+      if (t.tier !== 'none') {
+        add('Platform', t.platform || 'Not public');
+        if (t.launch) add('eInstants', 'Since ' + monthLabel(t.launch.date, t.launch.precision));
+        if (t.sales_fy24_m) add('FY2024', usd(t.sales_fy24_m) + ' lottery sales');
+      }
+      detail.appendChild(dl);
+    };
+
+    let selected = null;
+    const select = (b, t) => {
+      if (selected) selected.classList.remove('is-sel');
+      selected = b; b.classList.add('is-sel');
+      fill(t);
+    };
+
+    tiles.forEach((t, idx) => {
+      const [c, r] = GRID[t.code];
+      const b = h('button', 'tile t-' + t.tier, t.code);
+      b.type = 'button';
+      b.style.gridColumn = c; b.style.gridRow = r;
+      b.dataset.code = t.code;
+      b.setAttribute('aria-label', `${t.name}: ${TIER[t.tier]}${t.platform ? ', platform ' + t.platform : ''}`);
+      b.tabIndex = idx === 0 ? 0 : -1;
+      b.addEventListener('click', () => select(b, t));
+      b.addEventListener('focus', () => select(b, t));
+      b.addEventListener('pointerenter', () => fill(t));
+      b.addEventListener('pointerleave', () => { if (selected) fill(tiles[btns.indexOf(selected)]); });
+      host.appendChild(b);
+      btns.push(b);
+      if (t.tier !== 'none') {
+        tbody.appendChild(row([t.name, t.lottery || '', TIER[t.tier], t.platform || '', t.launch ? monthLabel(t.launch.date, t.launch.precision) : '', t.sales_fy24_m ? usd(t.sales_fy24_m) : ''], [5]));
+      }
+    });
+
+    // Roving focus: arrow keys move between tiles by position
+    host.addEventListener('keydown', (e) => {
+      const i = btns.indexOf(document.activeElement);
+      if (i < 0) return;
+      const [c, r] = GRID[btns[i].dataset.code];
+      const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+      if (!dir) return;
+      e.preventDefault();
+      let best = null, bd = Infinity;
+      btns.forEach((b) => {
+        const [bc, br] = GRID[b.dataset.code];
+        const dc = bc - c, dr = br - r;
+        if (dir[0] && Math.sign(dc) !== dir[0]) return;
+        if (dir[1] && Math.sign(dr) !== dir[1]) return;
+        const d = dir[0] ? Math.abs(dc) * 10 + Math.abs(dr) * 15 : Math.abs(dr) * 10 + Math.abs(dc) * 15;
+        if (d < bd) { bd = d; best = b; }
+      });
+      if (best) { btns[i].tabIndex = -1; best.tabIndex = 0; best.focus(); }
+    });
+
+    // Platform filter
+    const vhost = $('#vendors');
+    let active = null;
+    const highlight = (v) => {
+      host.classList.toggle('is-filtered', !!v);
+      const set = v ? new Set(v.einstants.concat(v.other)) : null;
+      btns.forEach((b) => b.classList.toggle('is-match', !!set && set.has(b.dataset.code)));
+    };
+    reg.vendors.forEach((v) => {
+      const b = h('button', 'vendor');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      b.appendChild(h('span', 'vendor-name', v.vendor));
+      const n = v.einstants.length;
+      b.appendChild(h('span', 'vendor-n', n ? `${n} eInstant ${n === 1 ? 'lottery' : 'lotteries'}` : 'Other games online'));
+      b.appendChild(h('span', 'vendor-codes', v.einstants.concat(v.other.map((c) => c + '*')).join('  ')));
+      b.addEventListener('pointerenter', () => { if (!active) highlight(v); });
+      b.addEventListener('pointerleave', () => { if (!active) highlight(null); });
+      b.addEventListener('click', () => {
+        const on = active !== v;
+        vhost.querySelectorAll('.vendor').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        active = on ? v : null;
+        b.setAttribute('aria-pressed', String(on));
+        highlight(active);
+      });
+      vhost.appendChild(b);
+    });
+    vhost.appendChild(h('p', 'meta', '* other games online, or eInstants planned'));
+    vhost.lastChild.style.marginTop = '10px';
+
+    // Default: the largest eInstant market
+    const first = tiles.find((t) => t.code === 'VA');
+    if (first) fill(first);
+  }
+
+  /* ---------- 02: Growth ---------- */
+  function growth(series) {
+    const picker = $('#series-picker');
+    const host = $('#growth-chart');
+    const tbody = $('#growth-table tbody');
+    let chart = null, picked = false;
+
+    const cfgFor = (sr) => {
+      const pts = sr.points.map((p) => ({ x: p.fy, y: p.v, hollow: p.grade === 'C', floor: p.floor, grade: p.grade, derived: p.derived }));
+      const max = Math.max(...pts.map((p) => p.y));
+      const first = pts[0], last = pts[pts.length - 1];
+      const label = (p) => (p.floor ? usd(p.y).replace(/bn$/, 'bn+') : usd(p.y));
+      const labelled = [{ x: first.x, y: first.y, text: label(first), anchor: 'start' }, { x: last.x, y: last.y, text: label(last), anchor: 'end' }];
+      const peak = pts.reduce((a, b) => (b.y > a.y ? b : a));
+      if (peak !== last && peak !== first) labelled.push({ x: peak.x, y: peak.y, text: label(peak) });
+      return {
+        points: pts, xDomain: [first.x, last.x], yMax: max, area: true, animate: true,
+        label: `${sr.lottery}, ${sr.metric}, FY${first.x} to FY${last.x}`,
+        height: (W) => Math.round(Math.max(240, Math.min(380, W * .46))),
+        yFmt: usdAxis, xFmt: (v) => 'FY' + String(v).slice(2),
+        xTicks: (pw) => { const out = []; const span = last.x - first.x; const every = pw / Math.max(span, 1) < 44 ? 2 : 1; for (let y = first.x; y <= last.x; y += every) out.push(y); return out; },
+        labelled,
+        tip: (el, p) => tipLines(el, (p.floor ? 'Over ' : '') + usd(p.y), `FY${p.x} · ${sr.metric}`, `Grade ${p.grade}${p.derived ? ' · derived from published figures' : ''}${p.floor ? ' · milestone, not a final figure' : ''}`),
+      };
+    };
+
+    const pick = (sr, btn) => {
+      picked = true;
+      picker.querySelectorAll('.series').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      $('#growth-chart-title').textContent = sr.lottery;
+      $('#growth-chart-sub').textContent = sr.metric + ', USD';
+      const src = $('#growth-sources');
+      src.replaceChildren(document.createTextNode('Source: '));
+      sr.sources.forEach((u, i) => {
+        if (i) src.appendChild(document.createTextNode(' · '));
+        const a = h('a', '', hostOf(u));
+        a.href = u; a.target = '_blank'; a.rel = 'noopener';
+        src.appendChild(a);
+      });
+      if (!chart) chart = lineChart(host, cfgFor(sr));
+      else chart.redraw(cfgFor(sr));
+    };
+
+    series.forEach((sr, i) => {
+      const b = h('button', 'series');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      b.appendChild(h('span', 'series-name', sr.label));
+      const mult = sr.multiple;
+      const x = h('span', 'series-x' + (mult && mult.x < 1 ? ' down' : ''), mult ? '×' + mult.x.toFixed(1) : '');
+      b.appendChild(x);
+      b.appendChild(h('span', 'series-per', mult ? `FY${String(mult.from).slice(2)} to FY${String(mult.to).slice(2)}` : ''));
+      // sparkline
+      const pts = sr.points.filter((p) => !p.floor);
+      const max = Math.max(...pts.map((p) => p.v));
+      const sv = s('svg', { viewBox: '0 0 100 30', preserveAspectRatio: 'none', 'aria-hidden': 'true' });
+      const xs = (j) => pts.length > 1 ? j / (pts.length - 1) * 100 : 50;
+      s('path', { d: pts.map((p, j) => (j ? 'L' : 'M') + xs(j) + ',' + (28 - p.v / max * 26)).join(''), fill: 'none', stroke: mult && mult.x < 1 ? '#A59F99' : '#2DD4BF', 'stroke-width': 1.5, 'vector-effect': 'non-scaling-stroke' }, sv);
+      b.appendChild(sv);
+      b.setAttribute('aria-label', `${sr.label}: ${mult ? mult.x.toFixed(1) + ' times from FY' + mult.from + ' to FY' + mult.to : ''}`);
+      b.addEventListener('click', () => pick(sr, b));
+      picker.appendChild(b);
+      sr.points.forEach((p) => tbody.appendChild(row([sr.lottery, sr.metric, 'FY' + p.fy, (p.floor ? '> ' : '') + int(p.v), p.grade], [3])));
+      if (i === 0) seen(host, () => { if (!picked) pick(sr, b); });
+    });
+  }
+
+  function uk(d) {
+    const host = $('#uk-chart');
+    const tbody = $('#uk-table tbody');
+    d.points.forEach((p) => tbody.appendChild(row([String(p.year), int(p.sales_m), p.share_pct.toFixed(1) + '%'], [1, 2])));
+    const pts = d.points.map((p) => ({ x: p.year, y: p.share_pct, sales: p.sales_m }));
+    const first = pts[0], last = pts[pts.length - 1];
+    seen(host, () => lineChart(host, {
+      points: pts, xDomain: [first.x, last.x], yMax: 40, yTicks: 4, area: true, animate: true, dotR: 3.5,
+      label: `UK digital instants share of all instants, ${first.x} to ${last.x}`,
+      height: (W) => Math.round(Math.max(200, Math.min(300, W * .34))),
+      yFmt: (v) => v + '%', xFmt: (v) => String(v),
+      xTicks: (pw) => pts.filter((p, i) => pw > 520 || i % 3 === 0 || i === pts.length - 1).map((p) => p.x),
+      labelled: [{ x: first.x, y: first.y, text: first.y.toFixed(1) + '%', anchor: 'start' }, { x: last.x, y: last.y, text: last.y.toFixed(1) + '%', anchor: 'end' }],
+      tip: (el, p) => tipLines(el, p.y.toFixed(1) + '% of instants', String(p.x), '£' + int(p.sales) + 'm in digital instant sales'),
+    }));
+  }
+
+  /* ---------- 03: RTP rows ---------- */
+  function rtp(list) {
+    const host = $('#rtp');
+    const tbody = $('#rtp-table tbody');
+    const LO = 40, HI = 100;
+    const pct = (v) => ((v - LO) / (HI - LO) * 100).toFixed(2) + '%';
+
+    const axis = h('div', 'rtp-axis');
+    axis.appendChild(h('div'));
+    const at = h('div', 'track');
+    for (let v = LO; v <= HI; v += 10) {
+      const t = h('span', (v - LO) % 20 ? 'minor' : '', v + '%');
+      t.style.left = pct(v);
+      t.style.transform = v === LO ? 'none' : v === HI ? 'translateX(-100%)' : '';
+      at.appendChild(t);
+    }
+    axis.appendChild(at);
+    host.appendChild(axis);
+
+    const rows = h('div', 'rtp-rows');
+    list.forEach((d) => {
+      const r = h('div', 'rtp-row');
+      r.tabIndex = 0;
+      const name = h('span', 'rtp-name', d.lottery);
+      name.appendChild(h('span', 'cc', d.cc));
+      r.appendChild(name);
+      const tr = h('div', 'track');
+      const range = h('span', 'rtp-range'); range.style.left = pct(d.min); range.style.width = `calc(${pct(d.max)} - ${pct(d.min)})`;
+      const iqr = h('span', 'rtp-iqr'); iqr.style.left = pct(d.p25); iqr.style.width = `max(8px, calc(${pct(d.p75)} - ${pct(d.p25)}))`;
+      const med = h('span', 'rtp-med ' + (d.region === 'North America' ? 'na' : 'eu')); med.style.left = pct(d.median);
+      tr.append(range, iqr, med);
+      r.appendChild(tr);
+      r.setAttribute('aria-label', `${d.lottery}: median ${d.median}%, ${d.n} games, range ${d.min} to ${d.max}%`);
+      bindTip(r, (el) => tipLines(el, d.median.toFixed(1) + '% median', `${d.lottery} · ${d.n} games`, `Middle half ${d.p25}–${d.p75}% · range ${d.min}–${d.max}%`), med);
+      rows.appendChild(r);
+      tbody.appendChild(row([d.lottery, d.region, String(d.n), d.median.toFixed(1) + '%', `${d.p25}–${d.p75}%`, `${d.min}–${d.max}%`], [2, 3, 4, 5]));
+    });
+    host.appendChild(rows);
+  }
+
+  /* ---------- 04: Studios ---------- */
+  function studios(st) {
+    const tabs = $('#region-tabs');
+    const bars = $('#studio-bars');
+    const cov = $('#studio-coverage');
+    const tbody = $('#studio-table tbody');
+
+    let shown = false;
+    const show = (reg) => {
+      shown = true;
+      bars.replaceChildren();
+      bars.classList.remove('is-in');
+      const max = Math.max(...reg.studios.map((x) => x.share));
+      reg.studios.forEach((x) => {
+        const r = h('div', 'bar-row');
+        r.tabIndex = 0;
+        r.appendChild(h('span', 'bar-name', x.studio));
+        const t = h('div', 'bar-track');
+        const b = h('span', 'bar' + (x.other ? ' other' : ''));
+        b.style.width = `calc((100% - 56px) * ${x.share / max})`;
+        t.appendChild(b);
+        t.appendChild(h('span', 'bar-val', x.share.toFixed(1) + '%'));
+        r.appendChild(t);
+        bindTip(r, (el) => tipLines(el, x.share.toFixed(1) + '%', x.studio, int(x.titles) + ' live titles'), b);
+        bars.appendChild(r);
+      });
+      cov.textContent = `Studio identified for ${Math.round(reg.attributed_pct)}% of ${int(reg.titles)} live titles at ${reg.lotteries} ${reg.lotteries === 1 ? 'lottery' : 'lotteries'}.`;
+      requestAnimationFrame(() => requestAnimationFrame(() => bars.classList.add('is-in')));
+    };
+
+    st.regions.forEach((reg, i) => {
+      const b = h('button', 'chip', reg.region);
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', String(i === 0));
+      b.addEventListener('click', () => {
+        tabs.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+        show(reg);
+      });
+      tabs.appendChild(b);
+      reg.studios.forEach((x) => tbody.appendChild(row([reg.region, x.studio, int(x.titles), x.share.toFixed(1) + '%'], [2, 3])));
+    });
+    seen(bars, () => { if (!shown) show(st.regions[0]); });
+
+    const reach = $('#reach');
+    st.reach.slice(0, 5).forEach((x) => {
+      const li = h('li');
+      const left = h('span', '', x.studio);
+      left.appendChild(h('span', 's', int(x.titles) + ' live titles'));
+      li.appendChild(left);
+      li.appendChild(h('span', 'n', String(x.lotteries)));
+      reach.appendChild(li);
+    });
+
+    const split = $('#mi-split');
+    st.michigan_share.forEach((y) => {
+      const r = h('div', 'split-row');
+      r.appendChild(h('span', 'meta num', y.months < 12 ? `${y.year}*` : String(y.year)));
+      const bar = h('div', 'split-bar');
+      const a = h('span', 'a'); a.style.width = y.iwg_share + '%';
+      const b = h('span', 'b'); b.style.width = (100 - y.iwg_share) + '%';
+      bar.append(a, b);
+      bindTip(r, (el) => tipLines(el, y.iwg_share.toFixed(1) + '% IWG', `${y.year}${y.months < 12 ? ', ' + y.months + ' months reported' : ''}`, '$' + int(y.wagers_m) + 'm in eInstant wagers'), a);
+      r.appendChild(bar);
+      r.appendChild(h('span', 'meta num', Math.round(y.iwg_share) + '%'));
+      split.appendChild(r);
+    });
+    const partial = st.michigan_share.find((y) => y.months < 12);
+    if (partial) split.appendChild(h('p', 'meta', `* ${partial.months} months reported`));
+  }
+
+  /* ---------- 05: Launch curve ---------- */
+  function curve(L, copy) {
+    const host = $('#curve-chart');
+    const tbody = $('#curve-table tbody');
+    L.curve.forEach((c) => tbody.appendChild(row([String(c.m), c.median + '%', `${c.p25}–${c.p75}%`, String(c.n)], [1, 2, 3])));
+    const pts = L.curve.map((c) => ({ x: c.m, y: c.median, c }));
+    const at = (m) => pts.find((p) => p.x === m);
+    const rounded = { 3: copy.launch_m3, 12: copy.launch_m12 };  // the same integers the copy uses
+    const labelled = [3, 12].filter(at).map((m) => ({ x: m, y: at(m).y, text: rounded[m] + '%' }));
+    seen(host, () => lineChart(host, {
+      points: pts, xDomain: [0, pts[pts.length - 1].x], yMax: 100, yTicks: 4, area: false, animate: true, dotR: 0,
+      band: L.curve.map((c) => ({ x: c.m, lo: c.p25, hi: c.p75 })),
+      label: 'Median monthly wagers as a share of the best month, by months since launch',
+      height: (W) => Math.round(Math.max(240, Math.min(360, W * .42))),
+      yFmt: (v) => v + '%', xFmt: (v) => (v === 0 ? 'Launch' : String(v)),
+      xTicks: (pw) => pts.filter((p) => p.x % (pw > 560 ? 3 : 6) === 0).map((p) => p.x),
+      labelled, annotations: labelled,
+      tip: (el, p) => tipLines(el, Math.round(p.y) + '% of peak', p.x === 0 ? 'Launch month' : `Month ${p.x} after launch`, `Middle half ${p.c.p25}–${p.c.p75}% · ${p.c.n} games`),
+    }));
+  }
+
+  /* ---------- 06: Moves ---------- */
+  function moves(list) {
+    const ol = $('#moves-list');
+    const items = list.slice().sort((a, b) => b.month.localeCompare(a.month)).map((m) => {
+      const li = h('li', 'move');
+      li.dataset.kind = m.kind;
+      li.appendChild(h('p', 'move-when', monthLabel(m.month, 'month')));
+      const t = h('h3', '', m.lottery);
+      t.appendChild(h('span', 'v', ' · ' + m.vendor));
+      li.appendChild(t);
+      li.appendChild(h('p', '', m.text));
+      const a = h('a', '', 'Source: ' + (m.source || hostOf(m.url)));
+      a.href = m.url; a.target = '_blank'; a.rel = 'noopener';
+      const p = h('p'); p.appendChild(a); li.appendChild(p);
+      ol.appendChild(li);
+      return li;
+    });
+    $('#move-filter').addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      $('#move-filter').querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      items.forEach((li) => { li.hidden = b.dataset.kind !== 'all' && li.dataset.kind !== b.dataset.kind; });
+    });
+  }
+
+  /* ---------- 07: Sample rows, then ghost rows (no data in the page) ---------- */
+  function sample(rows) {
+    const tbody = $('#sample-table tbody');
+    rows.forEach((r) => tbody.appendChild(row([r.game, r.lottery, r.studio, r.price, r.top_prize, r.rtp], [5])));
+    for (let i = 0; i < 5; i++) {
+      const tr = h('tr', 'ghost');
+      tr.setAttribute('aria-hidden', 'true');
+      [58, 46, 40, 34, 40, 22].forEach((w) => { const td = h('td'); const sp = h('span'); sp.style.width = (w + ((i * 7 + w) % 13)) + '%'; td.appendChild(sp); tr.appendChild(td); });
+      tbody.appendChild(tr);
+    }
+  }
+
+  /* ---------- Rail scrollspy ---------- */
+  const railLinks = Array.from(document.querySelectorAll('.rail a[href^="#"]'));
+  const chapters = railLinks.map((a) => document.querySelector(a.hash)).filter(Boolean);
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(() => {
+      const mid = innerHeight * .4;
+      let cur = null;
+      chapters.forEach((c) => { const r = c.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) cur = c; });
+      railLinks.forEach((a) => a.classList.toggle('is-active', !!cur && a.hash === '#' + cur.id));
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    chapters.forEach((c) => io.observe(c));
+  }
+
+  /* ---------- Masthead + mobile menu (as on the homepage) ---------- */
+  const root = document.documentElement;
+  const header = $('#masthead');
+  const sentinel = document.createElement('div');
+  sentinel.setAttribute('aria-hidden', 'true');
+  sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:16px;pointer-events:none;';
+  document.body.prepend(sentinel);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => header.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sentinel);
+  }
+  const toggle = header.querySelector('.menu-toggle');
+  const toggleLabel = toggle.querySelector('.menu-toggle-label');
+  const nav = $('#site-nav');
+  const outside = [$('#main'), $('.site-footer'), $('.skip')];
+  const isOpen = () => root.classList.contains('menu-open');
+  const openMenu = () => {
+    root.classList.add('menu-open'); toggle.setAttribute('aria-expanded', 'true'); toggleLabel.textContent = 'Close';
+    outside.forEach((el) => { if (el) el.inert = true; });
+    const f = nav.querySelector('a'); if (f) f.focus();
+  };
+  const closeMenu = (back) => {
+    root.classList.remove('menu-open'); toggle.setAttribute('aria-expanded', 'false'); toggleLabel.textContent = 'Menu';
+    outside.forEach((el) => { if (el) el.inert = false; });
+    if (back) toggle.focus();
+  };
+  toggle.addEventListener('click', () => (isOpen() ? closeMenu(true) : openMenu()));
+  header.addEventListener('click', (e) => { if (isOpen() && e.target.closest('a')) closeMenu(false); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { hideTip(); if (isOpen()) { e.preventDefault(); closeMenu(true); } }
+  });
+  document.addEventListener('pointerdown', (e) => { if (tipOwner && !tipOwner.contains(e.target)) hideTip(); });
+
+  /* ---------- Load ---------- */
+  fetch('atlas.json', { cache: 'no-cache' })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(init)
+    .catch((err) => {
+      console.error('iLottery Atlas: data failed to load', err);
+      document.querySelectorAll('.units, .tilemap, .chart, .rtp, .bars').forEach((el) => {
+        el.replaceChildren(h('p', 'meta', 'The charts could not load. Please reload the page.'));
+      });
+    });
+})();
+</script>
+</body>
+</html>
