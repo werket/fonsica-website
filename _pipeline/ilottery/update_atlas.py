@@ -137,7 +137,7 @@ def tiers_changed(old, new):
 
 def write_report(status, lines, candidates=()):
     os.makedirs(LOG_DIR, exist_ok=True)
-    path = os.path.join(LOG_DIR, f"ilottery-{datetime.now():%Y%m%d-%H%M}.md")
+    path = os.path.join(LOG_DIR, f"ilottery-{datetime.now():%Y%m%d-%H%M%S}.md")
     body = [f"# iLottery Atlas: uppdatering {datetime.now():%Y-%m-%d %H:%M}", "", f"**Status:** {status}", ""]
     body += [f"- {line}" for line in lines]
     if candidates:
