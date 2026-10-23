@@ -37,9 +37,12 @@
         <string>/Users/adamfonsica/Projects/fonsica-insights/data/history_tables/eInstant_sales_by_lottery_year.csv</string>
     </array>
 
-    <!-- Fallback every six hours; unchanged data exits in a second -->
+    <!-- Every hour and at login: fetch what the bot pushed to GitHub, then rebuild.
+         Unchanged data exits in a few seconds. -->
+    <key>RunAtLoad</key>
+    <true/>
     <key>StartInterval</key>
-    <integer>21600</integer>
+    <integer>3600</integer>
     <key>ThrottleInterval</key>
     <integer>120</integer>
 

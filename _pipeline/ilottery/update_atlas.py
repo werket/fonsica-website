@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Keep the iLottery Atlas current: rebuild, check and publish when the research data changes.
 
-launchd (com.fonsica.ilottery-atlas) starts this when files in the fonsica-data folder
-change, and every six hours as a fallback. Adam chose (2026-10-23) to publish automatically
-when every check passes. Anything else stops the run, leaves a report in _pipeline/logs/
-and sends a notification; nothing is pushed.
+The research bot works in its own container and pushes deliveries to the private repo
+werket/fonsica-insights. launchd (com.fonsica.ilottery-atlas) runs this every hour, at login
+and when the local copy changes: it fast-forwards ~/Projects/fonsica-insights from GitHub
+(this Mac only reads that repo), then rebuilds. Adam chose (2026-10-23) to publish
+automatically when every check passes. Anything else stops the run, leaves a report in
+_pipeline/logs/ and sends a notification; nothing is pushed.
 
   python3 _pipeline/ilottery/update_atlas.py             rebuild and write locally, no git
   python3 _pipeline/ilottery/update_atlas.py --publish   ... then commit and push the atlas files
@@ -61,6 +63,43 @@ def fingerprint(data):
         st = os.stat(path) if os.path.exists(path) else None
         h.update(f"{rel}|{st.st_size if st else '-'}|{st.st_mtime_ns if st else '-'}\n".encode())
     return h.hexdigest()
+
+
+NETWORK_ERRORS = ("could not resolve", "connection", "timed out", "network is unreachable", "ssh: connect")
+PULL_WARNING = os.path.join(STATE_DIR, "pull-warning.json")
+
+
+def sync_from_github(data):
+    """Fast-forward the research repo to what the bot pushed from its container.
+
+    The bot is the only writer; this Mac only reads. Returns True when new commits arrived.
+    Without a network the local copy is used as it is. A copy that can no longer
+    fast-forward (local edits, rewritten history) is reported at most once a day.
+    """
+    repo = os.path.dirname(os.path.abspath(data))
+    if not os.path.isdir(os.path.join(repo, ".git")):
+        return False
+    head = lambda: subprocess.run(["git", "-C", repo, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+    before = head()
+    r = subprocess.run(["git", "-C", repo, "pull", "--ff-only", "--quiet"], capture_output=True, text=True, timeout=300)
+    if r.returncode == 0:
+        after = head()
+        if after != before:
+            log(f"pulled {before}..{after} from GitHub")
+        return after != before
+    reason = ((r.stderr or r.stdout).strip().splitlines() or ["git pull failed"])[-1]
+    if any(n in reason.lower() for n in NETWORK_ERRORS):
+        log(f"GitHub not reachable, using the local copy ({reason})")
+        return False
+    log(f"could not fast-forward the research repo: {reason}")
+    try:
+        last = json.load(open(PULL_WARNING, encoding="utf-8")).get("at", 0)
+    except (OSError, ValueError):
+        last = 0
+    if time.time() - last > 86400:
+        notify("Forskningsrepot kan inte hämta botens senaste leverans (lokala ändringar?). Se _pipeline/logs.")
+        json.dump({"at": time.time(), "reason": reason}, open(PULL_WARNING, "w", encoding="utf-8"))
+    return False
 
 
 def wait_for_quiet(data):
@@ -195,12 +234,14 @@ def main():
             return 0
 
         data = ba.find_data_dir(args.data)
+        pulled = False if args.dry_run else sync_from_github(data)
         fp = fingerprint(data)
         if fp == load_state().get("fingerprint") and not args.force:
             log("no new data")
             return 0
-        wait_for_quiet(data)
-        fp = fingerprint(data)
+        if not pulled:   # a pull lands a whole commit at once; local writes may still be going on
+            wait_for_quiet(data)
+            fp = fingerprint(data)
 
         try:
             new = ba.build(data)
