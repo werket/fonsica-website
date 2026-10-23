@@ -19,20 +19,22 @@
     <key>EnvironmentVariables</key>
     <dict>
         <key>FONSICA_DATA</key>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data</string>
         <key>PATH</key>
         <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     </dict>
 
-    <!-- Run when a delivery lands in the research folder (update FONSICA_DATA and these
-         paths if the folder moves) -->
+    <!-- Run when a delivery lands in the research bot's folder: the parent catches the
+         data.new -> data swap, the files catch in-place writes. Update FONSICA_DATA and
+         these paths if the folder moves. -->
     <key>WatchPaths</key>
     <array>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data</string>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/einstant_games_catalog.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/lotteries_suppliers.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/ilottery_contracts.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-website/fonsica-data/history_tables/eInstant_sales_by_lottery_year.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data/einstant_games_catalog.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data/lotteries_suppliers.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data/ilottery_contracts.csv</string>
+        <string>/Users/adamfonsica/Projects/fonsica-insights/data/history_tables/eInstant_sales_by_lottery_year.csv</string>
     </array>
 
     <!-- Fallback every six hours; unchanged data exits in a second -->

@@ -8,7 +8,7 @@ private: they are the data pack sold on request.
 Usage:
   python3 _pipeline/ilottery/build_atlas.py [--data /path/to/fonsica-data] [--check]
 
-The data path defaults to $FONSICA_DATA, then ../fonsica-data next to this repo,
+The data path defaults to $FONSICA_DATA, then ../fonsica-insights/data (the research bot's home), then ../fonsica-data next to this repo,
 then fonsica-data inside it. Standard library only.
 """
 
@@ -46,6 +46,7 @@ INPUTS = [
 
 def find_data_dir(cli):
     candidates = [cli, os.environ.get("FONSICA_DATA"),
+                  os.path.join(REPO, "..", "fonsica-insights", "data"),   # the research bot's home
                   os.path.join(REPO, "..", "fonsica-data"),
                   os.path.join(REPO, "fonsica-data")]
     for c in candidates:
