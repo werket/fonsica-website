@@ -24,21 +24,9 @@
         <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     </dict>
 
-    <!-- Run when a delivery lands in the research bot's folder: the parent catches the
-         data.new -> data swap, the files catch in-place writes. Update FONSICA_DATA and
-         these paths if the folder moves. -->
-    <key>WatchPaths</key>
-    <array>
-        <string>/Users/adamfonsica/Projects/fonsica-insights</string>
-        <string>/Users/adamfonsica/Projects/fonsica-insights/data</string>
-        <string>/Users/adamfonsica/Projects/fonsica-insights/data/einstant_games_catalog.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-insights/data/lotteries_suppliers.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-insights/data/ilottery_contracts.csv</string>
-        <string>/Users/adamfonsica/Projects/fonsica-insights/data/history_tables/eInstant_sales_by_lottery_year.csv</string>
-    </array>
-
     <!-- Every hour and at login: fetch what the bot pushed to GitHub, then rebuild.
-         Unchanged data exits in a few seconds. -->
+         Unchanged data exits in a few seconds. No WatchPaths: deliveries arrive through
+         the job's own git pull, and watching the copy made each pull start the next run. -->
     <key>RunAtLoad</key>
     <true/>
     <key>StartInterval</key>
