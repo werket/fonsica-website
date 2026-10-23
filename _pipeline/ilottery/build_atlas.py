@@ -307,6 +307,11 @@ GROWTH = [
 ]
 
 
+# A first year that only covers part of the fiscal year ("Start nov 2023 (delår)",
+# "endast ~2 mån"): shown on the chart, never used as the base of a growth multiple
+PARTIAL = re.compile(r"delår|endast ~?\d+ mån|partial", re.I)
+
+
 def fy_num(fy):
     m = re.match(r"FY(\d{4})$", fy.strip())
     return int(m.group(1)) if m else None
@@ -330,19 +335,21 @@ def build_growth(data):
                 "fy": y, "v": v, "grade": r["grade"],
                 "derived": str(r["is_estimate"]).lower().startswith("ja"),
                 "floor": "milstolpe" in r["metric"],
+                "partial": bool(PARTIAL.search(r.get("note") or "")),
             })
             if r["source_url"] and r["source_url"] not in urls:
                 urls.append(r["source_url"])
         pts.sort(key=lambda p: p["fy"])
         if not pts:
             continue
-        by = {p["fy"]: p["v"] for p in pts if not p["floor"]}
+        by = {p["fy"]: p["v"] for p in pts if not p["floor"] and not p["partial"]}
         base = 2022 if 2022 in by else min(by)
         end = 2025 if 2025 in by else max(by)
         series.append({
             "id": sid, "label": label, "lottery": lottery, "metric": metric,
             "currency": "USD", "points": pts, "sources": urls[:3],
             "multiple": {"from": base, "to": end, "x": round(by[end] / by[base], 2)} if end > base else None,
+            "first_full": min(by),
             "peak": max(pts, key=lambda p: p["v"])["fy"],
         })
     return series
@@ -462,6 +469,7 @@ def build_catalog(data):
 
     return {
         "games": len(rows),
+        "unique_titles": len({r["game"].strip().lower() for r in rows}),
         "lotteries": len({r["lottery"] for r in rows}),
         "countries": len({r["country"].split(" - ")[0] for r in rows if r["country"]}),
         "fields": len(rows[0]) if rows else 0,
@@ -528,7 +536,8 @@ def build_studios(data):
     mi = [{"year": int(k), "iwg_share": r1(100 * v["iwg"] / v["total"]), "months": v["months"],
            "wagers_m": round(v["total"] / 1e6)} for k, v in sorted(years.items())]
 
-    return {"count": len(master), "regions": regions, "reach": reach, "michigan_share": mi}
+    verified = sum(1 for r in master if r["type"] != "ej verifierat")   # the rest are unconfirmed feed labels
+    return {"count": len(master), "verified": verified, "regions": regions, "reach": reach, "michigan_share": mi}
 
 
 def build_launch_curve(data):
@@ -781,7 +790,8 @@ def build(data):
         "us_einstant_sales_m": atlas["register"]["us"]["einstant_sales_m"],
         "us_big4_sales_m": atlas["register"]["us"]["biggest_four_offline_sales_m"],
         "ky_x": g["ky"]["multiple"]["x"], "ga_x": g["ga"]["multiple"]["x"],
-        "va_x": g["va"]["multiple"]["x"], "nc_x": g["nc"]["multiple"]["x"],
+        "va_x": g["va"]["multiple"]["x"],
+        "nc_first_full_m": next(p["v"] for p in g["nc"]["points"] if p["fy"] == g["nc"]["first_full"]),
         "mi_drop_pct": r1(100 * (mi[-1] / max(mi) - 1)),
         "alc_drop_pct": atlas["alc"]["digital_instants_change_pct"],
         "rtp_lotteries": len(catalog["rtp"]),
@@ -800,6 +810,7 @@ def build(data):
         "rtp_min_pct": min(rtp.values()),
         "rtp_max_pct": max(rtp.values()),
         "rtp_na_min_pct": min(r["median"] for r in catalog["rtp"] if r["region"] == "North America"),
+        "rtp_na_count": sum(1 for r in catalog["rtp"] if r["region"] == "North America"),
         "na_top3_pct": r1(sum(s["share"] for s in na["studios"][:3])) if na else None,
     })
 

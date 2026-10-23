@@ -43,9 +43,10 @@ def check(atlas):
         need(m and (m["from"], m["to"]) == (2022, 2025), "From FY2022 to FY2025",
              f"{sid.upper()} now runs FY{m['from'] if m else '?'} to FY{m['to'] if m else '?'}")
         need(m and 2.5 <= m["x"] <= 3.6, "roughly tripled in three years", f"{sid.upper()} grew {m['x'] if m else 0} times")
-    nc = _growth(atlas, "nc")["multiple"]
-    need(nc and nc["to"] - nc["from"] == 1 and nc["x"] > 2, "North Carolina grew ... times in a single year",
-         f"North Carolina now covers FY{nc['from']} to FY{nc['to']}" if nc else "no multiple")
+    nc = _growth(atlas, "nc")
+    need(nc["points"][0]["fy"] == 2024 and nc["points"][0]["partial"] and nc["first_full"] == 2025,
+         "North Carolina, which launched in November 2023, sold ... in its first full year",
+         f"first point FY{nc['points'][0]['fy']} (partial: {nc['points'][0]['partial']}), first full year FY{nc['first_full']}")
     slow = {sid: (_growth(atlas, sid)["multiple"] or {}).get("x", 0) for sid in ("pa", "nh", "mi")}
     need(max(slow["pa"], slow["nh"]) < min(leaders), "Pennsylvania and New Hampshire grew more slowly",
          f"PA {slow['pa']}, NH {slow['nh']} against {min(leaders)}")
@@ -66,9 +67,13 @@ def check(atlas):
          f"the lowest median is now {lowest['lottery']}")
     need(any(r["lottery"] == "Pennsylvania Lottery" for r in rtp), "A Pennsylvanian one", "Pennsylvania has no RTP row")
     europe_high = [r["lottery"] for r in rtp if r["region"] == "Europe" and r["median"] > 74 and r["lottery"] != "Lotterie Nazionali"]
-    need(not europe_high, "In Europe, only Italy goes above 74%", f"also {', '.join(europe_high)}")
+    need(not europe_high, "In Europe, only Italy has a median above 74%", f"also {', '.join(europe_high)}")
+    na_count = sum(1 for r in rtp if r["region"] == "North America")
+    need(na_count == 8, "All eight North American lotteries have a median of 78% or more", f"there are {na_count}")
+    quebec = next((r for r in rtp if r["lottery"] == "Loto-Québec"), None)
+    need(quebec and quebec["n"] == 10, "such as Loto-Québec's ten", f"Loto-Québec has {quebec['n'] if quebec else 'no'} games")
 
-    # 04 "Three studios make 88% of the eInstants in North American lobbies"
+    # 04 "Three studios make 88% of the attributed eInstants in North America"
     regions = {r["region"]: r for r in atlas["studios"]["regions"]}
     na = regions.get("North America")
     top3 = [s["studio"] for s in na["studios"][:3]] if na else []

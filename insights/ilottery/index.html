@@ -401,6 +401,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
 .counter h3 { margin-top: 10px; font-weight: 600; font-size: 1.0625rem; letter-spacing: -.01em; }
 .counter p { margin-top: 8px; color: var(--ash); font-size: 15px; }
 .counter a { color: var(--ash); text-decoration-color: var(--hair); text-underline-offset: .25em; font-family: var(--mono); font-size: 12px; }
+.counter .sources { margin-top: 8px; font-family: var(--mono); font-size: 12px; line-height: 1.6; }
 
 /* ==========================================================================
    03 Payout: dot and range rows
@@ -662,8 +663,8 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     <dl class="kpis">
       <div class="kpi"><dt class="label">Lotteries in the register</dt><dd data-k="register.lotteries">177</dd></div>
       <div class="kpi"><dt class="label">Online lobbies read</dt><dd data-k="catalog.lotteries">59</dd></div>
-      <div class="kpi"><dt class="label">eInstant games catalogued</dt><dd data-k="catalog.games" data-fmt="int">4,360</dd></div>
-      <div class="kpi"><dt class="label">Studios identified</dt><dd data-k="studios.count">57</dd></div>
+      <div class="kpi"><dt class="label">eInstant listings catalogued</dt><dd data-k="catalog.games" data-fmt="int">4,360</dd></div>
+      <div class="kpi"><dt class="label">Verified studios</dt><dd data-k="studios.verified">20</dd></div>
     </dl>
   </section>
 
@@ -691,7 +692,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       <section id="online" class="chapter" aria-labelledby="online-title">
         <p class="kicker label"><span class="idx">01</span>Who sells online</p>
         <h2 id="online-title" class="chapter-title reveal"><span data-k="copy.us_einstant_jurisdictions">13</span> US jurisdictions sell eInstants online. The four biggest lotteries do not.</h2>
-        <p class="dek reveal">The eInstant states account for a third of US lottery sales: <strong>$<span data-k="copy.us_einstant_sales_m" data-fmt="bn">35.5</span> billion</strong> in FY2024. California, New York, Florida and Texas sell the same amount again, $<span data-k="copy.us_big4_sales_m" data-fmt="bn">35.5</span> billion, and none of them offers eInstants online.</p>
+        <p class="dek reveal">The jurisdictions that sell eInstants today accounted for a third of all US lottery sales in FY2024: <strong>$<span data-k="copy.us_einstant_sales_m" data-fmt="bn">35.5</span> billion</strong> across every product. California, New York, Florida and Texas sold the same amount again, $<span data-k="copy.us_big4_sales_m" data-fmt="bn">35.5</span> billion, and none of them offers eInstants online.</p>
 
         <figure class="fig reveal" aria-labelledby="map-title">
           <h3 id="map-title" class="fig-title">North America by online status</h3>
@@ -733,7 +734,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       <section id="growth" class="chapter" aria-labelledby="growth-title">
         <p class="kicker label"><span class="idx">02</span>Growth</p>
         <h2 id="growth-title" class="chapter-title reveal">In Kentucky, Georgia and Virginia, eInstant sales roughly tripled in three years</h2>
-        <p class="dek reveal">From FY2022 to FY2025, eInstant sales grew <strong><span data-k="copy.ky_x" data-fmt="x">3.5</span> times</strong> in Kentucky, <span data-k="copy.ga_x" data-fmt="x">2.8</span> times in Georgia and <span data-k="copy.va_x" data-fmt="x">2.6</span> times in Virginia. North Carolina grew <span data-k="copy.nc_x" data-fmt="x">2.3</span> times in a single year. Pennsylvania and New Hampshire grew more slowly, and Michigan shrank.</p>
+        <p class="dek reveal">From FY2022 to FY2025, eInstant sales grew <strong><span data-k="copy.ky_x" data-fmt="x">3.5</span> times</strong> in Kentucky, <span data-k="copy.ga_x" data-fmt="x">2.8</span> times in Georgia and <span data-k="copy.va_x" data-fmt="x">2.6</span> times in Virginia. North Carolina, which launched in November 2023, sold $<span data-k="copy.nc_first_full_m" data-fmt="bn">2.6</span> billion in its first full year. Pennsylvania and New Hampshire grew more slowly, and Michigan shrank.</p>
 
         <figure class="fig reveal" aria-labelledby="growth-fig-title">
           <h3 id="growth-fig-title" class="sr-only">eInstant sales by lottery and fiscal year</h3>
@@ -744,7 +745,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
           </div>
           <div class="chart" id="growth-chart" style="margin-top:14px"></div>
           <div class="fig-foot meta">
-            <span>Fiscal years ending in June (Michigan: September). Hollow points are grade C, from a single secondary source. Metrics differ between lotteries, so compare the shape and the multiple, not the levels.</span>
+            <span>Fiscal years ending in June (Michigan: September). Hollow points are grade C (a single secondary source) or a partial first year. Metrics differ between lotteries, so compare the shape and the multiple, not the levels.</span>
             <span id="growth-sources"></span>
           </div>
           <details class="table-view">
@@ -758,7 +759,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
             <p class="big">−<span data-k="copy.mi_drop_pct" data-fmt="abs0">30</span>%</p>
             <h3>Michigan, since its FY2021 peak</h3>
             <p>eInstant net win peaked in FY2021, the year the state opened online casino in January, and was <span data-k="copy.mi_drop_pct" data-fmt="abs0">30</span>% lower by FY2025.</p>
-            <a href="https://www.michigan.gov/mgcb/news/2021/01/22/online-gaming-and-sports-betting-are-now-live-in-michigan-as-sen--hertel-places-first-wager" target="_blank" rel="noopener">Source: Michigan Gaming Control Board<span class="sr-only"> (opens in a new tab)</span></a>
+            <p class="sources"><a href="https://audgen.michigan.gov/wp-content/uploads/2026/03/2025-Michigan-Lottery-Annual-Comprehensive-Financial-Report.pdf" target="_blank" rel="noopener">Source: Michigan Lottery annual report<span class="sr-only"> (opens in a new tab)</span></a> · <a href="https://www.michigan.gov/mgcb/news/2021/01/22/online-gaming-and-sports-betting-are-now-live-in-michigan-as-sen--hertel-places-first-wager" target="_blank" rel="noopener">casino launch: Michigan Gaming Control Board<span class="sr-only"> (opens in a new tab)</span></a></p>
           </div>
           <div>
             <p class="big">−<span data-k="copy.alc_drop_pct" data-fmt="abs0">11</span>%</p>
@@ -786,7 +787,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       <section id="payout" class="chapter" aria-labelledby="payout-title">
         <p class="kicker label"><span class="idx">03</span>Payouts</p>
         <h2 id="payout-title" class="chapter-title reveal">A Swedish eInstant pays back <span data-k="copy.rtp_se_pct" data-fmt="pct0">50</span>%. A Pennsylvanian one pays back <span data-k="copy.rtp_pa_pct" data-fmt="pct0">89</span>%.</h2>
-        <p class="dek reveal">Across the <span data-k="copy.rtp_lotteries">26</span> lotteries that publish return to player (RTP) for their eInstants, the median game pays back between <span data-k="copy.rtp_min_pct" data-fmt="pct0">50</span>% and <span data-k="copy.rtp_max_pct" data-fmt="pct0">92</span>% of what is staked. <strong>North American lotteries pay back <span data-k="copy.rtp_na_min_pct" data-fmt="pct0">78</span>% or more.</strong> In Europe, only Italy goes above 74%. For a studio, that means a different maths model in almost every market.</p>
+        <p class="dek reveal">Across the <span data-k="copy.rtp_lotteries">26</span> lotteries that publish return to player (RTP) for at least five eInstants, the median game pays back between <span data-k="copy.rtp_min_pct" data-fmt="pct0">50</span>% and <span data-k="copy.rtp_max_pct" data-fmt="pct0">92</span>% of what is staked. <strong>All eight North American lotteries have a median of <span data-k="copy.rtp_na_min_pct" data-fmt="pct0">78</span>% or more.</strong> In Europe, only Italy has a median above 74%. For a studio, that means a different maths model in almost every market.</p>
 
         <figure class="fig reveal" aria-labelledby="rtp-title">
           <h3 id="rtp-title" class="fig-title">Return to player by lottery</h3>
@@ -798,7 +799,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
           </ul>
           <div class="rtp fig-body" id="rtp"></div>
           <div class="fig-foot meta">
-            <span>RTP published for <span data-k="catalog.rtp_games" data-fmt="int">1,703</span> of <span data-k="catalog.games" data-fmt="int">4,360</span> catalogued games. Lotteries with fewer than five games with a published RTP are left out. Source: each lottery's game rules and lobby data.</span>
+            <span>RTP published for <span data-k="catalog.rtp_games" data-fmt="int">1,703</span> of <span data-k="catalog.games" data-fmt="int">4,360</span> catalogued listings. Lotteries with fewer than five listings with a published RTP are left out, and medians that rest on few games, such as Loto-Québec's ten, are less certain. Source: each lottery's game rules and lobby data.</span>
           </div>
           <details class="table-view">
             <summary>Show the table</summary>
@@ -810,7 +811,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       <!-- 04 ============================================================ -->
       <section id="studios" class="chapter" aria-labelledby="studios-title">
         <p class="kicker label"><span class="idx">04</span>Studios</p>
-        <h2 id="studios-title" class="chapter-title reveal">Three studios make <span data-k="copy.na_top3_pct" data-fmt="pct0">88</span>% of the eInstants in North American lobbies</h2>
+        <h2 id="studios-title" class="chapter-title reveal">Three studios make <span data-k="copy.na_top3_pct" data-fmt="pct0">88</span>% of the attributed eInstants in North America</h2>
         <p class="dek reveal">IWG, NeoGames and Brightstar together account for <span data-k="copy.na_top3_pct" data-fmt="pct0">88</span>% of live titles where the studio is known. In the Nordics, Fennica Gaming alone makes more than half. The picture is a count of games in the lobby, not of sales.</p>
 
         <div class="studio-layout fig reveal">
@@ -837,7 +838,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
             </ul>
           </div>
         </div>
-        <p class="note reveal">A game live at three lotteries counts three times. Studios are identified from lottery feeds, game rules and supplier releases; where none of these names the studio, the game is left out of the shares.</p>
+        <p class="note reveal">A game live at three lotteries counts three times. Studios are identified from lottery feeds, game rules and supplier releases; where none of these names the studio, the game is left out of the shares. In the Nordics, Fennica's share includes Norsk Tipping titles identified from their game codes.</p>
       </section>
 
       <!-- 05 ============================================================ -->
@@ -887,11 +888,11 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         <p class="dek reveal">Lotteries, studios, platform suppliers and investors use game-level data to price games, plan portfolios and size markets. The full dataset comes as a data pack with a briefing, or as part of an advisory engagement.</p>
 
         <div class="pack reveal">
-          <div><p class="big"><span data-k="pack.games" data-fmt="int">4,360</span></p><h3>Games</h3><p>Every eInstant in <span data-k="pack.lotteries">59</span> online lobbies: price points, top prize, RTP, studio, mechanics and source.</p></div>
+          <div><p class="big"><span data-k="pack.games" data-fmt="int">4,360</span></p><h3>Listings</h3><p>Every eInstant listing in <span data-k="pack.lotteries">59</span> online lobbies, <span data-k="catalog.unique_titles" data-fmt="int">3,309</span> unique titles: price points, top prize, RTP, studio, mechanics and source.</p></div>
           <div><p class="big"><span data-k="pack.prize_rows" data-fmt="k">936k</span></p><h3>Prize-table rows</h3><p>Prize tiers and odds parsed from published game rules.</p></div>
           <div><p class="big">Daily</p><h3>Lobby scans</h3><p>New games, removals and lobby movers, scanned every day since October 2026.</p></div>
-          <div><p class="big"><span data-k="pack.sales_points">145</span></p><h3>Sales data points</h3><p>eInstant and iLottery sales for <span data-k="pack.sales_sources">31</span> lotteries and markets back to 2015, each with source and grade.</p></div>
-          <div><p class="big"><span data-k="pack.contracts">26</span></p><h3>Contracts</h3><p>Platform and content contracts with terms, extensions and status.</p></div>
+          <div><p class="big"><span data-k="pack.sales_points">145</span></p><h3>Sales data points</h3><p>eInstant and iLottery sales back to 2015, each with its source and grade.</p></div>
+          <div><p class="big"><span data-k="pack.contracts">26</span></p><h3>Contracts and market events</h3><p>Platform and content contracts with terms, extensions and status, plus related market events.</p></div>
           <div><p class="big"><span data-k="pack.michigan_game_months" data-fmt="int">3,158</span></p><h3>Game-months</h3><p>Michigan's per-game sales, 2019 to 2021: launch curves, lifetimes and provider shares.</p></div>
         </div>
 
@@ -902,7 +903,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
               <tbody></tbody>
             </table>
           </div>
-          <div class="locked-veil"><p><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 6V4a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span><span data-k="copy.games_more" data-fmt="int">4,357</span> more games in the data pack</span></p></div>
+          <div class="locked-veil"><p><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 6V4a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span><span data-k="copy.games_more" data-fmt="int">4,357</span> more listings in the data pack</span></p></div>
         </div>
 
         <div class="cta-row reveal">
@@ -927,12 +928,12 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
               <li><span class="grade">A</span><span>Read from the lottery's own source and archived.</span></li>
               <li><span class="grade">B</span><span>Official figures via a compilation, or the supplier's own release.</span></li>
               <li><span class="grade">C</span><span>A single secondary source, such as trade press.</span></li>
-              <li><span class="grade">D</span><span>Derived or estimated. Not shown on this page.</span></li>
+              <li><span class="grade">D</span><span>Derived or estimated. Not used for any sales figure on this page.</span></li>
             </ul>
           </div>
           <div>
             <h3>Limits</h3>
-            <p>The studio is identified for <span data-k="catalog.studio_known_pct" data-fmt="pct0">76</span>% of games and RTP is published for <span data-k="copy.rtp_share_pct" data-fmt="pct0">39</span>%. Sales metrics differ between lotteries, so levels are not compared across states. Daily lobby scans began in October 2026.</p>
+            <p>The studio is identified for <span data-k="catalog.studio_known_pct" data-fmt="pct0">76</span>% of listings and RTP is published for <span data-k="copy.rtp_share_pct" data-fmt="pct0">39</span>%. Sales metrics differ between lotteries, so levels are not compared across states. Daily lobby scans began in October 2026.</p>
           </div>
         </div>
         <div class="disclose">
@@ -1359,7 +1360,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     let chart = null, picked = false;
 
     const cfgFor = (sr) => {
-      const pts = sr.points.map((p) => ({ x: p.fy, y: p.v, hollow: p.grade === 'C', floor: p.floor, grade: p.grade, derived: p.derived }));
+      const pts = sr.points.map((p) => ({ x: p.fy, y: p.v, hollow: p.grade === 'C' || p.partial, floor: p.floor, grade: p.grade, derived: p.derived, partial: p.partial }));
       const max = Math.max(...pts.map((p) => p.y));
       const first = pts[0], last = pts[pts.length - 1];
       const label = (p) => (p.floor ? usd(p.y).replace(/bn$/, 'bn+') : usd(p.y));
@@ -1373,7 +1374,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         yFmt: usdAxis, xFmt: (v) => 'FY' + String(v).slice(2),
         xTicks: (pw) => { const out = []; const span = last.x - first.x; const every = pw / Math.max(span, 1) < 44 ? 2 : 1; for (let y = first.x; y <= last.x; y += every) out.push(y); return out; },
         labelled,
-        tip: (el, p) => tipLines(el, (p.floor ? 'Over ' : '') + usd(p.y), `FY${p.x} · ${sr.metric}`, `Grade ${p.grade}${p.derived ? ' · derived from published figures' : ''}${p.floor ? ' · milestone, not a final figure' : ''}`),
+        tip: (el, p) => tipLines(el, (p.floor ? 'Over ' : '') + usd(p.y), `FY${p.x} · ${sr.metric}`, `Grade ${p.grade}${p.partial ? ' · partial first year' : ''}${p.derived ? ' · derived from published figures' : ''}${p.floor ? ' · milestone, not a final figure' : ''}`),
       };
     };
 
@@ -1400,9 +1401,13 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       b.setAttribute('aria-pressed', 'false');
       b.appendChild(h('span', 'series-name', sr.label));
       const mult = sr.multiple;
-      const x = h('span', 'series-x' + (mult && mult.x < 1 ? ' down' : ''), mult ? '×' + mult.x.toFixed(1) : '');
-      b.appendChild(x);
-      b.appendChild(h('span', 'series-per', mult ? `FY${String(mult.from).slice(2)} to FY${String(mult.to).slice(2)}` : ''));
+      // Without two full years there is no fair multiple: show the latest full year instead
+      const full = sr.points.filter((p) => !p.floor && !p.partial);
+      const latest = full[full.length - 1];
+      const per = mult ? `FY${String(mult.from).slice(2)} to FY${String(mult.to).slice(2)}`
+        : `FY${String(latest.fy).slice(2)}${latest.fy === sr.first_full ? ', first full year' : ''}`;
+      b.appendChild(h('span', 'series-x' + (mult && mult.x < 1 ? ' down' : ''), mult ? '×' + mult.x.toFixed(1) : usd(latest.v)));
+      b.appendChild(h('span', 'series-per', per));
       // sparkline
       const pts = sr.points.filter((p) => !p.floor);
       const max = Math.max(...pts.map((p) => p.v));
@@ -1410,10 +1415,10 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       const xs = (j) => pts.length > 1 ? j / (pts.length - 1) * 100 : 50;
       s('path', { d: pts.map((p, j) => (j ? 'L' : 'M') + xs(j) + ',' + (28 - p.v / max * 26)).join(''), fill: 'none', stroke: mult && mult.x < 1 ? '#A59F99' : '#2DD4BF', 'stroke-width': 1.5, 'vector-effect': 'non-scaling-stroke' }, sv);
       b.appendChild(sv);
-      b.setAttribute('aria-label', `${sr.label}: ${mult ? mult.x.toFixed(1) + ' times from FY' + mult.from + ' to FY' + mult.to : ''}`);
+      b.setAttribute('aria-label', `${sr.label}: ${mult ? mult.x.toFixed(1) + ' times from FY' + mult.from + ' to FY' + mult.to : usd(latest.v) + ' in FY' + latest.fy}`);
       b.addEventListener('click', () => pick(sr, b));
       picker.appendChild(b);
-      sr.points.forEach((p) => tbody.appendChild(row([sr.lottery, sr.metric, 'FY' + p.fy, (p.floor ? '> ' : '') + int(p.v), p.grade], [3])));
+      sr.points.forEach((p) => tbody.appendChild(row([sr.lottery, sr.metric, 'FY' + p.fy + (p.partial ? ' (partial)' : ''), (p.floor ? '> ' : '') + int(p.v), p.grade], [3])));
       if (i === 0) seen(host, () => { if (!picked) pick(sr, b); });
     });
   }
