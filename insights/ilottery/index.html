@@ -245,6 +245,143 @@ main:focus { outline: none; }
 .kpi dt { margin-top: 12px; }
 
 /* ==========================================================================
+   Hero: the world map
+   ========================================================================== */
+.world { --m-off: #5A5452; --m-dim: #4A4547; --m-none: #38343A; margin-top: 56px; }
+.key.m-off { background: var(--m-off); }
+.key.m-dim { background: var(--m-dim); }
+.key.m-none { background: var(--m-none); }
+.world-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-bottom: 18px; }
+.world-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.controls.scroll-x { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); padding: 2px var(--gr) 2px var(--gl); }
+.scroll-x::-webkit-scrollbar { display: none; }
+.scroll-x .chip { flex: none; }
+.pick { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pick .label { white-space: nowrap; }
+.pick .select { flex: 1 1 auto; min-width: 0; }
+.pick .dd { flex: none; width: 13.5rem; }
+.world-foot .pick .dd { width: 15rem; }
+.world-controls .pick, .world-foot .pick { flex: none; }
+.world-foot .legend { flex: 1 1 24rem; }
+@media (max-width: 639px) { .world-controls .pick, .world-foot .pick { width: 100%; } .pick .dd, .world-foot .pick .dd { flex: 1 1 auto; width: auto; } }
+.select {
+  appearance: none; -webkit-appearance: none; min-height: 40px; max-width: 100%; padding: 0 38px 0 16px;
+  border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--hair); cursor: pointer;
+  background: var(--ground) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23A59F99' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 16px center;
+  color: var(--bone); font: 500 12px/1 var(--mono); letter-spacing: .06em;
+}
+.select:hover { box-shadow: inset 0 0 0 1px var(--ash); }
+
+/* Dropdown drawn in the page's style; the hidden native select keeps the value */
+.dd { position: relative; min-width: 0; }
+.dd-box {
+  display: block; height: 40px; line-height: 40px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  -webkit-user-select: none; user-select: none; transition: box-shadow .2s ease;
+}
+.dd.is-open .dd-box {
+  box-shadow: inset 0 0 0 1px var(--teal);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 5l4-4 4 4' fill='none' stroke='%232DD4BF' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+.dd-list {
+  position: absolute; z-index: 45; left: 0; top: calc(100% + 6px);
+  width: max-content; min-width: 100%; max-width: min(22rem, calc(100vw - 32px));
+  max-height: min(380px, 60vh); overflow-y: auto; overscroll-behavior: contain; padding: 6px;
+  border-radius: 14px; background: var(--raised);
+  box-shadow: 0 0 0 1px var(--hair), 0 18px 44px rgba(0, 0, 0, .5);
+  scrollbar-width: thin; scrollbar-color: var(--lift) transparent;
+  transform-origin: top center; animation: dd-in .16s cubic-bezier(.2, .8, .2, 1);
+}
+.dd.is-up .dd-list { top: auto; bottom: calc(100% + 6px); transform-origin: bottom center; }
+.dd.is-right .dd-list { left: auto; right: 0; }
+.dd-list[hidden] { display: none; }
+@keyframes dd-in { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+.dd-opt {
+  position: relative; display: flex; align-items: center; min-height: 36px; padding: 7px 12px 7px 30px;
+  border-radius: 8px; cursor: pointer; font-size: 14px; line-height: 1.3; color: var(--bone);
+}
+.dd-opt.is-active { background: rgba(236, 231, 225, .07); }
+.dd-opt[aria-selected="true"] { color: var(--teal); }
+.dd-opt[aria-selected="true"]::before {
+  content: ""; position: absolute; left: 13px; top: 50%; width: 6px; height: 6px; margin-top: -3px;
+  border-radius: 50%; background: var(--teal);
+}
+.dd-group { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--hair); }
+.dd-group:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.dd-group-name { padding: 8px 12px 6px 30px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); }
+
+.world-stage { display: grid; gap: 12px; }
+.world-map {
+  position: relative; aspect-ratio: 2.25; border-radius: 8px; overflow: hidden;
+  background:
+    radial-gradient(80% 70% at 50% 45%, rgba(45, 212, 191, .06) 0%, rgba(45, 212, 191, 0) 60%),
+    radial-gradient(rgba(236, 231, 225, .07) 1px, transparent 1.2px) 0 0 / 14px 14px,
+    var(--ground);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.world-map svg { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.world-map .grat { fill: none; stroke: rgba(236, 231, 225, .045); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.world-map .land {
+  fill: var(--m-none); stroke: var(--ground); stroke-width: .7; vector-effect: non-scaling-stroke; cursor: default;
+  transition: fill .45s ease, opacity .3s ease;
+}
+.world-map .land.c-einstants { fill: var(--teal); cursor: pointer; }
+.world-map .land.c-online { fill: var(--t-online); cursor: pointer; }
+.world-map .land.c-planned { fill: #2B3A38; stroke: var(--teal); stroke-width: 1.2; cursor: pointer; }
+.world-map .land.c-offline { fill: var(--m-off); cursor: pointer; }
+.world-map .land.c-lens { fill: var(--teal); cursor: pointer; }
+.world-map .land.c-dim { fill: var(--m-dim); cursor: pointer; }
+.world-map .land.is-hot, .world-map .land.is-sel { stroke: var(--bone); stroke-width: 1.4; }
+.world-map .mark { stroke: var(--ground); stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
+.world-map .pulse { fill: none; stroke: var(--bone); stroke-width: 1.2; vector-effect: non-scaling-stroke; pointer-events: none; transform-box: fill-box; transform-origin: center; }
+.world-map .pulse-dot { fill: var(--bone); pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .world-map .pulse { animation: pulse 2.8s cubic-bezier(.2, .6, .3, 1) infinite; }
+}
+@keyframes pulse { 0% { transform: scale(.4); opacity: .9; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
+.js .world-map svg { opacity: 0; transition: opacity 1s ease; }
+.js .world-map.is-in svg { opacity: 1; }
+
+.world-card { padding: 18px 20px 20px; border-radius: 8px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--hair); }
+.world-card h3 { margin-top: 6px; font-weight: 700; font-size: 1.5rem; line-height: 1.1; letter-spacing: -.02em; }
+.world-card-lead { margin-top: 8px; font-size: 1.0625rem; line-height: 1.45; }
+.world-card .meta { margin-top: 10px; }
+.world-card .status { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 14px; }
+.world-card ul { margin-top: 12px; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.world-card ul li { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.world-card ul li .key { width: 10px; height: 10px; }
+.world-card dl { margin-top: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; }
+.world-card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); padding-top: .2em; }
+.world-card .more { color: var(--ash); }
+.world-top { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair); }
+.world-top ol { margin-top: 6px; }
+.world-top button {
+  width: 100%; display: flex; justify-content: space-between; gap: 12px; align-items: baseline;
+  min-height: 34px; padding: 6px 0; border: 0; border-bottom: 1px solid rgba(69, 64, 63, .6); background: none; cursor: pointer;
+  font-size: 14px; text-align: left; color: var(--bone);
+}
+.world-top li:last-child button { border-bottom: 0; }
+.world-top button .num { font-family: var(--mono); font-size: 12px; color: var(--ash); }
+.world-top button:hover span:first-child { color: var(--teal); }
+.world-card.is-long:not(.at-end) { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); }
+.world-card .dd-meta { display: block; margin-top: 2px; font-family: var(--mono); font-size: 11px; letter-spacing: .02em; color: var(--ash); }
+.world-card .card-link {
+  display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--bone);
+  text-decoration: underline; text-decoration-color: var(--teal); text-underline-offset: .3em;
+}
+.world-foot { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.world-note { margin-top: 10px; font-size: 12px; }
+.key.pulse-key { width: 10px; height: 10px; border-radius: 50%; background: none; box-shadow: inset 0 0 0 1.5px var(--bone); }
+.units[hidden] { display: none; }
+.world.no-map .world-stage, .world.no-map .world-controls, .world.no-map .world-foot .pick, .world.no-map .map-only { display: none; }
+.world.no-map .units { margin-top: 24px; }
+.kpi dd, .pack .big { font-variant-numeric: tabular-nums; }
+
+/* Scroll progress, under the masthead */
+.progress { position: fixed; left: 0; right: 0; top: var(--header-h); height: 2px; z-index: 49; pointer-events: none; }
+.progress span { display: block; height: 100%; background: var(--teal); transform-origin: left center; transform: scaleX(0); }
+
+/* ==========================================================================
    Atlas layout: chapter rail + chapters
    ========================================================================== */
 .rail { display: none; }
@@ -390,11 +527,25 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
 .chart .pt.hollow { fill: var(--ground); stroke: var(--teal); stroke-width: 2; }
 .chart .cross { stroke: var(--ash); stroke-width: 1; }
 .chart .hit { fill: transparent; cursor: crosshair; }
-.chart .line.anim { animation: draw 1.4s cubic-bezier(.45, 0, .2, 1) both; }
+.chart .line.anim, .chart .cmp.anim, .chart .curve.anim { animation: draw 1.4s cubic-bezier(.45, 0, .2, 1) both; }
+.chart text.tag { font-family: var(--sans); font-size: 13px; font-weight: 600; fill: var(--bone); }
 .chart .hit { touch-action: pan-y; }
 @keyframes draw { from { stroke-dashoffset: var(--len); stroke-dasharray: var(--len); } to { stroke-dashoffset: 0; stroke-dasharray: var(--len); } }
 
-.growth-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-top: 36px; }
+.growth-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; margin-top: 36px; }
+.growth-head .meta { margin-top: 2px; }
+.chart .cmp { fill: none; stroke: var(--muted-mark); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; transition: stroke .3s ease; }
+.chart .cmp.is-hi { stroke: var(--teal); stroke-width: 2.5; }
+.chart .cmp-hit { fill: none; stroke: transparent; stroke-width: 18; stroke-linecap: round; cursor: pointer; pointer-events: stroke; }
+.chart .pt.cmp-pt { fill: var(--muted-mark); }
+.chart .base { stroke: var(--ash); stroke-width: 1; stroke-dasharray: 3 4; }
+.chart .lead { stroke: var(--muted-mark); stroke-width: 1; stroke-dasharray: 1 3; }
+.chart text.end { font-family: var(--sans); font-size: 13px; fill: var(--ash); cursor: pointer; }
+.chart text.end.is-hi { fill: var(--bone); font-weight: 600; }
+.chart text.end .v { font-family: var(--mono); font-size: 12px; font-weight: 400; }
+.tip-row .key { width: 10px; height: 2px; border-radius: 1px; background: var(--muted-mark); }
+.tip-row .key.is-hi { height: 3px; background: var(--teal); }
+.tip-row b { margin-left: auto; padding-left: 14px; color: var(--bone); font-family: var(--mono); font-weight: 500; font-size: 12px; }
 .counter { display: grid; gap: 1px; margin-top: 56px; background: var(--hair); border-radius: 6px; overflow: hidden; }
 .counter > div { padding: 22px 22px 24px; background: var(--ground); }
 .counter .big { color: var(--bone); font-weight: 800; font-size: clamp(2.25rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -.045em; }
@@ -436,6 +587,41 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
 .rtp-rows { display: grid; gap: 2px; margin-top: 6px; }
 .rtp-split { margin: 10px 0 8px; display: grid; grid-template-columns: minmax(118px, 30%) minmax(0, 1fr); column-gap: 16px; }
 
+/* How far a budget goes */
+.play { display: grid; gap: 32px; }
+.play-calc { display: grid; gap: 22px; align-content: start; }
+.play-field { display: grid; gap: 10px; }
+.play-field .select { width: 100%; }
+.range-row { display: flex; align-items: center; gap: 16px; }
+.range-row output { min-width: 3ch; font-weight: 700; font-size: 1.25rem; letter-spacing: -.02em; text-align: right; }
+.range {
+  --p: 5%;
+  -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 32px; margin: 0;
+  background: none; cursor: pointer;
+}
+.range::-webkit-slider-runnable-track { height: 2px; border-radius: 1px; background: linear-gradient(to right, var(--teal) var(--p), var(--hair) var(--p)); }
+.range::-moz-range-track { height: 2px; border-radius: 1px; background: var(--hair); }
+.range::-moz-range-progress { height: 2px; border-radius: 1px; background: var(--teal); }
+.range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -10px; border: 0; border-radius: 50%; background: var(--bone); box-shadow: 0 0 0 4px var(--ground); }
+.range::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 50%; background: var(--bone); box-shadow: 0 0 0 4px var(--ground); }
+.range:focus-visible { outline: none; }
+.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--ground), 0 0 0 6px var(--teal); }
+.range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--ground), 0 0 0 6px var(--teal); }
+.play-out { padding: 20px 22px 22px; border-radius: 8px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--hair); }
+.play-out .big { margin-top: 8px; color: var(--bone); font-weight: 800; font-size: clamp(3rem, 5.4vw, 4.25rem); line-height: .92; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.play-out .big small { margin-left: 10px; color: var(--ash); font-weight: 600; font-size: 1rem; letter-spacing: -.01em; }
+.play-out p { margin-top: 12px; color: var(--ash); font-size: 15px; line-height: 1.5; }
+.play-out p strong { color: var(--bone); font-weight: 600; }
+.play-out .vs { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair); font-family: var(--mono); font-size: 12px; letter-spacing: .02em; }
+.chart .curve { fill: none; stroke: var(--muted-mark); stroke-width: 1.5; }
+.chart .dot { stroke: var(--ground); stroke-width: 2; pointer-events: none; }
+.chart .dot.na { fill: var(--teal); }
+.chart .dot.eu { fill: var(--bone); }
+.chart .ring { fill: none; stroke: var(--bone); stroke-width: 1.5; pointer-events: none; }
+.chart .dot-hit { fill: transparent; cursor: pointer; }
+.chart .dot-hit:focus-visible { outline: none; }
+.chart .dot-hit:focus-visible + .dot, .chart .dot-hit:hover + .dot { stroke: var(--bone); }
+
 /* ==========================================================================
    04 Studios
    ========================================================================== */
@@ -469,10 +655,40 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
 /* ==========================================================================
    06 Moves
    ========================================================================== */
+.timeline-fig { margin-top: 44px; }
+.timeline { position: relative; margin-top: 22px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); border-bottom: 1px solid var(--hair); }
+.tl-col { display: flex; flex-direction: column-reverse; align-items: center; gap: 7px; min-height: 84px; padding: 22px 0 12px; }
+.tl-col + .tl-col { box-shadow: inset 1px 0 0 rgba(69, 64, 63, .55); }
+.tl-dot {
+  flex: none; width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--bone); box-shadow: 0 0 0 2px var(--ground);
+  transition: transform .2s ease, opacity .25s ease;
+}
+.tl-dot.k-platform { background: var(--teal); }
+.tl-dot.k-market { background: var(--ground); box-shadow: inset 0 0 0 2px var(--bone), 0 0 0 2px var(--ground); }
+.tl-dot:hover, .tl-dot:focus-visible { transform: scale(1.3); }
+.tl-dot.is-off { opacity: .16; }
+.js .timeline:not(.is-in) .tl-dot { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .js .timeline.is-in .tl-dot { animation: rise .55s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: calc(var(--i) * 60ms); }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+.tl-months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); margin-top: 8px; }
+.tl-months span { text-align: center; font-family: var(--mono); font-size: 11px; letter-spacing: .02em; color: var(--ash); }
+.tl-now { position: absolute; z-index: 0; top: 0; bottom: -1px; border-left: 1px dashed var(--teal); pointer-events: none; }
+.tl-dot { position: relative; z-index: 1; }
+.tl-now span { position: absolute; top: 2px; left: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); white-space: nowrap; }
+.key.kind { width: 10px; height: 10px; border-radius: 50%; }
+.key.k-platform { background: var(--teal); }
+.key.k-content { background: var(--bone); }
+.key.k-market { background: none; box-shadow: inset 0 0 0 1.5px var(--bone); }
 .moves { margin-top: 22px; border-top: 1px solid var(--hair); }
-.move { display: grid; gap: 4px 24px; padding: 18px 0 20px; border-bottom: 1px solid var(--hair); }
+.move { display: grid; gap: 4px 24px; padding: 18px 0 20px; border-bottom: 1px solid var(--hair); scroll-margin-top: calc(var(--header-h) + 24px); }
 .move[hidden] { display: none; }
-.move-when { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--ash); }
+.move.is-flash { animation: flash 1.8s ease; }
+@keyframes flash { 0%, 35% { background: rgba(45, 212, 191, .10); } 100% { background: rgba(45, 212, 191, 0); } }
+.move-when { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--ash); }
+.move-when .key { flex: none; }
 .move h3 { font-weight: 600; font-size: 1.125rem; line-height: 1.3; letter-spacing: -.012em; }
 .move h3 .v { color: var(--ash); font-weight: 400; }
 .move p { color: var(--ash); font-size: 15px; }
@@ -542,10 +758,17 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
   .chapter { padding: 112px 0; }
   .counter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .move { grid-template-columns: 120px minmax(0, 1fr); }
-  .move-when { grid-row: 1 / span 3; padding-top: .3em; }
+  .move-when { grid-row: 1 / span 3; align-self: start; padding-top: .3em; }
   .method { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (min-width: 1100px) {
+  /* the map sets the row height; a long card scrolls inside it */
+  .world-stage { grid-template-columns: minmax(0, 1fr) 300px; }
+  .world-map { align-self: start; }
+  .world-card { contain: size; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--lift) transparent; }
+}
 @media (min-width: 900px) {
+  .play { grid-template-columns: minmax(250px, 1fr) minmax(0, 1.75fr); gap: 44px; align-items: start; }
   .map-layout { grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr); align-items: start; }
   .studio-layout { grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr); }
   .method { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -582,6 +805,8 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
 
   .hero { padding-top: calc(var(--header-h) + 72px); }
   .glance { margin-top: 72px; }
+  .world { margin-top: 72px; }
+  .controls.scroll-x { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
 
   .atlas { display: grid; grid-template-columns: minmax(180px, 21fr) minmax(0, 79fr); column-gap: clamp(32px, 4vw, 72px); }
   .rail {
@@ -634,6 +859,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     </ul>
   </nav>
 </header>
+<div class="progress" aria-hidden="true"><span></span></div>
 
 <main id="main" tabindex="-1">
 
@@ -643,17 +869,47 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     <p class="hero-intro">Where lotteries sell online, how fast eInstants grow, what players get back and who builds the games. Compiled from lottery lobbies, game rules, annual reports and public records, with a confidence grade on every figure.</p>
     <p class="hero-meta meta">By Adam Fonsica · Data retrieved <span data-k="meta.data_retrieved" data-fmt="date">24 Oct 2026</span> · <a href="#method">How it's built</a></p>
 
-    <figure class="glance" aria-labelledby="glance-title">
-      <div class="glance-head">
-        <h2 id="glance-title" class="glance-title">The <span data-k="register.lotteries">177</span> lotteries in the register, one square each</h2>
-        <ul class="legend" aria-label="Status">
-          <li><span class="key t-einstants"></span>eInstants online <span class="n" data-k="register.totals.einstants">72</span></li>
-          <li><span class="key t-online"></span>Other games online <span class="n" data-k="register.totals.online">56</span></li>
-          <li><span class="key t-planned"></span>Planned <span class="n" data-k="register.totals.planned">4</span></li>
-          <li><span class="key t-offline"></span>Not online <span class="n" data-k="register.totals.offline">45</span></li>
-        </ul>
+    <figure class="world" aria-labelledby="world-title">
+      <div class="world-head">
+        <h2 id="world-title" class="glance-title">The <span data-k="register.lotteries">177</span> lotteries in the register, country by country</h2>
+        <div class="world-controls">
+          <div class="controls scroll-x" id="world-regions" role="group" aria-label="Zoom to region">
+            <button class="chip" type="button" data-region="world" aria-pressed="true">World</button>
+            <button class="chip" type="button" data-region="europe" aria-pressed="false">Europe</button>
+            <button class="chip" type="button" data-region="namerica" aria-pressed="false">North America</button>
+            <button class="chip" type="button" data-region="latam" aria-pressed="false">Latin America</button>
+            <button class="chip" type="button" data-region="asia" aria-pressed="false">Asia</button>
+            <button class="chip" type="button" data-region="oceania" aria-pressed="false">Oceania</button>
+            <button class="chip" type="button" data-region="mea" aria-pressed="false">Africa &amp; Middle East</button>
+          </div>
+          <div class="pick"><span class="label" id="world-lens-label">Colour by</span>
+            <select class="select" id="world-lens" data-label="world-lens-label" aria-labelledby="world-lens-label"><option value="status">Online status</option></select>
+          </div>
+        </div>
       </div>
-      <div class="units" id="units" role="img" aria-label="Unit chart of 177 lotteries by region and online status. The table below lists every lottery."></div>
+      <div class="world-stage">
+        <div class="world-map" id="world-map" role="img" aria-label="World map of lotteries by online status. The country picker and the list below hold the same information."></div>
+        <aside class="world-card" id="world-card" aria-live="polite">
+          <p class="label">World</p>
+          <p class="world-card-lead"><span data-k="register.lotteries">177</span> lotteries in <span data-k="copy.world_countries">96</span> countries and territories. In <span data-k="copy.world_einstant_countries">41</span> of them, at least one lottery sells eInstants online.</p>
+          <p class="meta">Point at a country, or pick one below.</p>
+        </aside>
+      </div>
+      <div class="world-foot">
+        <ul class="legend" id="world-legend" aria-label="Key">
+          <li><span class="key t-einstants"></span>eInstants online</li>
+          <li><span class="key t-online"></span>Other games online</li>
+          <li><span class="key t-planned"></span>Planned</li>
+          <li><span class="key t-offline"></span>Not online</li>
+          <li class="map-only"><span class="key m-none"></span>Not in the register</li>
+          <li class="map-only"><span class="key pulse-key"></span>2026 deal or launch</li>
+        </ul>
+        <div class="pick"><span class="label" id="world-country-label">Country</span>
+          <select class="select" id="world-country" data-label="world-country-label" aria-labelledby="world-country-label"><option value="">World</option></select>
+        </div>
+      </div>
+      <p class="world-note meta map-only"><span id="world-rule">A country takes the colour of its furthest-along lottery.</span> Map: Natural Earth.</p>
+      <div class="units" id="units" hidden></div>
       <details class="table-view">
         <summary>Show all lotteries</summary>
         <div class="table-scroll"><table class="data" id="units-table"><thead><tr><th>Lottery</th><th>Country or state</th><th>Region</th><th>Status</th></tr></thead><tbody></tbody></table></div>
@@ -661,10 +917,10 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     </figure>
 
     <dl class="kpis">
-      <div class="kpi"><dt class="label">Lotteries in the register</dt><dd data-k="register.lotteries">177</dd></div>
-      <div class="kpi"><dt class="label">Online lobbies read</dt><dd data-k="catalog.lotteries">59</dd></div>
-      <div class="kpi"><dt class="label">eInstant listings catalogued</dt><dd data-k="catalog.games" data-fmt="int">4,362</dd></div>
-      <div class="kpi"><dt class="label">Verified studios</dt><dd data-k="studios.verified">20</dd></div>
+      <div class="kpi"><dt class="label">Lotteries in the register</dt><dd data-k="register.lotteries" data-count>177</dd></div>
+      <div class="kpi"><dt class="label">Online lobbies read</dt><dd data-k="catalog.lotteries" data-count>59</dd></div>
+      <div class="kpi"><dt class="label">eInstant listings catalogued</dt><dd data-k="catalog.games" data-fmt="int" data-count>4,362</dd></div>
+      <div class="kpi"><dt class="label">Verified studios</dt><dd data-k="studios.verified" data-count>20</dd></div>
     </dl>
   </section>
 
@@ -740,10 +996,17 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
           <h3 id="growth-fig-title" class="sr-only">eInstant sales by lottery and fiscal year</h3>
           <div class="series-picker" id="series-picker" role="group" aria-label="Choose a lottery"></div>
           <div class="growth-head">
-            <p class="fig-title" id="growth-chart-title">Virginia Lottery</p>
-            <p class="meta" id="growth-chart-sub">Online instant ticket sales, USD</p>
+            <div>
+              <p class="fig-title" id="growth-chart-title">Virginia Lottery</p>
+              <p class="meta" id="growth-chart-sub">Online instant ticket sales, USD</p>
+            </div>
+            <div class="controls" id="growth-mode" role="group" aria-label="View">
+              <button class="chip" type="button" data-mode="one" aria-pressed="true">One lottery</button>
+              <button class="chip" type="button" data-mode="compare" aria-pressed="false">Compare, FY2022 = 100</button>
+            </div>
           </div>
           <div class="chart" id="growth-chart" style="margin-top:14px"></div>
+          <div class="chart" id="growth-compare" style="margin-top:14px" hidden></div>
           <div class="fig-foot meta">
             <span>Fiscal years ending in June (Michigan: September). Hollow points are grade C (a single secondary source) or a partial first year. Metrics differ between lotteries, so compare the shape and the multiple, not the levels.</span>
             <span id="growth-sources"></span>
@@ -806,6 +1069,42 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
             <div class="table-scroll"><table class="data" id="rtp-table"><thead><tr><th>Lottery</th><th>Region</th><th class="r">Games</th><th class="r">Median</th><th class="r">Middle half</th><th class="r">Range</th></tr></thead><tbody></tbody></table></div>
           </details>
         </figure>
+
+        <figure class="fig reveal" aria-labelledby="play-title">
+          <h3 id="play-title" class="fig-title">How far a budget goes</h3>
+          <p class="fig-sub meta">On average, when every win is staked again until the money runs out</p>
+          <div class="play fig-body">
+            <div class="play-calc">
+              <div class="play-field">
+                <span class="label" id="play-lottery-label">Lottery</span>
+                <select class="select" id="play-lottery" data-label="play-lottery-label" aria-labelledby="play-lottery-label"></select>
+              </div>
+              <div class="play-field">
+                <label class="label" for="play-budget">Budget, in games</label>
+                <div class="range-row">
+                  <input class="range" type="range" id="play-budget" min="10" max="200" step="10" value="20">
+                  <output class="num" id="play-budget-out" for="play-budget">20</output>
+                </div>
+              </div>
+              <div class="play-out" id="play-out" aria-live="polite"></div>
+            </div>
+            <div>
+              <ul class="legend" aria-label="Key">
+                <li><span class="key dot dot-teal"></span>North America</li>
+                <li><span class="key dot dot-bone"></span>Europe and Asia-Pacific</li>
+              </ul>
+              <div class="chart play-chart" id="play-chart" style="margin-top:14px"></div>
+            </div>
+          </div>
+          <div class="fig-foot meta">
+            <span>Expected values at each lottery's median RTP: the games played are the budget divided by the share the lottery keeps (100% minus RTP). A budget of 20 buys 20 games at the start. Single sessions vary widely around these averages.</span>
+          </div>
+          <details class="table-view">
+            <summary>Show the table</summary>
+            <div class="table-scroll"><table class="data" id="play-table"><thead><tr><th>Lottery</th><th class="r">Median RTP</th><th class="r">Times the budget is staked</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </figure>
+        <p class="note reveal"><strong>What it means:</strong> the gap is wider than the percentages suggest. When every win is staked again, the same budget buys about <span data-k="copy.play_pa_se_x" data-fmt="x">4.5</span> times as many games in Pennsylvania as in Sweden.</p>
       </section>
 
       <!-- 04 ============================================================ -->
@@ -870,6 +1169,15 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         <p class="kicker label"><span class="idx">06</span>2026 moves</p>
         <h2 id="moves-title" class="chapter-title reveal">Platforms and content: what changed in 2026</h2>
         <p class="dek reveal">Contract awards, renewals and launches from public sources, newest first. Fennica Gaming stands out, with new eInstant deals in Québec, Estonia and Italy.</p>
+        <figure class="fig reveal timeline-fig" aria-labelledby="timeline-title">
+          <h3 id="timeline-title" class="fig-title">2026, month by month</h3>
+          <ul class="legend" style="margin-top:12px" aria-label="Key">
+            <li><span class="key kind k-platform"></span>Platforms</li>
+            <li><span class="key kind k-content"></span>Content</li>
+            <li><span class="key kind k-market"></span>Markets</li>
+          </ul>
+          <div class="timeline" id="timeline" role="group" aria-label="2026 moves by month. Select one to jump to it in the list."></div>
+        </figure>
         <div class="fig reveal">
           <div class="controls" id="move-filter" role="group" aria-label="Filter">
             <button class="chip" type="button" data-kind="all" aria-pressed="true">All</button>
@@ -888,12 +1196,12 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         <p class="dek reveal">Lotteries, studios, platform suppliers and investors use game-level data to price games, plan portfolios and size markets. The full dataset comes as a data pack with a briefing, or as part of an advisory engagement.</p>
 
         <div class="pack reveal">
-          <div><p class="big"><span data-k="pack.games" data-fmt="int">4,362</span></p><h3>Listings</h3><p>Every eInstant listing in <span data-k="pack.lotteries">59</span> online lobbies, <span data-k="catalog.unique_titles" data-fmt="int">3,311</span> unique titles: price points, top prize, RTP, studio, mechanics and source.</p></div>
-          <div><p class="big"><span data-k="pack.prize_rows" data-fmt="k">937k</span></p><h3>Prize-table rows</h3><p>Prize tiers and odds parsed from published game rules.</p></div>
+          <div><p class="big"><span data-k="pack.games" data-fmt="int" data-count>4,362</span></p><h3>Listings</h3><p>Every eInstant listing in <span data-k="pack.lotteries">59</span> online lobbies, <span data-k="catalog.unique_titles" data-fmt="int">3,311</span> unique titles: price points, top prize, RTP, studio, mechanics and source.</p></div>
+          <div><p class="big"><span data-k="pack.prize_rows" data-fmt="k" data-count>937k</span></p><h3>Prize-table rows</h3><p>Prize tiers and odds parsed from published game rules.</p></div>
           <div><p class="big">Daily</p><h3>Lobby scans</h3><p>New games, removals and lobby movers, scanned every day since October 2026.</p></div>
-          <div><p class="big"><span data-k="pack.sales_points">145</span></p><h3>Sales data points</h3><p>eInstant and iLottery sales back to 2015, each with its source and grade.</p></div>
-          <div><p class="big"><span data-k="pack.contracts">30</span></p><h3>Contracts and market events</h3><p>Platform and content contracts with terms, extensions and status, plus related market events.</p></div>
-          <div><p class="big"><span data-k="pack.michigan_game_months" data-fmt="int">3,158</span></p><h3>Game-months</h3><p>Michigan's per-game sales, 2019 to 2021: launch curves, lifetimes and provider shares.</p></div>
+          <div><p class="big"><span data-k="pack.sales_points" data-count>145</span></p><h3>Sales data points</h3><p>eInstant and iLottery sales back to 2015, each with its source and grade.</p></div>
+          <div><p class="big"><span data-k="pack.contracts" data-count>30</span></p><h3>Contracts and market events</h3><p>Platform and content contracts with terms, extensions and status, plus related market events.</p></div>
+          <div><p class="big"><span data-k="pack.michigan_game_months" data-fmt="int" data-count>3,158</span></p><h3>Game-months</h3><p>Michigan's per-game sales, 2019 to 2021: launch curves, lifetimes and provider shares.</p></div>
         </div>
 
         <div class="locked reveal">
@@ -920,7 +1228,7 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         <div class="method">
           <div>
             <h3>Sources</h3>
-            <p>Lottery lobbies and game rules, read from each lottery's public website or feed. Annual reports, financial statements and public records, including freedom-of-information releases. Procurement records and press releases from lotteries and suppliers.</p>
+            <p>Lottery lobbies and game rules, read from each lottery's public website or feed. Annual reports, financial statements and public records, including freedom-of-information releases. Procurement records and press releases from lotteries and suppliers. Country shapes from Natural Earth, via world-atlas.</p>
           </div>
           <div>
             <h3>Confidence grades</h3>
@@ -1047,6 +1355,137 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
     el.addEventListener('focus', () => { const [x, y] = tipAt(anchor || el); showTip(x, y, build, el); });
     el.addEventListener('blur', hideTip);
   };
+
+  /* ---------- Dropdown ----------
+     A native select menu follows the system theme (light on most Macs), so the page draws its own:
+     the select-only combobox pattern from the WAI-ARIA practices. The hidden select keeps the value
+     and fires the change events; setValue() updates both from code. */
+  const pickers = new Map();
+  function picker(sel) {
+    if (pickers.has(sel)) { pickers.get(sel)(); return; }
+    const id = sel.id + '-dd';
+    const wrap = h('div', 'dd');
+    const box = h('div', 'select dd-box');
+    const attrs = { id: id + '-box', role: 'combobox', tabindex: '0', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': id + '-list' };
+    if (sel.dataset.label) attrs['aria-labelledby'] = `${sel.dataset.label} ${id}-box`;
+    for (const k in attrs) box.setAttribute(k, attrs[k]);
+    const list = h('div', 'dd-list');
+    list.id = id + '-list';
+    list.setAttribute('role', 'listbox');
+    if (sel.dataset.label) list.setAttribute('aria-labelledby', sel.dataset.label);
+    list.hidden = true;
+    wrap.append(box, list);
+    sel.hidden = true;
+    sel.after(wrap);
+
+    let opts = [], active = -1, typed = '', typedAt = 0, lx = -1, ly = -1;
+    const refresh = () => { const o = sel.options[sel.selectedIndex]; box.textContent = o ? o.textContent : ''; };
+    const option = (o) => {
+      const el = h('div', 'dd-opt', o.textContent);
+      el.id = `${id}-${opts.length}`;
+      el.setAttribute('role', 'option');
+      el.setAttribute('aria-selected', String(o.selected));
+      el.dataset.i = opts.length;
+      opts.push({ o, el });
+      return el;
+    };
+    const build = () => {
+      opts = [];
+      list.replaceChildren();
+      Array.from(sel.children).forEach((n) => {
+        if (n.tagName !== 'OPTGROUP') { list.appendChild(option(n)); return; }
+        const g = h('div', 'dd-group');
+        const name = h('div', 'dd-group-name', n.label);
+        name.id = `${id}-g${list.children.length}`;
+        g.setAttribute('role', 'group');
+        g.setAttribute('aria-labelledby', name.id);
+        g.appendChild(name);
+        Array.from(n.children).forEach((o) => g.appendChild(option(o)));
+        list.appendChild(g);
+      });
+    };
+    const setActive = (i, center) => {
+      if (opts[active]) opts[active].el.classList.remove('is-active');
+      active = Math.max(0, Math.min(opts.length - 1, i));
+      const el = opts[active].el;
+      el.classList.add('is-active');
+      box.setAttribute('aria-activedescendant', el.id);
+      const top = el.offsetTop, bottom = top + el.offsetHeight;
+      if (center) list.scrollTop = top - (list.clientHeight - el.offsetHeight) / 2;
+      else if (top < list.scrollTop) list.scrollTop = top - 6;
+      else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 6;
+    };
+    const open = () => {
+      if (!list.hidden) return;
+      build();
+      list.hidden = false;
+      wrap.classList.add('is-open');
+      box.setAttribute('aria-expanded', 'true');
+      // open upwards when there is more room above than below
+      const r = box.getBoundingClientRect(), roof = $('#masthead').getBoundingClientRect().bottom;
+      const below = innerHeight - r.bottom, need = Math.min(list.scrollHeight, 380) + 12;
+      wrap.classList.toggle('is-up', below < need && r.top - roof > below);
+      // a box on the right half of the screen opens its list leftwards
+      wrap.classList.toggle('is-right', r.left + r.width / 2 > innerWidth / 2);
+      setActive(Math.max(0, sel.selectedIndex), true);
+    };
+    const close = (refocus) => {
+      if (list.hidden) return;
+      list.hidden = true;
+      wrap.classList.remove('is-open', 'is-up');
+      box.setAttribute('aria-expanded', 'false');
+      box.removeAttribute('aria-activedescendant');
+      if (refocus) box.focus();
+    };
+    const choose = (i) => {
+      const o = opts[i] && opts[i].o;
+      close(true);
+      if (!o || o.selected) return;
+      sel.value = o.value;
+      refresh();
+      sel.dispatchEvent(new Event('change'));
+    };
+
+    box.addEventListener('click', () => (list.hidden ? open() : close(true)));
+    list.addEventListener('mousedown', (e) => e.preventDefault());   // keep focus on the box
+    list.addEventListener('click', (e) => { const el = e.target.closest('.dd-opt'); if (el) choose(+el.dataset.i); });
+    list.addEventListener('pointermove', (e) => {
+      if (e.clientX === lx && e.clientY === ly) return;   // the list scrolled under a still pointer
+      lx = e.clientX; ly = e.clientY;
+      const el = e.target.closest('.dd-opt');
+      if (el && +el.dataset.i !== active) setActive(+el.dataset.i);
+    });
+    box.addEventListener('keydown', (e) => {
+      const k = e.key, typing = performance.now() - typedAt < 800;
+      if (k.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey && (k !== ' ' || typing)) {
+        // type-ahead: jump to the first option that starts with what was typed
+        e.preventDefault();
+        typed = (typing ? typed : '') + k.toLowerCase();
+        typedAt = performance.now();
+        open();
+        const from = typed.length === 1 ? active + 1 : active;
+        for (let n = 0; n < opts.length; n++) {
+          const i = (from + n) % opts.length;
+          if (opts[i].o.textContent.toLowerCase().startsWith(typed)) { setActive(i); break; }
+        }
+        return;
+      }
+      if (list.hidden) {
+        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(k)) { e.preventDefault(); open(); }
+        return;
+      }
+      const go = { ArrowDown: active + 1, ArrowUp: active - 1, Home: 0, End: opts.length - 1, PageDown: active + 8, PageUp: active - 8 }[k];
+      if (go != null) { e.preventDefault(); setActive(go); }
+      else if (k === 'Enter' || k === ' ') { e.preventDefault(); choose(active); }
+      else if (k === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+      else if (k === 'Tab') close(false);
+    });
+    box.addEventListener('focusout', (e) => { if (e.relatedTarget && !wrap.contains(e.relatedTarget)) close(false); });
+    document.addEventListener('pointerdown', (e) => { if (!wrap.contains(e.target)) close(false); });
+    refresh();
+    pickers.set(sel, refresh);
+  }
+  const setValue = (sel, v) => { sel.value = v; const refresh = pickers.get(sel); if (refresh) refresh(); };
 
   /* ---------- Reveal on scroll ---------- */
   const seen = (el, fn) => {
@@ -1189,22 +1628,46 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       const f = FMT[el.dataset.fmt];
       el.textContent = f ? f(v) : (typeof v === 'number' ? int(v) : String(v));
     });
+    document.querySelectorAll('[data-count]').forEach((el) => countUp(el, lookup(A, el.dataset.k), FMT[el.dataset.fmt] || int));
 
     units(A.register);
+    world(A);
     tileMap(A.register);
     growth(A.growth);
     uk(A.uk);
     rtp(A.catalog.rtp);
+    play(A.catalog.rtp);
     studios(A.studios);
     curve(A.launch, A.copy);
     moves(A.moves);
     sample(A.pack.sample);
   }
 
-  /* ---------- Hero: one square per lottery ---------- */
-  function units(reg) {
+  // Key figures count up once, the first time they are seen; the final text is the formatted value
+  function countUp(el, v, f) {
+    if (typeof v !== 'number' || still.matches || !('IntersectionObserver' in window)) return;
+    const end = el.textContent;
+    el.textContent = f(0);
+    seen(el, () => {
+      const t0 = performance.now();
+      const tick = (now) => {
+        const k = Math.min(1, (now - t0) / 1500);
+        el.textContent = k < 1 ? f(v * (1 - Math.pow(1 - k, 4))) : end;
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }
+
+  /* ---------- Hero: all lotteries as a list, and one square each if the map cannot load ---------- */
+  function units(reg, squares) {
     const host = $('#units');
     const tbody = $('#units-table tbody');
+    if (!squares) {
+      reg.units.forEach((u) => tbody.appendChild(row([u.name, u.place, u.region, TIER[u.tier]])));
+      return;
+    }
+    host.hidden = false;
     let i = 0;
     reg.regions.forEach((g) => {
       const list = reg.units.filter((u) => u.region === g.region);
@@ -1221,11 +1684,307 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         b.style.setProperty('--i', i++);
         bindTip(b, (el) => tipLines(el, u.name, u.place, TIER[u.tier]));
         grid.appendChild(b);
-        tbody.appendChild(row([u.name, u.place, u.region, TIER[u.tier]]));
       });
       box.appendChild(grid);
       host.appendChild(box);
     });
+    seen(host, () => host.classList.add('is-in'));
+  }
+
+  /* ---------- Hero: the world map ---------- */
+  // Country shapes: Natural Earth 1:110m from world-atlas, drawn in the Equal Earth projection
+  const WORLD_URL = 'countries-110m.json';   // world-atlas 2.0.2, served unchanged; licence beside it
+  function world(A) {
+    fetch(WORLD_URL)
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then((topo) => worldMap(A, topo))
+      .catch((err) => {
+        // Without the shapes the hero falls back to one square per lottery
+        console.warn('iLottery Atlas: the world map could not load', err);
+        $('.world').classList.add('no-map');
+        units(A.register, true);
+      });
+  }
+  const REGIONS = {   // west, south, east, north
+    world: null, europe: [-25, 34, 45, 71], namerica: [-170, 7, -50, 72],
+    latam: [-120, -56, -30, 33], asia: [65, -11, 150, 55], oceania: [110, -48, 180, -8], mea: [-20, -36, 65, 43],
+  };
+  const project = (lon, lat) => {
+    const A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    const l = lon * Math.PI / 180, t = Math.asin(M * Math.sin(lat * Math.PI / 180));
+    const t2 = t * t, t6 = t2 * t2 * t2;
+    return [
+      160 * l * Math.cos(t) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))),
+      -160 * t * (A1 + A2 * t2 + t6 * (A3 + A4 * t2)),
+    ];
+  };
+  const decodeTopo = (topo) => {
+    const [kx, ky] = topo.transform.scale, [dx, dy] = topo.transform.translate;
+    const arcs = topo.arcs.map((arc) => {
+      let x = 0, y = 0;
+      return arc.map(([a, b]) => { x += a; y += b; return [x * kx + dx, y * ky + dy]; });
+    });
+    const ring = (ids) => {
+      const pts = [];
+      ids.forEach((i, n) => {
+        const a = i < 0 ? arcs[~i].slice().reverse() : arcs[i];
+        (n ? a.slice(1) : a).forEach((p) => pts.push(p));
+      });
+      return pts;
+    };
+    return topo.objects.countries.geometries
+      .filter((g) => g.arcs && g.id !== '010')   // no Antarctica
+      .map((g) => ({ id: g.id, polys: (g.type === 'Polygon' ? [g.arcs] : g.arcs).map((p) => p.map(ring)) }));
+  };
+  const line = (pts) => 'M' + pts.map(([lon, lat]) => project(lon, lat).map((v) => v.toFixed(1)).join(',')).join('L');
+
+  function worldMap(A, topo) {
+    const host = $('#world-map');
+    const card = $('#world-card');
+    const chips = $('#world-regions');
+    const lensSel = $('#world-lens');
+    const countrySel = $('#world-country');
+    const beside = matchMedia('(min-width: 1100px)');   // the card sits next to the map
+    const byIso = new Map(A.world.countries.map((c) => [c.iso, c]));
+    const top = h('div', 'world-top');
+    top.appendChild(h('p', 'label', 'Most eInstants catalogued'));
+    const topList = h('ol');
+    A.world.countries.filter((c) => c.listings).sort((a, b) => b.listings - a.listings).slice(0, 5).forEach((c) => {
+      const b = h('button');
+      b.type = 'button';
+      b.dataset.iso = c.iso;
+      b.append(h('span', '', c.name), h('span', 'num', int(c.listings)));
+      const li = h('li');
+      li.appendChild(b);
+      topList.appendChild(li);
+    });
+    top.appendChild(topList);
+    card.appendChild(top);
+    const intro = Array.from(card.childNodes).map((n) => n.cloneNode(true));
+    const shapes = decodeTopo(topo);
+
+    const svg = s('svg', { 'aria-hidden': 'true' });
+    // The map's outline clips whatever is drawn past the antimeridian
+    const edge = [];
+    for (let lat = 90; lat >= -90; lat -= 2) edge.push([-180, lat]);
+    for (let lat = -90; lat <= 90; lat += 2) edge.push([180, lat]);
+    s('path', { d: line(edge) + 'Z' }, s('clipPath', { id: 'world-clip' }, s('defs', {}, svg)));
+    const grat = s('g', { 'clip-path': 'url(#world-clip)' }, svg);
+    for (let lon = -150; lon <= 150; lon += 30) {
+      const pts = []; for (let lat = -80; lat <= 85; lat += 5) pts.push([lon, lat]);
+      s('path', { class: 'grat', d: line(pts) }, grat);
+    }
+    for (let lat = -60; lat <= 60; lat += 30) {
+      const pts = []; for (let lon = -180; lon <= 180; lon += 5) pts.push([lon, lat]);
+      s('path', { class: 'grat', d: line(pts) }, grat);
+    }
+
+    // Countries, and points for places too small for the map. A pulse sits at the
+    // centroid of the country's largest polygon. A polygon that crosses the antimeridian
+    // (Russia, the Aleutians, Fiji) is drawn twice, shifted east and west of it.
+    const lands = s('g', { 'clip-path': 'url(#world-clip)' }, svg);
+    const items = [];
+    const anchors = new Map();
+    const crosses = (r) => r.some((p, i) => i > 0 && Math.abs(p[0] - r[i - 1][0]) > 180);
+    const shift = (poly, east) => poly.map((r) => r.map(([lon, lat]) => [east ? (lon < 0 ? lon + 360 : lon) : (lon > 0 ? lon - 360 : lon), lat]));
+    shapes.forEach((g) => {
+      const polys = g.polys.flatMap((p) => (p.some(crosses) ? [shift(p, true), shift(p, false)] : [p]));
+      const d = polys.map((p) => p.map((r) => line(r) + 'Z').join('')).join('');
+      const el = s('path', { class: 'land', d }, lands);
+      let best = 0;
+      polys.forEach((p) => {
+        const pts = p[0].map(([lon, lat]) => project(lon, lat));
+        let a = 0, cx = 0, cy = 0;
+        pts.forEach(([x0, y0], i) => {
+          const [x1, y1] = pts[(i + 1) % pts.length];
+          const f = x0 * y1 - x1 * y0;
+          a += f; cx += (x0 + x1) * f; cy += (y0 + y1) * f;
+        });
+        if (Math.abs(a) > best) { best = Math.abs(a); anchors.set(g.id, [cx / (3 * a), cy / (3 * a)]); }
+      });
+      items.push({ el, c: byIso.get(g.id) || null });
+    });
+    const drawn = new Set(shapes.map((g) => g.id));
+    const marks = s('g', {}, svg);
+    Object.entries(A.world.markers).forEach(([iso, [lat, lon]]) => {
+      if (drawn.has(iso) || !byIso.has(iso)) return;
+      const [x, y] = project(lon, lat);
+      anchors.set(iso, [x, y]);
+      const el = s('circle', { class: 'land mark', cx: x, cy: y, r: 3 }, marks);
+      items.push({ el, c: byIso.get(iso), mark: true });
+    });
+    // 2026 deals and launches
+    const pulses = s('g', {}, svg);
+    const pulseAt = [];
+    new Set(A.moves.flatMap((m) => m.iso || [])).forEach((iso) => {
+      const p = anchors.get(iso);
+      if (!p) return;
+      pulseAt.push(s('circle', { class: 'pulse-dot', cx: p[0], cy: p[1], r: 1.6 }, pulses));
+      pulseAt.push(s('circle', { class: 'pulse', cx: p[0], cy: p[1], r: 3.2 }, pulses));
+    });
+    host.appendChild(svg);
+
+    // View box: the whole world, or a region at the same aspect so the map keeps its size
+    const all = [];
+    shapes.forEach((g) => g.polys.forEach((p) => p[0].forEach(([lon, lat]) => all.push(project(lon, lat)))));
+    const fx = all.map((q) => q[0]), fy = all.map((q) => q[1]);
+    const full = [Math.min(...fx) - 8, Math.min(...fy) - 8, Math.max(...fx) - Math.min(...fx) + 16, Math.max(...fy) - Math.min(...fy) + 16];
+    host.style.aspectRatio = (full[2] / full[3]).toFixed(3);
+    const boxOf = (b) => {
+      if (!b) return full.slice();
+      const [w, so, e, n] = b, pts = [];
+      for (let i = 0; i <= 12; i++) {
+        const lon = w + (e - w) * i / 12, lat = so + (n - so) * i / 12;
+        pts.push(project(lon, so), project(lon, n), project(w, lat), project(e, lat));
+      }
+      const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+      let x0 = Math.min(...xs), y0 = Math.min(...ys), bw = Math.max(...xs) - x0, bh = Math.max(...ys) - y0;
+      const aspect = full[2] / full[3];
+      if (bw / bh > aspect) { const nh = bw / aspect; y0 -= (nh - bh) / 2; bh = nh; } else { const nw = bh * aspect; x0 -= (nw - bw) / 2; bw = nw; }
+      // stay inside the drawn world: no empty ocean past the antimeridian
+      x0 = Math.min(Math.max(x0, full[0]), full[0] + full[2] - bw);
+      y0 = Math.min(Math.max(y0, full[1]), full[1] + full[3] - bh);
+      return [x0, y0, bw, bh];
+    };
+    let vb = full.slice(), anim = 0;
+    const setVB = (v) => {
+      svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' '));
+      const k = v[2] / full[2];   // points and pulses keep their size on screen
+      items.forEach((it) => { if (it.mark) it.el.setAttribute('r', (3.2 * k).toFixed(2)); });
+      pulseAt.forEach((el) => el.setAttribute('r', ((el.classList.contains('pulse') ? 3.2 : 1.6) * k).toFixed(2)));
+    };
+    setVB(vb);
+    const zoomTo = (target) => {
+      cancelAnimationFrame(anim);
+      if (still.matches) { vb = target; setVB(vb); return; }
+      const from = vb.slice(), t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 900);
+        const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        vb = from.map((f, i) => f + (target[i] - f) * e);
+        setVB(vb);
+        if (k < 1) anim = requestAnimationFrame(step);
+      };
+      anim = requestAnimationFrame(step);
+    };
+    const setRegion = (key) => {
+      chips.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.region === key)));
+      zoomTo(boxOf(REGIONS[key]));
+    };
+    const regionOf = (c) => (c.iso === '036' || c.iso === '554' ? 'oceania'
+      : { Europe: 'europe', 'North America': 'namerica', 'Latin America': 'latam', 'Asia-Pacific': 'asia' }[c.region] || 'mea');
+
+    // Colour: online status, or one studio's footprint
+    let lens = 'status', selected = null;
+    const live = (c) => (A.world.footprints[lens] || []).includes(c.iso);
+    const paint = () => {
+      items.forEach((it) => {
+        const cls = !it.c ? '' : lens === 'status' ? ' c-' + it.c.tier : live(it.c) ? ' c-lens' : ' c-dim';
+        it.el.setAttribute('class', `land${it.mark ? ' mark' : ''}${cls}${it === selected ? ' is-sel' : ''}`);
+      });
+      const legend = $('#world-legend');
+      legend.replaceChildren();
+      const keys = lens === 'status'
+        ? [['t-einstants', 'eInstants online'], ['t-online', 'Other games online'], ['t-planned', 'Planned'], ['m-off', 'Not online'], ['m-none', 'Not in the register']]
+        : [['t-einstants', `${lens} live`], ['m-dim', 'Not in the lobbies we read'], ['m-none', 'Not in the register']];
+      keys.concat([['pulse-key', '2026 deal or launch']]).forEach(([k, label]) => {
+        const li = h('li'); li.appendChild(h('span', 'key ' + k)); li.appendChild(document.createTextNode(label)); legend.appendChild(li);
+      });
+      $('#world-rule').textContent = lens === 'status'
+        ? 'A country takes the colour of its furthest-along lottery.'
+        : `A country is teal where a lottery lobby we read lists ${lens} games.`;
+    };
+
+    const show = (c) => {
+      if (!c) { card.replaceChildren(...intro.map((n) => n.cloneNode(true))); return; }
+      card.replaceChildren();
+      card.appendChild(h('p', 'label', c.region));
+      card.appendChild(h('h3', '', c.name));
+      const st = h('p', 'status');
+      st.appendChild(h('span', 'key t-' + c.tier));
+      st.appendChild(document.createTextNode(TIER[c.tier]));
+      card.appendChild(st);
+      const n = c.lotteries.length, ein = c.lotteries.filter((l) => l.tier === 'einstants').length;
+      if (n > 1) card.appendChild(h('p', 'meta', `${n} lotteries · ${ein} with eInstants online`));
+      const ul = h('ul');
+      const shown = n > 4 ? 3 : n;
+      c.lotteries.slice(0, shown).forEach((l) => {
+        const li = h('li'); li.appendChild(h('span', 'key t-' + l.tier)); li.appendChild(h('span', '', l.name)); ul.appendChild(li);
+      });
+      if (n > shown) { const li = h('li', 'more'); li.appendChild(h('span')); li.appendChild(h('span', '', `and ${n - shown} more`)); ul.appendChild(li); }
+      card.appendChild(ul);
+      const dl = h('dl');
+      const add = (k, v) => { dl.appendChild(h('dt', '', k)); dl.appendChild(h('dd', '', v)); };
+      if (c.listings) add('Listings', int(c.listings) + ' eInstants catalogued');
+      if (c.rtp_median) add('RTP', `${c.rtp_median}% median`);
+      if (c.studios && c.studios.length) add('Studios', c.studios.join(', '));
+      if (lens !== 'status') add(lens, live(c) ? 'Live here' : 'Not in the lobbies we read');
+      const here = A.moves.filter((m) => (m.iso || []).includes(c.iso)).sort((a, b) => b.month.localeCompare(a.month));
+      here.slice(0, 2).forEach((m) => {
+        add(monthLabel(m.month, 'month'), m.text);
+        dl.lastChild.appendChild(h('span', 'dd-meta', `${m.lottery.replace(/\s*\(.*\)$/, '')} · ${m.vendor}`));
+      });
+      if (dl.childNodes.length) card.appendChild(dl);
+      const link = (text, href) => { const a = h('a', 'card-link', text); a.href = href; card.appendChild(a); };
+      if (here.length > 2) link(`All ${here.length} moves in chapter 06`, '#moves');
+      if (c.iso === '840') link('State by state in chapter 01', '#online');
+      if (c.iso === '124') link('Province by province in chapter 01', '#online');
+    };
+    const fit = () => {
+      card.scrollTop = 0;
+      card.classList.toggle('is-long', card.scrollHeight > card.clientHeight + 2);
+      card.classList.remove('at-end');
+    };
+    const showFit = (c) => { show(c); fit(); };
+    card.addEventListener('scroll', () => card.classList.toggle('at-end', card.scrollTop + card.clientHeight >= card.scrollHeight - 2), { passive: true });
+    const select = (it) => {
+      selected = it;
+      paint();
+      showFit(it ? it.c : null);
+      setValue(countrySel, it ? it.c.iso : '');
+    };
+    // Shortcuts in the intro card select a country and light it up on hover
+    const itemOf = (el) => { const b = el.closest && el.closest('[data-iso]'); return b ? items.find((x) => x.c && x.c.iso === b.dataset.iso) : null; };
+    card.addEventListener('click', (e) => { const it = itemOf(e.target); if (it) { select(it); setRegion(regionOf(it.c)); } });
+    card.addEventListener('pointerover', (e) => { const it = itemOf(e.target); if (it) it.el.classList.add('is-hot'); });
+    card.addEventListener('pointerout', (e) => { const it = itemOf(e.target); if (it) it.el.classList.remove('is-hot'); });
+
+    items.forEach((it) => {
+      if (!it.c) return;
+      const c = it.c;
+      it.el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { it.el.classList.add('is-hot'); showFit(c); } });
+      it.el.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse' || beside.matches) return;
+        showTip(e.clientX, e.clientY, (el) => tipLines(el, c.name, TIER[c.tier], c.lotteries.length > 1 ? `${c.lotteries.length} lotteries` : c.lotteries[0].name), host);
+      });
+      it.el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        it.el.classList.remove('is-hot');
+        hideTip();
+        showFit(selected ? selected.c : null);
+      });
+      it.el.addEventListener('click', () => select(selected === it ? null : it));
+    });
+
+    chips.addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (b) setRegion(b.dataset.region);
+    });
+    const group = h('optgroup');
+    group.label = 'Where a studio is live';
+    Object.keys(A.world.footprints).forEach((name) => { const o = h('option', '', name); o.value = name; group.appendChild(o); });
+    lensSel.appendChild(group);
+    lensSel.addEventListener('change', () => { lens = lensSel.value; paint(); showFit(selected ? selected.c : null); });
+    A.world.countries.forEach((c) => { const o = h('option', '', c.name); o.value = c.iso; countrySel.appendChild(o); });
+    picker(lensSel);
+    picker(countrySel);
+    countrySel.addEventListener('change', () => {
+      const it = items.find((x) => x.c && x.c.iso === countrySel.value) || null;
+      select(it);
+      setRegion(it ? regionOf(it.c) : 'world');
+    });
+
+    paint();
     seen(host, () => host.classList.add('is-in'));
   }
 
@@ -1356,8 +2115,13 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
   function growth(series) {
     const picker = $('#series-picker');
     const host = $('#growth-chart');
+    const cmpHost = $('#growth-compare');
+    const modes = $('#growth-mode');
+    const title = $('#growth-chart-title');
+    const sub = $('#growth-chart-sub');
     const tbody = $('#growth-table tbody');
-    let chart = null, picked = false;
+    const buttons = new Map();
+    let chart = null, cmp = null, picked = false, mode = 'one', current = series[0];
 
     const cfgFor = (sr) => {
       const pts = sr.points.map((p) => ({ x: p.fy, y: p.v, hollow: p.grade === 'C' || p.partial, floor: p.floor, grade: p.grade, derived: p.derived, partial: p.partial }));
@@ -1378,11 +2142,12 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       };
     };
 
-    const pick = (sr, btn) => {
-      picked = true;
-      picker.querySelectorAll('.series').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      $('#growth-chart-title').textContent = sr.lottery;
-      $('#growth-chart-sub').textContent = sr.metric + ', USD';
+    const render = () => {
+      const sr = current;
+      buttons.forEach((b, id) => b.setAttribute('aria-pressed', String(id === sr.id)));
+      modes.querySelectorAll('.chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+      host.hidden = mode !== 'one';
+      cmpHost.hidden = mode !== 'compare';
       const src = $('#growth-sources');
       src.replaceChildren(document.createTextNode('Source: '));
       sr.sources.forEach((u, i) => {
@@ -1391,11 +2156,34 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
         a.href = u; a.target = '_blank'; a.rel = 'noopener';
         src.appendChild(a);
       });
-      if (!chart) chart = lineChart(host, cfgFor(sr));
-      else chart.redraw(cfgFor(sr));
+      if (mode === 'one') {
+        title.textContent = sr.lottery;
+        sub.textContent = sr.metric + ', USD';
+        if (!chart) chart = lineChart(host, cfgFor(sr));
+        else chart.redraw(cfgFor(sr));
+      } else {
+        title.textContent = `Every lottery against its own FY${BASE_FY}`;
+        sub.textContent = `eInstant sales, FY${BASE_FY} = 100. Highlighted: ${sr.label}`;
+        if (!cmp) cmp = compareChart(cmpHost, series, (id) => { current = series.find((x) => x.id === id); render(); });
+        cmp.highlight(sr.id);
+      }
     };
+    const pick = (sr) => {
+      picked = true;
+      current = sr;
+      if (mode === 'compare' && !comparable(sr)) mode = 'one';   // no FY2022 base to index against
+      render();
+    };
+    modes.addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      picked = true;
+      mode = b.dataset.mode;
+      if (mode === 'compare' && !comparable(current)) current = series.find(comparable);
+      render();
+    });
 
-    series.forEach((sr, i) => {
+    series.forEach((sr) => {
       const b = h('button', 'series');
       b.type = 'button';
       b.setAttribute('aria-pressed', 'false');
@@ -1416,11 +2204,136 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       s('path', { d: pts.map((p, j) => (j ? 'L' : 'M') + xs(j) + ',' + (28 - p.v / max * 26)).join(''), fill: 'none', stroke: mult && mult.x < 1 ? '#A59F99' : '#2DD4BF', 'stroke-width': 1.5, 'vector-effect': 'non-scaling-stroke' }, sv);
       b.appendChild(sv);
       b.setAttribute('aria-label', `${sr.label}: ${mult ? mult.x.toFixed(1) + ' times from FY' + mult.from + ' to FY' + mult.to : usd(latest.v) + ' in FY' + latest.fy}`);
-      b.addEventListener('click', () => pick(sr, b));
+      b.addEventListener('click', () => pick(sr));
+      buttons.set(sr.id, b);
       picker.appendChild(b);
       sr.points.forEach((p) => tbody.appendChild(row([sr.lottery, sr.metric, 'FY' + p.fy + (p.partial ? ' (partial)' : ''), (p.floor ? '> ' : '') + int(p.v), p.grade], [3])));
-      if (i === 0) seen(host, () => { if (!picked) pick(sr, b); });
     });
+    seen(host, () => { if (!picked) render(); });
+  }
+
+  /* ---------- 02: Every lottery indexed to its own FY2022 ---------- */
+  const BASE_FY = 2022;
+  const comparable = (sr) => sr.points.some((p) => p.fy === BASE_FY && !p.partial && !p.floor);
+  function compareChart(host, series, onPick) {
+    const rows = series.filter(comparable).map((sr) => {
+      const base = sr.points.find((p) => p.fy === BASE_FY).v;
+      return { sr, pts: sr.points.filter((p) => p.fy >= BASE_FY && !p.partial && !p.floor).map((p) => ({ x: p.fy, y: p.v / base * 100 })) };
+    });
+    // End at the latest year that at least half of the lotteries have reported
+    const x0 = BASE_FY;
+    const x1 = Math.max(...rows.flatMap((r) => r.pts.map((p) => p.x)).filter((y) => rows.filter((r) => r.pts.some((p) => p.x === y)).length * 2 >= rows.length));
+    rows.forEach((r) => { r.pts = r.pts.filter((p) => p.x <= x1); });
+    const yTop = Math.max(...rows.flatMap((r) => r.pts.map((p) => p.y)));
+    const label = `eInstant sales indexed to FY${x0} = 100: ` + rows.map((r) => { const p = r.pts[r.pts.length - 1]; return `${r.sr.label} ${Math.round(p.y)} in FY${p.x}`; }).join(', ');
+    let hi = rows[0].sr.id, animate = true;
+
+    const draw = () => {
+      host.replaceChildren();
+      const W = host.clientWidth;
+      if (!W) return;
+      const wide = W >= 560;
+      const H = Math.round(Math.max(260, Math.min(400, W * .46)));
+      const m = { t: 22, r: wide ? 184 : 16, b: 30, l: 44 };
+      const pw = W - m.l - m.r, ph = H - m.t - m.b;
+      const step = niceStep(yTop, 4);
+      const yMax = Math.ceil(yTop * 1.04 / step) * step;
+      const X = (v) => m.l + (v - x0) / (x1 - x0) * pw;
+      const Y = (v) => m.t + ph - v / yMax * ph;
+      const svg = s('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': label, tabindex: '0' });
+      const grid = s('g', { class: 'grid' }, svg);
+      const axis = s('g', { class: 'axis' }, svg);
+      for (let v = 0; v <= yMax + 1e-9; v += step) {
+        s('line', { x1: m.l, x2: m.l + pw + 8, y1: Y(v), y2: Y(v) }, grid);
+        s('text', { x: m.l - 10, y: Y(v) + 4, 'text-anchor': 'end' }, axis).textContent = String(v);
+      }
+      for (let v = x0; v <= x1; v++) s('text', { x: X(v), y: H - 8, 'text-anchor': 'middle' }, axis).textContent = 'FY' + String(v).slice(2);
+      s('line', { class: 'base', x1: m.l, x2: m.l + pw, y1: Y(100), y2: Y(100) }, svg);
+
+      // The highlighted lottery is drawn last, on top
+      const paths = new Map();
+      rows.slice().sort((a, b) => (a.sr.id === hi) - (b.sr.id === hi)).forEach((r) => {
+        const d = r.pts.map((p, i) => (i ? 'L' : 'M') + X(p.x).toFixed(1) + ',' + Y(p.y).toFixed(1)).join('');
+        paths.set(r.sr.id, s('path', { class: 'cmp' + (r.sr.id === hi ? ' is-hi' : ''), d }, svg));
+        if (r.sr.id === hi) r.pts.forEach((p) => s('circle', { class: 'pt', cx: X(p.x), cy: Y(p.y), r: 3.5 }, svg));
+      });
+
+      // Line-end labels: every lottery in the right margin when there is room, else the highlighted one
+      const labels = rows.filter((r) => wide || r.sr.id === hi)
+        .map((r) => { const p = r.pts[r.pts.length - 1]; return { r, p, y: Y(p.y) }; })
+        .sort((a, b) => a.y - b.y);
+      if (wide) {
+        const gap = 17, last = labels[labels.length - 1];
+        for (let i = 1; i < labels.length; i++) labels[i].y = Math.max(labels[i].y, labels[i - 1].y + gap);
+        if (last && last.y > m.t + ph) {
+          last.y = m.t + ph;
+          for (let i = labels.length - 2; i >= 0; i--) labels[i].y = Math.min(labels[i].y, labels[i + 1].y - gap);
+        }
+      }
+      labels.forEach((l) => {
+        const isHi = l.r.sr.id === hi;
+        const value = String(Math.round(l.p.y)) + (l.p.x < x1 ? ` in FY${String(l.p.x).slice(2)}` : '');
+        if (wide) {
+          if (l.p.x < x1) s('line', { class: 'lead', x1: X(l.p.x) + 6, x2: X(x1) + 4, y1: Y(l.p.y), y2: Y(l.p.y) }, svg);
+          const t = s('text', { class: 'end' + (isHi ? ' is-hi' : ''), x: X(x1) + 12, y: l.y + 4 }, svg);
+          t.appendChild(document.createTextNode(l.r.sr.label + ' '));
+          s('tspan', { class: 'v' }, t).textContent = value;
+          t.addEventListener('click', () => onPick(l.r.sr.id));
+        } else {
+          const t = s('text', { class: 'end is-hi', x: X(l.p.x) - 4, y: Y(l.p.y) - 12, 'text-anchor': 'end' }, svg);
+          t.appendChild(document.createTextNode(l.r.sr.label + ' '));
+          s('tspan', { class: 'v' }, t).textContent = value;
+        }
+      });
+
+      // Wide invisible strokes make a thin line easy to pick
+      rows.forEach((r) => {
+        const hit = s('path', { class: 'cmp-hit', d: paths.get(r.sr.id).getAttribute('d') }, svg);
+        hit.addEventListener('click', () => onPick(r.sr.id));
+      });
+
+      // Crosshair: every lottery's index for the year under the pointer
+      const cross = s('line', { class: 'cross', y1: m.t, y2: m.t + ph, opacity: 0 }, svg);
+      const tipFor = (x) => (el) => {
+        el.appendChild(h('span', 'tip-k', `FY${x} · FY${x0} = 100`));
+        rows.map((r) => ({ r, p: r.pts.find((p) => p.x === x) })).filter((o) => o.p).sort((a, b) => b.p.y - a.p.y).forEach(({ r, p }) => {
+          const ln = h('span', 'tip-row');
+          ln.appendChild(h('span', 'key' + (r.sr.id === hi ? ' is-hi' : '')));
+          ln.appendChild(h('span', '', r.sr.label));
+          ln.appendChild(h('b', '', String(Math.round(p.y))));
+          el.appendChild(ln);
+        });
+      };
+      const showAt = (x, cx, cy) => {
+        cross.setAttribute('x1', X(x)); cross.setAttribute('x2', X(x)); cross.setAttribute('opacity', 1);
+        const r = svg.getBoundingClientRect();
+        showTip(cx == null ? r.left + X(x) : cx, cy == null ? r.top + m.t + 24 : cy, tipFor(x), svg);
+      };
+      const off = () => { cross.setAttribute('opacity', 0); hideTip(); };
+      const near = (clientX) => Math.max(x0, Math.min(x1, Math.round(x0 + (clientX - svg.getBoundingClientRect().left - m.l) / pw * (x1 - x0))));
+      svg.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') showAt(near(e.clientX), e.clientX, e.clientY); });
+      svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') off(); });
+      svg.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') showAt(near(e.clientX)); });
+      let kx = x1;
+      svg.addEventListener('focus', () => showAt(kx));
+      svg.addEventListener('blur', off);
+      svg.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        kx = Math.max(x0, Math.min(x1, kx + (e.key === 'ArrowRight' ? 1 : -1)));
+        showAt(kx);
+      });
+      host.appendChild(svg);
+      if (animate && !still.matches) paths.forEach((p) => { p.style.setProperty('--len', p.getTotalLength()); p.classList.add('anim'); });
+      animate = false;
+    };
+    let lastW = 0;
+    new ResizeObserver(() => {
+      const w = host.clientWidth;
+      if (Math.abs(w - lastW) < 2) return;
+      lastW = w; draw();
+    }).observe(host);
+    return { highlight: (id) => { hi = id; lastW = host.clientWidth; draw(); } };
   }
 
   function uk(d) {
@@ -1478,6 +2391,140 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       tbody.appendChild(row([d.lottery, d.region, String(d.n), d.median.toFixed(1) + '%', `${d.p25}–${d.p75}%`, `${d.min}–${d.max}%`], [2, 3, 4, 5]));
     });
     host.appendChild(rows);
+  }
+
+  /* ---------- 03: How far a budget goes ---------- */
+  // When every win is staked again until the money runs out, the expected amount staked is the
+  // budget divided by the share the lottery keeps: budget / (1 - RTP), counted here in games.
+  function play(list) {
+    const sel = $('#play-lottery');
+    const range = $('#play-budget');
+    const out = $('#play-budget-out');
+    const box = $('#play-out');
+    const host = $('#play-chart');
+    const tbody = $('#play-table tbody');
+    const times = (rtp) => 100 / (100 - rtp);
+    const sorted = list.slice().sort((a, b) => a.median - b.median || a.lottery.localeCompare(b.lottery));
+    const low = sorted[0], high = sorted[sorted.length - 1];
+    const groups = [];   // lotteries with the same median share one dot
+    sorted.forEach((d) => {
+      const g = groups.find((x) => x.median === d.median);
+      if (g) g.list.push(d); else groups.push({ median: d.median, list: [d] });
+    });
+    sorted.forEach((d) => {
+      const o = h('option', '', `${d.lottery} · ${d.median}%`);
+      o.value = d.lottery;
+      sel.appendChild(o);
+      tbody.appendChild(row([d.lottery, d.median + '%', times(d.median).toFixed(1)], [1, 2]));
+    });
+    let cur = list.find((d) => d.lottery === 'Pennsylvania Lottery') || high;
+    setValue(sel, cur.lottery);
+    picker(sel);
+
+    let shownGames = null, anim = 0;
+    const readout = () => {
+      const B = +range.value;
+      out.textContent = B;
+      range.style.setProperty('--p', ((B - range.min) / (range.max - range.min) * 100).toFixed(1) + '%');
+      const games = B * times(cur.median);
+      box.replaceChildren();
+      box.appendChild(h('p', 'label', `${cur.lottery} · ${cur.median}% median RTP`));
+      const big = h('p', 'big');
+      const n = h('span', '', int(games));
+      big.append(n, h('small', '', 'games'));
+      box.appendChild(big);
+      const p = h('p');
+      const b = (t) => h('strong', '', t);
+      p.append('The budget is staked ', b(times(cur.median).toFixed(1) + ' times'), ' over. Prizes worth about ', b(int(games - B) + ' games'), ' are paid out along the way and staked again, until the money is gone.');
+      box.appendChild(p);
+      const ref = cur === low ? high : low;
+      box.appendChild(h('p', 'vs', `${ref.lottery}, ${ref.median}%: ${int(B * times(ref.median))} games`));
+      // the big number runs from its last value
+      cancelAnimationFrame(anim);
+      if (shownGames != null && !still.matches && Math.round(shownGames) !== Math.round(games)) {
+        const from = shownGames, t0 = performance.now();
+        const tick = (now) => {
+          const k = Math.min(1, (now - t0) / 450);
+          shownGames = from + (games - from) * (1 - Math.pow(1 - k, 3));
+          n.textContent = int(shownGames);
+          if (k < 1) anim = requestAnimationFrame(tick);
+        };
+        anim = requestAnimationFrame(tick);
+      } else {
+        shownGames = games;
+      }
+    };
+
+    // The curve: times a budget is staked, by median RTP, with each lottery on it
+    const R0 = 45, R1 = 95;
+    const yTop = Math.ceil(times(high.median) / 2) * 2 + 2;
+    let ring = null, tag = null, lastW = 0, first = true;
+    const place = (X, Y) => {
+      const g = groups.find((x) => x.list.includes(cur));
+      const x = X(g.median), y = Y(times(g.median)), left = g.median < 70;   // the curve is flat on the left
+      ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+      tag.setAttribute('x', left ? x + 12 : x - 14); tag.setAttribute('y', left ? y - 14 : y - 12);
+      tag.setAttribute('text-anchor', left ? 'start' : 'end');
+      tag.textContent = cur.lottery;
+    };
+    let placeNow = () => {};
+    const draw = () => {
+      host.replaceChildren();
+      const W = host.clientWidth;
+      if (!W) return;
+      const H = Math.round(Math.max(270, Math.min(380, W * .62)));
+      const m = { t: 26, r: 16, b: 42, l: 40 };
+      const pw = W - m.l - m.r, ph = H - m.t - m.b;
+      const X = (r) => m.l + (r - R0) / (R1 - R0) * pw;
+      const Y = (v) => m.t + ph - v / yTop * ph;
+      const svg = s('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Times a budget is staked, by median RTP: ${times(low.median).toFixed(1)} at ${low.lottery}'s ${low.median}%, ${times(high.median).toFixed(1)} at ${high.lottery}'s ${high.median}%. The list beside the chart holds every lottery.` });
+      const grid = s('g', { class: 'grid' }, svg);
+      const axis = s('g', { class: 'axis' }, svg);
+      for (let v = 0; v <= yTop; v += 2) {
+        s('line', { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v) }, grid);
+        s('text', { x: m.l - 10, y: Y(v) + 4, 'text-anchor': 'end' }, axis).textContent = v ? v + '×' : '0';
+      }
+      for (let r = 50; r <= 90; r += 10) s('text', { x: X(r), y: m.t + ph + 20, 'text-anchor': 'middle' }, axis).textContent = r + '%';
+      s('text', { x: m.l + pw, y: H - 4, 'text-anchor': 'end' }, axis).textContent = 'Median RTP';
+      s('text', { x: m.l - 10, y: 12 }, axis).textContent = 'Times the budget is staked';
+      const rMax = Math.min(R1, 100 - 100 / yTop);
+      let d = '';
+      for (let r = R0; r <= rMax + 1e-9; r += .25) d += (d ? 'L' : 'M') + X(r).toFixed(1) + ',' + Y(times(r)).toFixed(1);
+      const curve = s('path', { class: 'curve', d }, svg);
+      groups.forEach((g) => {
+        const cx = X(g.median), cy = Y(times(g.median));
+        const hit = s('circle', { class: 'dot-hit', cx, cy, r: 13 }, svg);
+        s('circle', { class: 'dot ' + (g.list[0].region === 'North America' ? 'na' : 'eu'), cx, cy, r: 5.5 }, svg);
+        const tip = (el) => {
+          tipLines(el, `${times(g.median).toFixed(1)}× the budget`, `${g.median}% median RTP`, g.list.map((x) => x.lottery).join(', '));
+        };
+        bindTip(hit, tip);
+        hit.addEventListener('click', () => {
+          // a shared dot cycles through its lotteries
+          const i = g.list.indexOf(cur);
+          cur = g.list[(i + 1) % g.list.length];
+          setValue(sel, cur.lottery);
+          readout(); placeNow();
+        });
+      });
+      ring = s('circle', { class: 'ring', r: 10 }, svg);
+      tag = s('text', { class: 'tag' }, svg);
+      host.appendChild(svg);
+      placeNow = () => place(X, Y);
+      placeNow();
+      if (first && !still.matches) { curve.style.setProperty('--len', curve.getTotalLength()); curve.classList.add('anim'); }
+      first = false;
+    };
+    const ro = new ResizeObserver(() => {
+      const w = host.clientWidth;
+      if (Math.abs(w - lastW) < 2) return;
+      lastW = w; draw();
+    });
+    seen(host, () => ro.observe(host));
+
+    sel.addEventListener('change', () => { cur = list.find((d) => d.lottery === sel.value) || cur; readout(); placeNow(); });
+    range.addEventListener('input', readout);
+    readout();
   }
 
   /* ---------- 04: Studios ---------- */
@@ -1573,12 +2620,19 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
   }
 
   /* ---------- 06: Moves ---------- */
+  const KIND = { platform: 'Platform', content: 'Content', market: 'Market' };
   function moves(list) {
     const ol = $('#moves-list');
-    const items = list.slice().sort((a, b) => b.month.localeCompare(a.month)).map((m) => {
+    const tl = $('#timeline');
+    const filter = $('#move-filter');
+    const sorted = list.slice().sort((a, b) => b.month.localeCompare(a.month));
+    const items = sorted.map((m) => {
       const li = h('li', 'move');
       li.dataset.kind = m.kind;
-      li.appendChild(h('p', 'move-when', monthLabel(m.month, 'month')));
+      const when = h('p', 'move-when');
+      when.appendChild(h('span', 'key kind k-' + m.kind));
+      when.appendChild(document.createTextNode(monthLabel(m.month, 'month')));
+      li.appendChild(when);
       const t = h('h3', '', m.lottery);
       t.appendChild(h('span', 'v', ' · ' + m.vendor));
       li.appendChild(t);
@@ -1589,12 +2643,53 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
       ol.appendChild(li);
       return li;
     });
-    $('#move-filter').addEventListener('click', (e) => {
+
+    const dots = [];
+    const applyFilter = (k) => {
+      filter.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.kind === k)));
+      items.forEach((li) => { li.hidden = k !== 'all' && li.dataset.kind !== k; });
+      dots.forEach(({ b, m }) => b.classList.toggle('is-off', k !== 'all' && m.kind !== k));
+    };
+    filter.addEventListener('click', (e) => {
       const b = e.target.closest('.chip');
-      if (!b) return;
-      $('#move-filter').querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      items.forEach((li) => { li.hidden = b.dataset.kind !== 'all' && li.dataset.kind !== b.dataset.kind; });
+      if (b) applyFilter(b.dataset.kind);
     });
+
+    // Timeline: a column per month, one dot per move, the earliest at the bottom of each column
+    const year = sorted.length ? +sorted[0].month.slice(0, 4) : new Date().getFullYear();
+    const cols = MONTHS.map(() => tl.appendChild(h('div', 'tl-col')));
+    sorted.slice().reverse().forEach((m, i) => {
+      const [y, mo] = m.month.split('-').map(Number);
+      if (y !== year) return;
+      const li = items[sorted.indexOf(m)];
+      const b = h('button', 'tl-dot k-' + m.kind);
+      b.type = 'button';
+      b.style.setProperty('--i', i);
+      b.setAttribute('aria-label', `${monthLabel(m.month, 'month')}, ${KIND[m.kind] || m.kind}: ${m.lottery}, ${m.vendor}. ${m.text}`);
+      bindTip(b, (el) => tipLines(el, m.lottery, `${monthLabel(m.month, 'month')} · ${m.vendor}`, m.text));
+      b.addEventListener('click', () => {
+        if (li.hidden) applyFilter('all');
+        li.scrollIntoView({ behavior: still.matches ? 'auto' : 'smooth', block: 'center' });
+        li.classList.remove('is-flash');
+        void li.offsetWidth;   // restart the highlight
+        li.classList.add('is-flash');
+      });
+      cols[mo - 1].appendChild(b);
+      dots.push({ b, m });
+    });
+    const months = h('div', 'tl-months');
+    months.setAttribute('aria-hidden', 'true');
+    MONTHS.forEach((name) => months.appendChild(h('span', '', name)));
+    tl.after(months);
+    const now = new Date();
+    if (now.getFullYear() === year) {
+      const days = new Date(year, now.getMonth() + 1, 0).getDate();
+      const mark = h('div', 'tl-now');
+      mark.style.left = ((now.getMonth() + (now.getDate() - 1) / days) / 12 * 100).toFixed(2) + '%';
+      mark.appendChild(h('span', '', 'Now'));
+      tl.appendChild(mark);
+    }
+    seen(tl, () => tl.classList.add('is-in'));
   }
 
   /* ---------- 07: Sample rows, then ghost rows (no data in the page) ---------- */
@@ -1654,13 +2749,25 @@ table.data td.r, table.data th.r { text-align: right; font-variant-numeric: tabu
   });
   document.addEventListener('pointerdown', (e) => { if (tipOwner && !tipOwner.contains(e.target)) hideTip(); });
 
+  /* ---------- Reading progress, under the masthead ---------- */
+  const bar = $('.progress span');
+  let ticking = false;
+  const progress = () => {
+    ticking = false;
+    const max = root.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, scrollY / max)).toFixed(4) : 0})`;
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(progress); } }, { passive: true });
+  addEventListener('resize', progress);
+  progress();
+
   /* ---------- Load ---------- */
   fetch('atlas.json', { cache: 'no-cache' })
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(init)
     .catch((err) => {
       console.error('iLottery Atlas: data failed to load', err);
-      document.querySelectorAll('.units, .tilemap, .chart, .rtp, .bars').forEach((el) => {
+      document.querySelectorAll('.world-map, .tilemap, .chart, .rtp, .bars, .timeline').forEach((el) => {
         el.replaceChildren(h('p', 'meta', 'The charts could not load. Please reload the page.'));
       });
     });

@@ -626,6 +626,15 @@ def source_name(url):
     return SOURCE_NAMES.get(host, host)
 
 
+# Where each move happened, for the world map (ISO 3166-1 numeric)
+MOVE_ISO = {
+    "LEIA": ["208", "246", "250", "578", "752"], "Loto-Québec": ["124"], "PCSO": ["608"],
+    "Eesti Loto": ["233"], "BCLC": ["124"], "LOTTO24": ["276"], "National Lottery (NLC)": ["710"],
+    "Colorado": ["840"], "Virginia": ["840"], "Michigan": ["840"], "Massachusetts": ["840"],
+    "Lotterie Nazionali": ["380"], "Kentucky": ["840"],
+}
+
+
 def build_moves(data):
     rows = read_csv(data, "ilottery_contracts.csv")
     out = []
@@ -636,8 +645,124 @@ def build_moves(data):
             print(f"  ! move skipped, no verified source row: {lottery} / {vendor}", file=sys.stderr)
             continue
         out.append({"month": month, "lottery": lottery, "vendor": vendor, "text": text,
-                    "kind": kind, "url": match["source_url"], "source": source_name(match["source_url"])})
+                    "kind": kind, "url": match["source_url"], "source": source_name(match["source_url"]),
+                    "iso": MOVE_ISO.get(lot_key, [])})
     return out
+
+
+# ---------------------------------------------------------------------------
+# World map: one entry per country, keyed by ISO 3166-1 numeric (the world-atlas ids)
+# ---------------------------------------------------------------------------
+
+PLACE_ISO = {
+    "Algeria": "012", "Argentina": "032", "Australia": "036", "Austria": "040", "Azerbaijan": "031",
+    "Barbados": "052", "Belgium": "056", "Bhutan": "064", "Bolivia": "068", "Bosnia and Herzegovina": "070",
+    "Brazil": "076", "Bulgaria": "100", "Caribbean islands": "CAR", "Catalonia, Spain": "724",
+    "Channel Islands": "CHI", "Chile": "152", "China": "156", "Colombia": "170", "Costa Rica": "188",
+    "Croatia": "191", "Czechia": "203", "Denmark": "208", "Dominican Republic": "214", "Ecuador": "218",
+    "Egypt": "818", "El Salvador": "222", "Estonia": "233", "Ethiopia": "231", "Finland": "246",
+    "France": "250", "Germany": "276", "Ghana": "288", "Greece": "300", "Honduras": "340",
+    "Hong Kong": "344", "Hungary": "348", "Iceland": "352", "Ireland": "372", "Israel": "376",
+    "Italy": "380", "Jamaica": "388", "Japan": "392", "Kenya": "404", "Laos": "418", "Latvia": "428",
+    "Lebanon": "422", "Liechtenstein": "438", "Lithuania": "440", "Luxembourg": "442", "Macau": "446",
+    "Malaysia": "458", "Malta": "470", "Mauritius": "480", "Mexico": "484", "Mongolia": "496",
+    "Montenegro": "499", "Morocco": "504", "Mozambique": "508", "Myanmar": "104", "Netherlands": "528",
+    "New Zealand": "554", "Nigeria": "566", "North Macedonia": "807", "Norway": "578", "Panama": "591",
+    "Peru": "604", "Philippines": "608", "Poland": "616", "Portugal": "620", "Puerto Rico": "630",
+    "Romania": "642", "Russia": "643", "Serbia": "688", "Singapore": "702", "Slovakia": "703",
+    "Slovenia": "705", "South Africa": "710", "South Korea": "410", "South Sudan": "728", "Spain": "724",
+    "Sri Lanka": "144", "Sweden": "752", "Switzerland": "756", "Taiwan": "158", "Thailand": "764",
+    "Türkiye": "792", "U.S. Virgin Islands": "850", "Uganda": "800", "Ukraine": "804",
+    "United Arab Emirates": "784", "United Kingdom": "826", "Uruguay": "858", "Venezuela": "862",
+    "Vietnam": "704", "Zimbabwe": "716",
+}
+COUNTRY_NAME = {"840": "United States", "124": "Canada", "724": "Spain"}
+# Places too small for a 1:110m map are drawn as points (lat, lon)
+MARKERS = {
+    "470": [35.9, 14.45], "702": [1.35, 103.82], "344": [22.32, 114.17], "446": [22.2, 113.55],
+    "480": [-20.2, 57.5], "052": [13.19, -59.54], "438": [47.16, 9.55], "CHI": [49.35, -2.35],
+    "CAR": [15.5, -61.5], "850": [18.34, -64.9], "442": [49.61, 6.13], "630": [18.22, -66.5],
+}
+CATALOG_ISO = {"USA": "840", "Canada": "124", "Switzerland (FR)": "756"}
+# Verified studios only; feed codes and unattributed rows stay out of the public map
+STUDIO_RULES = [
+    (r"iwg|instant win gaming", "IWG"), (r"pariplay", "Pariplay"), (r"neogames", "NeoGames"),
+    (r"brightstar|\bigt\b", "Brightstar"), (r"scientific games|sg studios", "Scientific Games"),
+    (r"fennica", "Fennica Gaming"), (r"pollard", "Pollard"), (r"fdj united", "FDJ United"),
+    (r"fdj gaming", "FDJ Gaming Solutions"), (r"danske spil", "Danske Spil (in-house)"),
+    (r"svenska spel", "Svenska Spel (in-house)"), (r"\bonce\b", "ONCE (in-house)"),
+    (r"concepci", "Lotería de Concepción (in-house)"), (r"allodium", "Allodium"),
+    (r"synot", "Synot Interactive"), (r"nettrek", "netTrek"), (r"inspired", "Inspired Entertainment"),
+    (r"pragmatic", "Pragmatic Play"), (r"\bags\b|playags", "PlayAGS"),
+    (r"premier lotteries", "Premier Lotteries Ireland (in-house)"),
+]
+LENS_STUDIOS = ["IWG", "NeoGames", "Brightstar", "Scientific Games", "Fennica Gaming", "Pariplay", "Pollard"]
+
+
+def canon_studio(raw):
+    s = (raw or "").strip().lower()
+    if not s or s.startswith(("unknown", "okänd", "ej ")):
+        return None
+    return next((name for pattern, name in STUDIO_RULES if re.search(pattern, s)), None)
+
+
+def build_world(data):
+    reg = read_csv(data, "lotteries_suppliers.csv")
+    order = {t: i for i, t in enumerate(TIERS)}
+    countries = {}
+    for r in reg:
+        if r["sub_region"] == "USA":
+            iso = "840"
+        elif r["sub_region"] == "Kanada":
+            iso = "124"
+        else:
+            place = PLACE_EN.get(r["country_state"], r["country_state"])
+            iso = PLACE_ISO.get(place)
+            if not iso:
+                print(f"  ! no ISO code for {place}", file=sys.stderr)
+                continue
+        place = PLACE_EN.get(r["country_state"], r["country_state"])
+        c = countries.setdefault(iso, {"iso": iso, "name": COUNTRY_NAME.get(iso, place),
+                                       "region": REGION_EN[r["region"]], "lotteries": []})
+        ei = einstant_flag(r["einstants_online"])
+        c["lotteries"].append({"name": NAME_EN.get(r["lottery_operator"], r["lottery_operator"]),
+                               "tier": tier(r["ilottery_status"], ei)})
+    for c in countries.values():
+        c["lotteries"].sort(key=lambda l: (order[l["tier"]], l["name"]))
+        c["tier"] = c["lotteries"][0]["tier"]
+
+    cat = read_csv(data, "einstant_games_catalog.csv")
+    per = {}
+    footprints = {s: set() for s in LENS_STUDIOS}
+    for r in cat:
+        country = r["country"].split(" - ")[0]
+        iso = CATALOG_ISO.get(country) or PLACE_ISO.get(country)
+        if not iso:
+            continue
+        p = per.setdefault(iso, {"listings": 0, "rtp": [], "studios": {}})
+        p["listings"] += 1
+        v = num(r["rtp_pct"])
+        if v is not None:
+            p["rtp"].append(v)
+        studio = canon_studio(r["studio_normalized"])
+        if studio:
+            p["studios"][studio] = p["studios"].get(studio, 0) + 1
+            if studio in footprints:
+                footprints[studio].add(iso)
+    for iso, p in per.items():
+        c = countries.get(iso)
+        if not c:
+            continue
+        c["listings"] = p["listings"]
+        c["rtp_median"] = r1(statistics.median(p["rtp"])) if len(p["rtp"]) >= RTP_MIN_GAMES else None
+        c["studios"] = [s for s, _ in sorted(p["studios"].items(), key=lambda kv: -kv[1])[:3]]
+
+    out = sorted(countries.values(), key=lambda c: c["name"])
+    return {
+        "countries": out,
+        "markers": {k: v for k, v in MARKERS.items() if k in countries},
+        "footprints": {s: sorted(v) for s, v in footprints.items() if len(v) >= 2},
+    }
 
 
 def build_pack(data, catalog):
@@ -780,6 +905,7 @@ def build(data):
         "studios": build_studios(data),
         "launch": build_launch_curve(data),
         "moves": build_moves(data),
+        "world": build_world(data),
         "pack": build_pack(data, catalog),
     }
 
@@ -808,11 +934,16 @@ def build(data):
     atlas["copy"].update({
         "rtp_se_pct": rtp.get("Svenska Spel"),
         "rtp_pa_pct": rtp.get("Pennsylvania Lottery"),
+        # games a budget buys when every win is staked again: budget / (1 - RTP), Pennsylvania over Sweden
+        "play_pa_se_x": round((100 - rtp["Svenska Spel"]) / (100 - rtp["Pennsylvania Lottery"]), 3)
+                        if {"Svenska Spel", "Pennsylvania Lottery"} <= rtp.keys() else None,
         "rtp_min_pct": min(rtp.values()),
         "rtp_max_pct": max(rtp.values()),
         "rtp_na_min_pct": min(r["median"] for r in catalog["rtp"] if r["region"] == "North America"),
         "rtp_na_count": sum(1 for r in catalog["rtp"] if r["region"] == "North America"),
         "na_top3_pct": r1(sum(s["share"] for s in na["studios"][:3])) if na else None,
+        "world_countries": len(atlas["world"]["countries"]),
+        "world_einstant_countries": sum(1 for c in atlas["world"]["countries"] if c["tier"] == "einstants"),
     })
 
     # Guard rails: refuse to publish a broken or suspiciously small build

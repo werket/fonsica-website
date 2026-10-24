@@ -72,6 +72,11 @@ def check(atlas):
     need(na_count == 8, "All eight North American lotteries have a median of 78% or more", f"there are {na_count}")
     quebec = next((r for r in rtp if r["lottery"] == "Loto-Québec"), None)
     need(quebec and quebec["n"] == 10, "such as Loto-Québec's ten", f"Loto-Québec has {quebec['n'] if quebec else 'no'} games")
+    # 03 note: "the gap is wider than the percentages suggest ... times as many games in Pennsylvania as in Sweden"
+    med = {r["lottery"]: r["median"] for r in rtp}
+    se, pa, games_x = med.get("Svenska Spel"), med.get("Pennsylvania Lottery"), atlas["copy"].get("play_pa_se_x") or 0
+    need(se and pa and games_x > pa / se, "the gap is wider than the percentages suggest",
+         f"{games_x} times the games against {pa}% / {se}% in RTP")
 
     # 04 "Three studios make 88% of the attributed eInstants in North America"
     regions = {r["region"]: r for r in atlas["studios"]["regions"]}
