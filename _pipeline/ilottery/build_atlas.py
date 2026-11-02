@@ -113,7 +113,19 @@ PLACE_EN = {
     "Sydsudan": "South Sudan", "Hongkong": "Hong Kong", "Kina": "China", "Macao": "Macau",
     "Mongoliet": "Mongolia", "Sydkorea": "South Korea", "Dominikanska republiken": "Dominican Republic",
     "Karibien (flera öar)": "Caribbean islands", "Kanalöarna": "Channel Islands", "Ryssland": "Russia",
+    "övriga delstater": "Other states",
 }
+
+
+def place_en(place):
+    """English place name; a state listed under its country ("Brasilien – São Paulo") reads "São Paulo, Brazil"."""
+    if place in PLACE_EN:
+        return PLACE_EN[place]
+    country, _, state = place.partition(" – ")
+    if state and country in PLACE_EN:
+        return f"{PLACE_EN.get(state, state)}, {PLACE_EN[country]}"
+    return place
+
 
 NAME_EN = {
     "AGLC (PlayAlberta) / WCLC-medlem": "AGLC (PlayAlberta)",
@@ -128,6 +140,9 @@ NAME_EN = {
     "National Lottery (Sizekhaya från 2026-06-01; tidigare Ithuba)": "National Lottery (Sizekhaya)",
     "SET Lotto, Premier Lotto m.fl.": "SET Lotto, Premier Lotto and others",
     "The UAE Lottery (The Game LLC, GCGRA-licens)": "The UAE Lottery",
+    "Loteria do Estado do Rio Grande do Sul (koncession under upphandling)":
+        "Loteria do Estado do Rio Grande do Sul (concession out to tender)",
+    "Delstatslotterier nära drift: AL, CE, DF, ES, PI, RN, SC": "State lotteries close to launch: AL, CE, DF, ES, PI, RN, SC",
 }
 
 
@@ -221,7 +236,7 @@ def build_register(data):
     order = {reg["region"]: i for i, reg in enumerate(regions)}
     units = sorted(
         ({"name": NAME_EN.get(r["lottery_operator"], r["lottery_operator"]),
-          "place": PLACE_EN.get(r["country_state"], r["country_state"]),
+          "place": place_en(r["country_state"]),
           "region": REGION_EN[r["region"]], "tier": r["_tier"]} for r in rows),
         key=lambda u: (order[u["region"]], TIERS.index(u["tier"]), u["place"], u["name"]))
 
@@ -416,6 +431,14 @@ RTP_LABELS = {
     "Michigan Lottery": ("Michigan Lottery", "US"),
     "Pennsylvania Lottery": ("Pennsylvania Lottery", "US"),
     "Loto-Québec (Espacejeux)": ("Loto-Québec", "CA"),
+    "Virginia Lottery": ("Virginia Lottery", "US"),
+    "DC iLottery": ("DC Lottery", "US"),
+    "ONCE": ("ONCE", "ES"),
+    "LOTTO Bayern": ("Lotto Bayern", "DE"),
+    "LOTTO Bremen": ("Lotto Bremen", "DE"),
+    "LOTTO Schleswig-Holstein": ("Lotto Schleswig-Holstein", "DE"),
+    "Saartoto (Saarland)": ("Saartoto", "DE"),
+    "Loterie Romande": ("Loterie Romande", "CH"),
 }
 RTP_MIN_GAMES = 5
 
@@ -430,18 +453,25 @@ def quantile(xs, q):
     return xs[lo] + (xs[hi] - xs[lo]) * (pos - lo)
 
 
+def in_rtp_stats(r):
+    """A listing with an RTP that counts; the bot marks keno, slots and doubtful values "nej"."""
+    return num(r["rtp_pct"]) is not None and r.get("rtp_in_einstant_stats") != "nej"
+
+
 def build_catalog(data):
     rows = read_csv(data, "einstant_games_catalog.csv")
     by = {}
     for r in rows:
         v = num(r["rtp_pct"])
-        if v is not None:
+        if in_rtp_stats(r):
             by.setdefault(r["lottery"], []).append(v)
     rtp = []
     for lottery, xs in by.items():
         if len(xs) < RTP_MIN_GAMES:
             continue
-        name, cc = RTP_LABELS.get(lottery, (lottery, ""))
+        if lottery not in RTP_LABELS:   # a guessed region once put Virginia in Europe
+            raise BuildRefused(f"RTP: {lottery} needs a name and country in RTP_LABELS")
+        name, cc = RTP_LABELS[lottery]
         region = "North America" if cc in ("US", "CA") else ("Asia-Pacific" if cc == "NZ" else "Europe")
         rtp.append({"lottery": name, "cc": cc, "region": region, "n": len(xs),
                     "median": r1(statistics.median(xs)), "p25": r1(quantile(xs, .25)),
@@ -474,7 +504,7 @@ def build_catalog(data):
         "lotteries": len({r["lottery"] for r in rows}),
         "countries": len({r["country"].split(" - ")[0] for r in rows if r["country"]}),
         "fields": len(rows[0]) if rows else 0,
-        "rtp_games": sum(1 for r in rows if num(r["rtp_pct"]) is not None),
+        "rtp_games": sum(1 for r in rows if in_rtp_stats(r)),
         "studio_known_pct": r1(100 * len(known) / len(rows)),
         "grade_a_pct": r1(100 * sum(1 for r in rows if r["confidence"] == "A") / len(rows)),
         "retrieved": retrieved,
@@ -496,6 +526,7 @@ STUDIO_EN = {
     "Pariplay": "Pariplay",
     "EQL Games": "EQL Games",
     "Pollard Banknote": "Pollard Banknote",
+    "PDS (kod i flöde)": "PDS (feed code)",
 }
 STUDIO_REGIONS = [("Nordamerika", "North America"), ("Norden", "Nordics"), ("Europa (övrigt)", "Rest of Europe")]
 TOP_STUDIOS = 5
@@ -711,17 +742,16 @@ def build_world(data):
     order = {t: i for i, t in enumerate(TIERS)}
     countries = {}
     for r in reg:
+        place = place_en(r["country_state"])
         if r["sub_region"] == "USA":
             iso = "840"
         elif r["sub_region"] == "Kanada":
             iso = "124"
-        else:
-            place = PLACE_EN.get(r["country_state"], r["country_state"])
-            iso = PLACE_ISO.get(place)
+        else:   # a state counts for its country: "São Paulo, Brazil" is Brazil
+            iso = PLACE_ISO.get(place) or PLACE_ISO.get(place.rpartition(", ")[2])
             if not iso:
                 print(f"  ! no ISO code for {place}", file=sys.stderr)
                 continue
-        place = PLACE_EN.get(r["country_state"], r["country_state"])
         c = countries.setdefault(iso, {"iso": iso, "name": COUNTRY_NAME.get(iso, place),
                                        "region": REGION_EN[r["region"]], "lotteries": []})
         ei = einstant_flag(r["einstants_online"])
@@ -741,9 +771,8 @@ def build_world(data):
             continue
         p = per.setdefault(iso, {"listings": 0, "rtp": [], "studios": {}})
         p["listings"] += 1
-        v = num(r["rtp_pct"])
-        if v is not None:
-            p["rtp"].append(v)
+        if in_rtp_stats(r):
+            p["rtp"].append(num(r["rtp_pct"]))
         studio = canon_studio(r["studio_normalized"])
         if studio:
             p["studios"][studio] = p["studios"].get(studio, 0) + 1
@@ -844,8 +873,8 @@ def fmt_value(v, fmt):
         return str(abs(js_round(v)))
     if fmt == "pct0":
         return str(js_round(v))
-    if fmt == "k":
-        return f"{js_round(v / 1000)}k"
+    if fmt == "k":   # 937k; from a million, 1.17m
+        return f"{js_fixed(v / 1e6, 2)}m" if v >= 1e6 else f"{js_round(v / 1000)}k"
     return f"{js_round(v):,}" if isinstance(v, (int, float)) else str(v)
 
 

@@ -66,12 +66,10 @@ def check(atlas):
     need(lowest["lottery"] == "Svenska Spel", "the median game pays back between 50% (Sweden)",
          f"the lowest median is now {lowest['lottery']}")
     need(any(r["lottery"] == "Pennsylvania Lottery" for r in rtp), "A Pennsylvanian one", "Pennsylvania has no RTP row")
-    europe_high = [r["lottery"] for r in rtp if r["region"] == "Europe" and r["median"] > 74 and r["lottery"] != "Lotterie Nazionali"]
-    need(not europe_high, "In Europe, only Italy has a median above 74%", f"also {', '.join(europe_high)}")
-    na_count = sum(1 for r in rtp if r["region"] == "North America")
-    need(na_count == 8, "All eight North American lotteries have a median of 78% or more", f"there are {na_count}")
-    quebec = next((r for r in rtp if r["lottery"] == "Loto-Québec"), None)
-    need(quebec and quebec["n"] == 10, "such as Loto-Québec's ten", f"Loto-Québec has {quebec['n'] if quebec else 'no'} games")
+    europe_high = sorted(r["lottery"] for r in rtp if r["region"] == "Europe" and r["median"] > 74)
+    need(europe_high == ["Lotterie Nazionali", "win2day"], "In Europe, only Italy and Austria have a median above 74%",
+         f"the European lotteries above 74% are {', '.join(europe_high) or 'none'}")
+    # "Every North American lottery among them has a median of 78% or more" holds by itself: the 78 is data-k
     # 03 note: "the gap is wider than the percentages suggest ... times as many games in Pennsylvania as in Sweden"
     med = {r["lottery"]: r["median"] for r in rtp}
     se, pa, games_x = med.get("Svenska Spel"), med.get("Pennsylvania Lottery"), atlas["copy"].get("play_pa_se_x") or 0
