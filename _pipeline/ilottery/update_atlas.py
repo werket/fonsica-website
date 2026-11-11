@@ -7,7 +7,10 @@ hour on a fresh checkout of that repo. The Mac's launchd job com.fonsica.ilotter
 disabled and kept as a fallback, did the same on ~/Projects/fonsica-insights after a git pull.
 Adam chose (2026-10-23) to publish automatically when every check passes. Anything else stops
 the run: on the Mac with a report in _pipeline/logs/ and a notification, in Actions with a
-failed run, which GitHub emails. Nothing is pushed.
+failed run, which GitHub emails, and a message to the alert channel when the repository
+secret ATLAS_ALERT_WEBHOOK holds a Discord webhook. Nothing is pushed.
+
+  python3 _pipeline/ilottery/update_atlas.py --alert "text"   send one message to the alert channel
 
   python3 _pipeline/ilottery/update_atlas.py             rebuild and write locally, no git
   python3 _pipeline/ilottery/update_atlas.py --publish   ... then commit and push the atlas files
@@ -31,6 +34,7 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.request
 from datetime import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +47,8 @@ STATE_DIR = os.path.join(HERE, "data")              # gitignored (_pipeline/*/da
 STATE = os.path.join(STATE_DIR, "update-state.json")
 LOCK = os.path.join(STATE_DIR, "update.lock")
 LOG_DIR = os.path.join(REPO, "_pipeline", "logs")   # gitignored
-PUBLISH_PATHS = ["insights/ilottery/atlas.json", "insights/ilottery/index.html", "images/insights/ilottery"]
+# index.html is the homepage: the build only rewrites the atlas figure on its Insights card (data-k)
+PUBLISH_PATHS = ["insights/ilottery/atlas.json", "insights/ilottery/index.html", "images/insights/ilottery", "index.html"]
 COMMIT_PREFIX = "Update iLottery Atlas data"
 QUIET_SECONDS = 180      # a delivery is finished when no input has changed for this long
 MAX_WAIT_SECONDS = 1200
@@ -63,6 +68,28 @@ def notify(message):
         return
     script = f'display notification {json.dumps(message)} with title "iLottery Atlas"'
     subprocess.run(["osascript", "-e", script], capture_output=True)
+
+
+def alert(message):
+    """Post to the alert channel (a Discord webhook in $ATLAS_ALERT_WEBHOOK). Never raises.
+
+    The channel is private, but keep to what the public job summary already shows.
+    """
+    url = os.environ.get("ATLAS_ALERT_WEBHOOK", "").strip()
+    if not url:
+        return False
+    if os.environ.get("GITHUB_RUN_ID"):
+        message += (f"\n{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/"
+                    f"{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{os.environ['GITHUB_RUN_ID']}")
+    body = json.dumps({"content": message[:1900], "allowed_mentions": {"parse": []}}).encode()
+    req = urllib.request.Request(url, data=body, method="POST", headers={
+        "Content-Type": "application/json", "User-Agent": "fonsica-atlas-alert/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=15):
+            return True
+    except Exception as e:   # an alert that cannot be sent must not change the outcome of the run
+        log(f"alert not sent: {type(e).__name__}")
+        return False
 
 
 def ci_output(**values):
@@ -219,8 +246,11 @@ def stop(fp, title, lines, retry=False):
     notify(f"Publiceringen stoppades: {title}. Se rapporten i _pipeline/logs.")
     ci_output(outcome="retry" if retry else "blocked")
     ci_summary(f"stoppad ({title})", lines)
-    if not retry:
+    if not retry:   # a blocked delivery is reported once; git trouble is retried next hour without a message
         save_state(fp, f"blocked: {title}")
+        shown = [f"• {line}" for line in lines[:6]] + ([f"… och {len(lines) - 6} till"] if len(lines) > 6 else [])
+        alert("**iLottery Atlas: publiceringen är stoppad** (" + title + ")\n" + "\n".join(shown)
+              + "\nAtlasen ligger kvar på förra leveransen tills texten eller datan är rättad.")
     return 1
 
 
@@ -251,7 +281,12 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="report what would change, write nothing")
     ap.add_argument("--force", action="store_true", help="run even if the data looks unchanged")
     ap.add_argument("--force-publish", action="store_true", help="publish even if only the build time changed")
+    ap.add_argument("--alert", metavar="TEXT", help="send one message to the alert channel and exit")
     args = ap.parse_args()
+    if args.alert:
+        sent = alert(args.alert)
+        log("alert sent" if sent else "no alert sent (no webhook configured, or it failed)")
+        return 0
     os.makedirs(STATE_DIR, exist_ok=True)
 
     with open(LOCK, "w") as lock:

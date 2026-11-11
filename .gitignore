@@ -32,6 +32,7 @@ fonsica-data.*/
 insights_ready/
 insights_ready.zip
 
-# GitHub Actions: the private research checkout and the handled-delivery marker
+# GitHub Actions: the private research checkout and the handled-delivery and quiet-day markers
 .research/
 .atlas-seen
+.atlas-stale

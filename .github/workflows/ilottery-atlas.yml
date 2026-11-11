@@ -3,7 +3,9 @@
 # The bot pushes to the private repo werket/fonsica-insights. Every hour this job checks that
 # repo out with a read-only deploy key, rebuilds the atlas, checks every sentence on the page
 # against the data (_pipeline/ilottery/claims.py) and publishes only when all checks pass.
-# A stopped delivery fails the run, which GitHub emails, once per delivery.
+# A stopped delivery fails the run, which GitHub emails, once per delivery. With the repository
+# secret ATLAS_ALERT_WEBHOOK (a Discord webhook) the same stop, and a research bot that has gone
+# quiet for two days, are also reported in that channel.
 #
 # This repo is public, so its logs and job summaries are too: the scripts print aggregates
 # and counts only. Never add steps that print or upload the research data.
@@ -17,6 +19,10 @@ on:
     inputs:
       force:
         description: "Publish even if this delivery was already handled (tests the whole chain)"
+        type: boolean
+        default: false
+      test_alert:
+        description: "Send a test message to the alert channel"
         type: boolean
         default: false
 
@@ -35,6 +41,12 @@ jobs:
       - name: Check out the website
         uses: actions/checkout@v4
 
+      - name: Test the alert channel
+        if: inputs.test_alert
+        env:
+          ATLAS_ALERT_WEBHOOK: ${{ secrets.ATLAS_ALERT_WEBHOOK }}
+        run: python3 _pipeline/ilottery/update_atlas.py --alert "iLottery Atlas - testmeddelande från arbetsflödet. Larmkanalen fungerar."
+
       - name: Check out the research data (private, read only)
         uses: actions/checkout@v4
         with:
@@ -45,7 +57,38 @@ jobs:
 
       - name: Identify the delivery
         id: data
-        run: echo "sha=$(git -C .research rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "sha=$(git -C .research rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          # The bot delivers every morning. From 48 hours without a delivery, report once a day.
+          age_h=$(( ($(date +%s) - $(git -C .research log -1 --format=%ct)) / 3600 ))
+          echo "age_h=$age_h" >> "$GITHUB_OUTPUT"
+          if [ "$age_h" -ge 48 ]; then echo "stale_day=$(( age_h / 24 ))" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Has this quiet day been reported
+        id: stale
+        if: steps.data.outputs.stale_day != ''
+        uses: actions/cache/restore@v4
+        with:
+          path: .atlas-stale
+          key: atlas-stale-${{ steps.data.outputs.sha }}-${{ steps.data.outputs.stale_day }}
+          lookup-only: true
+
+      - name: Report a research bot that has gone quiet
+        id: stale_alert
+        if: steps.data.outputs.stale_day != '' && steps.stale.outputs.cache-hit != 'true'
+        env:
+          ATLAS_ALERT_WEBHOOK: ${{ secrets.ATLAS_ALERT_WEBHOOK }}
+        run: |
+          python3 _pipeline/ilottery/update_atlas.py --alert "**iLottery Atlas: ingen leverans från researchboten på ${{ steps.data.outputs.stale_day }} dygn.** Senaste leveransen är ${{ steps.data.outputs.sha }}. Atlasen visar äldre data tills boten levererar igen."
+          echo "### iLottery Atlas: ingen ny leverans på ${{ steps.data.outputs.age_h }} timmar" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.data.outputs.stale_day }}" > .atlas-stale
+
+      - name: Remember the reported quiet day
+        if: steps.stale_alert.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: .atlas-stale
+          key: atlas-stale-${{ steps.data.outputs.sha }}-${{ steps.data.outputs.stale_day }}
 
       - name: Skip a delivery that was already handled
         id: seen
@@ -70,6 +113,7 @@ jobs:
         if: steps.seen.outputs.cache-hit != 'true' || inputs.force
         env:
           PLAYWRIGHT_CHANNEL: chrome
+          ATLAS_ALERT_WEBHOOK: ${{ secrets.ATLAS_ALERT_WEBHOOK }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

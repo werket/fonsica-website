@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
-"""Render the homepage Insights images: North America as a board of raised tiles.
+"""Render the atlas board images: North America as a board of raised tiles.
 
 Reads insights/ilottery/atlas.json (built by build_atlas.py), draws the atlas tile map
 as a 3D board seen through a camera, in the After Hours palette (teal tiles = eInstants
-online), and exports web sizes to images/insights/ilottery/. Two framings: the tall
-desktop panel, and a 4:3 inline image for phones that sits on the section's raised band.
+online), and exports web sizes to images/insights/ilottery/. Three framings: the tall
+desktop panel and a 4:3 inline image for phones, both for the homepage Insights section,
+and the atlas page's 1200 x 630 share image with the wordmark and the headline.
 Re-run after the data changes.
 
-Usage: python3 _pipeline/ilottery/make_panel_image.py
+Usage: python3 _pipeline/ilottery/make_panel_image.py [--only panel|inline|og]
 Needs Playwright (Chromium) for the render and Pillow for the exports.
 """
 
+import argparse
 import json
 import math
 import os
+import re
 import tempfile
 
 from PIL import Image
@@ -23,15 +26,21 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 ATLAS = os.path.join(REPO, "insights", "ilottery", "atlas.json")
 OUT = os.path.join(REPO, "images", "insights", "ilottery")
 NAME = "ilottery-atlas-board"
+PAGE = os.path.join(REPO, "insights", "ilottery", "index.html")
 
 # Framings, in CSS px (rendered at 2x). The panel board fills 68% of the width so it survives
 # the cover crop of a narrow 1024 px panel and stays clear of the right-edge fade and the dark
 # band behind the caption. The inline board sits on the band colour so its edges disappear.
 VARIANTS = [
-    {"suffix": "", "W": 1000, "H": 1250, "fit": .68, "x": .48, "y": .43,
+    {"id": "panel", "suffix": "", "W": 1000, "H": 1250, "fit": .68, "x": .48, "y": .43,
      "ground": "#2B292B", "light": ("52%", "34%"), "widths": (800, 1200, 1600, 2000), "jpg": 1600},
-    {"suffix": "-inline", "W": 1000, "H": 750, "fit": .88, "x": .5, "y": .5,
+    {"id": "inline", "suffix": "-inline", "W": 1000, "H": 750, "fit": .88, "x": .5, "y": .5,
      "ground": "#343133", "light": ("50%", "45%"), "widths": (600, 900, 1200), "jpg": 1200},
+    # The share image (Open Graph): the board on the right, wordmark and headline on the left.
+    # It carries no figures, so it only changes when the map does.
+    {"id": "og", "suffix": "-og", "W": 1200, "H": 630, "fit": .43, "x": .755, "y": .5,
+     "ground": "#2B292B", "light": ("76%", "44%"), "widths": (), "jpg": 1200,
+     "file": "ilottery-atlas-og-1200x630.jpg", "overlay": True},
 ]
 ELEVATION = math.radians(50)  # the camera looks down at the board like a photo of a game board
 DISTANCE = 18                 # camera distance from the board centre, in tiles
@@ -166,10 +175,33 @@ def build_svg(tiles, v):
 </svg>"""
 
 
+def wordmark():
+    """The Fonsica wordmark as drawn in the page header, so the share image never drifts from it."""
+    m = re.search(r'<svg class="logo"[^>]*>.*?</svg>', open(PAGE, encoding="utf-8").read(), re.S)
+    return m.group(0) if m else '<span class="wordmark-text">Fonsica</span>'
+
+
+OVERLAY_CSS = """
+.og{position:absolute;inset:0;color:#ECE7E1;font-family:'Schibsted Grotesk',system-ui,sans-serif}
+.og .logo,.og .wordmark-text{position:absolute;left:72px;top:64px;height:32px;width:auto;color:#ECE7E1;font-weight:800;font-size:34px}
+.og .logo-dot{fill:#2DD4BF}
+.og h1{position:absolute;left:72px;top:214px;margin:0;font-weight:800;font-size:68px;line-height:1.02;letter-spacing:-.025em}
+.og p{position:absolute;left:72px;bottom:62px;margin:0;font-family:'Geist Mono',ui-monospace,monospace;font-weight:400;
+      font-size:19px;letter-spacing:.06em;color:#A59F99}
+.og p b{color:#2DD4BF;font-weight:400;padding:0 .5em}
+"""
+
+
+def overlay():
+    return (f'<div class="og">{wordmark()}<h1>The iLottery<br>market, mapped</h1>'
+            f'<p>iLottery Atlas<b>·</b>fonsica.se/insights</p></div>')
+
+
 def render(page, svg, v, tmp):
+    extra = overlay() if v.get("overlay") else ""
     html = f"""<!doctype html><html><head><meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@600&display=block">
-<style>html,body{{margin:0;background:{v["ground"]}}}svg{{display:block}}</style></head><body>{svg}</body></html>"""
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600&family=Schibsted+Grotesk:wght@800&display=block">
+<style>html,body{{margin:0;background:{v["ground"]}}}body{{position:relative;width:{v["W"]}px;height:{v["H"]}px;overflow:hidden}}svg{{display:block}}{OVERLAY_CSS}</style></head><body>{svg}{extra}</body></html>"""
     page_path = os.path.join(tmp, f"board{v['suffix']}.html")
     open(page_path, "w", encoding="utf-8").write(html)
     master = os.path.join(tmp, f"master{v['suffix']}.png")
@@ -182,6 +214,9 @@ def render(page, svg, v, tmp):
 
 
 def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--only", choices=[v["id"] for v in VARIANTS], help="render one framing instead of all")
+    args = ap.parse_args()
     atlas = json.load(open(ATLAS, encoding="utf-8"))
     os.makedirs(OUT, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
@@ -189,13 +224,15 @@ def main():
         browser = p.chromium.launch(channel=os.environ.get("PLAYWRIGHT_CHANNEL") or None)
         page = browser.new_page(device_scale_factor=2)
         for v in VARIANTS:
+            if args.only and v["id"] != args.only:
+                continue
             img = render(page, build_svg(atlas["register"]["tiles"], v), v, tmp)
             name = NAME + v["suffix"]
             for width in v["widths"]:
                 im = img.resize((width, round(width * v["H"] / v["W"])), Image.LANCZOS)
                 im.save(os.path.join(OUT, f"{name}-{width}.webp"), "WEBP", quality=88, method=6)
             jpg = img.resize((v["jpg"], round(v["jpg"] * v["H"] / v["W"])), Image.LANCZOS)
-            jpg.save(os.path.join(OUT, f"{name}-{v['jpg']}.jpg"), "JPEG", quality=88, optimize=True, progressive=True)
+            jpg.save(os.path.join(OUT, v.get("file") or f"{name}-{v['jpg']}.jpg"), "JPEG", quality=88, optimize=True, progressive=True)
         browser.close()
     for f in sorted(os.listdir(OUT)):
         print(f"{f:40s} {os.path.getsize(os.path.join(OUT, f)) / 1024:7.1f} KB")

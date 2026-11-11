@@ -27,6 +27,8 @@ from decimal import ROUND_HALF_UP, Decimal
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(REPO, "insights", "ilottery", "atlas.json")
 PAGE = os.path.join(REPO, "insights", "ilottery", "index.html")
+HOME = os.path.join(REPO, "index.html")   # the homepage quotes the register size on its Insights card
+PAGES = [PAGE, HOME]
 
 # Every file the build reads, relative to the data folder (update_atlas.py watches these)
 INPUTS = [
@@ -624,12 +626,20 @@ MOVES = [
      "Pollard Banknote", "Selected to build a new iLottery platform; not yet live", "platform"),
     ("2026-06", "Virginia", "upphandling", "Virginia Lottery",
      "Open tender", "iLottery RFP published; bids were due in September", "platform"),
+    ("2026-06", "Thüringer", "ej tilldelad", "Thüringer Staatslotterie, Germany",
+     "Open tender", "Tender published for an eInstant platform with five launch games; bids were due in July", "platform"),
+    ("2026-07", "São Paulo", "SP Loterias", "Loteria do Estado de São Paulo, Brazil",
+     "SP Loterias (Scientific Games and Brightstar)", "Online instant games go live in test operation under the new 15-year state concession", "market"),
     ("2026-07", "Michigan", "Aristocrat", "Michigan Lottery",
      "Aristocrat Interactive", "Platform contract renewed for six years, extending a partnership that began in 2014", "platform"),
     ("2026-07", "Massachusetts", "Aristocrat Interactive (NeoGames)", "Massachusetts State Lottery",
      "Aristocrat Interactive", "iLottery launches on 27 July with more than 20 eInstants", "platform"),
     ("2026-07", "Lotterie Nazionali", "Fennica", "Lotterie Nazionali, Italy",
      "Fennica Gaming via Brightstar", "Fennica eInstants live on Gratta e Vinci online", "content"),
+    ("2026-08", "Michigan", "IWG", "Michigan Lottery",
+     "IWG", "eInstant content deal extended to July 2032, continuing a supply that began in 2016", "content"),
+    ("2026-10", "ONCE", "Brightstar", "ONCE, Spain",
+     "Brightstar Lottery", "Multi-year extension for the central gaming system behind ONCE's draw and instant games", "platform"),
     ("2026-10", "Kentucky", "NeoGames Studio", "Kentucky Lottery",
      "Aristocrat Interactive", "NeoGames Studio eInstants added on the Brightstar platform, starting with The Lamp", "content"),
     ("2026-10", "Massachusetts", "Inspired", "Massachusetts State Lottery",
@@ -639,6 +649,10 @@ MOVES = [
 
 SOURCE_NAMES = {
     "aristocratinteractive.com": "Aristocrat Interactive",
+    "brightstarlottery.com": "Brightstar Lottery",
+    "eegaming.org": "European Gaming",
+    "oeffentlichevergabe.de": "German public procurement register",
+    "yogonet.com": "Yogonet",
     "business.inquirer.net": "Philippine Daily Inquirer",
     "cdnprodpaasmedia-valottery-com.azureedge.net": "Virginia Lottery RFP",
     "entity.ee": "Estonian procurement register via entity.ee",
@@ -662,7 +676,8 @@ MOVE_ISO = {
     "LEIA": ["208", "246", "250", "578", "752"], "Loto-Québec": ["124"], "PCSO": ["608"],
     "Eesti Loto": ["233"], "BCLC": ["124"], "LOTTO24": ["276"], "National Lottery (NLC)": ["710"],
     "Colorado": ["840"], "Virginia": ["840"], "Michigan": ["840"], "Massachusetts": ["840"],
-    "Lotterie Nazionali": ["380"], "Kentucky": ["840"],
+    "Lotterie Nazionali": ["380"], "Kentucky": ["840"], "Thüringer": ["276"], "São Paulo": ["076"],
+    "ONCE": ["724"],
 }
 
 
@@ -830,13 +845,16 @@ def lookup(obj, path):
 
 
 def check_page(atlas):
-    if not os.path.isfile(PAGE):
-        return 0
-    html = open(PAGE, encoding="utf-8").read()
-    missing = [k for k in sorted(set(re.findall(r'data-k="([^"]+)"', html))) if lookup(atlas, k) is None]
-    for k in missing:
-        print(f"  ! page uses data-k=\"{k}\" but atlas.json has no such value", file=sys.stderr)
-    return len(missing)
+    missing = 0
+    for page in PAGES:
+        if not os.path.isfile(page):
+            continue
+        html = open(page, encoding="utf-8").read()
+        for k in sorted(set(re.findall(r'data-k="([^"]+)"', html))):
+            if lookup(atlas, k) is None:
+                print(f"  ! {os.path.relpath(page, REPO)} uses data-k=\"{k}\" but atlas.json has no such value", file=sys.stderr)
+                missing += 1
+    return missing
 
 
 # ---------------------------------------------------------------------------
@@ -890,10 +908,18 @@ def render_page_numbers(html, atlas):
     return re.sub(r'<(span|dd)(\s[^>]*data-k="[^"]+"[^>]*)>([^<]*)</\1>', swap, html)
 
 
+def render_date_modified(html, atlas):
+    """Keep the Dataset description for search engines (JSON-LD) on the day the data was retrieved."""
+    day = atlas["meta"]["data_retrieved"]
+    return re.sub(r'("dateModified":\s*")[^"]*(")', rf"\g<1>{day}\g<2>", html) if day else html
+
+
 # Verified rows left out of the page on purpose, so update reports stop suggesting them
 MOVES_SKIPPED = [
     ("New York Lottery", "Brightstar", "central-system extension; New York sells no eInstants"),
     ("Virginia Lottery", "Random State", "Adam's own studio: left out, see the disclosure on the page"),
+    ("Maryland Lottery", "Intralot", "central-system procurement dispute; Maryland sells no eInstants"),
+    ("Montana Lottery", "Intralot", "central-system contract; Montana sells no eInstants"),
 ]
 
 
@@ -1023,10 +1049,15 @@ def write(atlas):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(atlas, f, ensure_ascii=False, separators=(",", ":"))
-    html = open(PAGE, encoding="utf-8").read()
-    updated = render_page_numbers(html, atlas)
-    if updated != html:
-        open(PAGE, "w", encoding="utf-8").write(updated)
+    for page in PAGES:
+        if not os.path.isfile(page):
+            continue
+        html = open(page, encoding="utf-8").read()
+        updated = render_page_numbers(html, atlas)
+        if page == PAGE:
+            updated = render_date_modified(updated, atlas)
+        if updated != html:
+            open(page, "w", encoding="utf-8").write(updated)
 
 
 if __name__ == "__main__":
